@@ -1,0 +1,91 @@
+/**
+ * 全局 CSS 变量体系
+ * 定义系统设计规范中的所有颜色、间距、圆角、阴影等变量
+ */
+
+:root {
+  /* ==================== 品牌色 ==================== */
+  --ek-color-primary: #409eff;
+  --ek-color-primary-light-3: #79bbff;
+  --ek-color-primary-light-5: #a0cfff;
+  --ek-color-primary-light-7: #c6e2ff;
+  --ek-color-primary-light-8: #d9ecff;
+  --ek-color-primary-light-9: #ecf5ff;
+  --ek-color-primary-dark-2: #337ecc;
+
+  /* ==================== 功能色 ==================== */
+  --ek-color-success: #67c23a;
+  --ek-color-success-light: #e1f3d8;
+  --ek-color-warning: #e6a23c;
+  --ek-color-warning-light: #faecd8;
+  --ek-color-danger: #f56c6c;
+  --ek-color-danger-light: #fde2e2;
+  --ek-color-info: #909399;
+  --ek-color-info-light: #e9e9eb;
+
+  /* ==================== 文字色 ==================== */
+  --ek-text-primary: #303133;
+  --ek-text-regular: #606266;
+  --ek-text-secondary: #909399;
+  --ek-text-placeholder: #a8abb2;
+  --ek-text-disabled: #c0c4cc;
+
+  /* ==================== 边框色 ==================== */
+  --ek-border-color: #dcdfe6;
+  --ek-border-color-light: #e4e7ed;
+  --ek-border-color-lighter: #ebeef5;
+  --ek-border-color-extra-light: #f2f6fc;
+
+  /* ==================== 背景色 ==================== */
+  --ek-bg-color: #ffffff;
+  --ek-bg-color-page: #f5f7fa;
+  --ek-bg-color-overlay: #ffffff;
+
+  /* ==================== 间距系统 ==================== */
+  --ek-spacing-xs: 4px;
+  --ek-spacing-sm: 8px;
+  --ek-spacing-md: 12px;
+  --ek-spacing-base: 16px;
+  --ek-spacing-lg: 20px;
+  --ek-spacing-xl: 24px;
+  --ek-spacing-xxl: 32px;
+
+  /* ==================== 圆角 ==================== */
+  --ek-radius-sm: 2px;
+  --ek-radius-base: 4px;
+  --ek-radius-md: 8px;
+  --ek-radius-lg: 12px;
+  --ek-radius-round: 20px;
+  --ek-radius-circle: 50%;
+
+  /* ==================== 阴影 ==================== */
+  --ek-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --ek-shadow-base: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --ek-shadow-md: 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --ek-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  /* ==================== 过渡动画 ==================== */
+  --ek-transition-duration: 0.3s;
+  --ek-transition-timing: ease-in-out;
+
+  /* ==================== 布局 ==================== */
+  --ek-sidebar-width: 210px;
+  --ek-sidebar-collapsed-width: 64px;
+  --ek-topbar-height: 56px;
+  --ek-content-padding: 20px;
+}
+
+/* ==================== Element Plus 主题色覆盖 ==================== */
+:root {
+  --el-color-primary: var(--ek-color-primary);
+  --el-color-primary-light-3: var(--ek-color-primary-light-3);
+  --el-color-primary-light-5: var(--ek-color-primary-light-5);
+  --el-color-primary-light-7: var(--ek-color-primary-light-7);
+  --el-color-primary-light-8: var(--ek-color-primary-light-8);
+  --el-color-primary-light-9: var(--ek-color-primary-light-9);
+  --el-color-primary-dark-2: var(--ek-color-primary-dark-2);
+  --el-color-success: var(--ek-color-success);
+  --el-color-warning: var(--ek-color-warning);
+  --el-color-danger: var(--ek-color-danger);
+  --el-color-info: var(--ek-color-info);
+}

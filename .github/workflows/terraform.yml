@@ -1,0 +1,254 @@
+name: Terraform 基础设施管理
+
+on:
+  # PR 时自动执行 fmt/validate/plan
+  pull_request:
+    paths:
+      - 'terraform/**'
+    branches:
+      - main
+  # main 分支合并后支持手动触发 apply（不自动执行，防止误操作）
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '执行动作'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+env:
+  TF_VERSION: '1.7.0'
+  TF_WORKING_DIR: './terraform'
+
+jobs:
+  # ─────────────────────────────────────────────
+  # PR 检查：fmt + validate + plan，结果评论到 PR
+  # ─────────────────────────────────────────────
+  terraform-pr-check:
+    name: Terraform PR 检查
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Terraform ${{ env.TF_VERSION }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        id: init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          # 使用阿里云 OSS 作为 Remote Backend
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+        run: |
+          set -e
+          terraform init \
+            -backend-config="access_key=${{ secrets.TF_VAR_ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.TF_VAR_SECRET_KEY }}"
+
+      - name: Terraform Format 检查
+        id: fmt
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform fmt --check --recursive
+        continue-on-error: true
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_access_key: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_rds_staging_password: ${{ secrets.TF_VAR_RDS_STAGING_PASSWORD }}
+          TF_VAR_rds_prod_password: ${{ secrets.TF_VAR_RDS_PROD_PASSWORD }}
+        run: |
+          set -e
+          terraform plan -no-color -out=tfplan 2>&1 | tee plan_output.txt
+        continue-on-error: true
+
+      - name: 将 Plan 结果评论到 PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN_OUTPUT: ${{ steps.plan.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fmtStatus  = '${{ steps.fmt.outcome }}'    === 'success' ? '✅' : '❌';
+            const initStatus = '${{ steps.init.outcome }}'   === 'success' ? '✅' : '❌';
+            const valStatus  = '${{ steps.validate.outcome }}' === 'success' ? '✅' : '❌';
+            const planStatus = '${{ steps.plan.outcome }}'   === 'success' ? '✅' : '❌';
+
+            const fs = require('fs');
+            let planOutput = '';
+            try {
+              planOutput = fs.readFileSync('terraform/plan_output.txt', 'utf8');
+            } catch(e) {
+              planOutput = '无法读取 plan 输出';
+            }
+            // 截断超长输出，避免评论超过 GitHub 限制
+            if (planOutput.length > 60000) {
+              planOutput = planOutput.substring(0, 60000) + '\n\n... (输出过长，已截断)';
+            }
+
+            const body = `## 🏗️ Terraform Plan 结果
+
+            | 步骤 | 状态 |
+            |------|------|
+            | Format 检查 | ${fmtStatus} |
+            | Init        | ${initStatus} |
+            | Validate    | ${valStatus} |
+            | Plan        | ${planStatus} |
+
+            <details><summary>📋 点击展开 Plan 详情</summary>
+
+            \`\`\`hcl
+            ${planOutput}
+            \`\`\`
+            </details>
+
+            > ⚠️ **注意：** \`terraform apply\` 需要 PR 合并到 \`main\` 后，在 GitHub Actions 页面手动触发 \`workflow_dispatch\`，不会自动执行。
+            `;
+
+            // 查找已有评论并更新，避免重复评论
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Terraform Plan 结果')
+            );
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: PR 检查失败时退出
+        if: steps.fmt.outcome == 'failure' || steps.validate.outcome == 'failure' || steps.plan.outcome == 'failure'
+        run: |
+          echo "❌ Terraform 检查失败，请查看上方评论中的详细信息"
+          exit 1
+
+  # ─────────────────────────────────────────────
+  # 手动触发：plan 或 apply（仅 workflow_dispatch）
+  # ─────────────────────────────────────────────
+  terraform-manual:
+    name: Terraform 手动执行 (${{ github.event.inputs.action }})
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      # apply/destroy 需要在 GitHub Environment "infrastructure" 中配置审批人
+      name: ${{ github.event.inputs.action == 'plan' && 'infrastructure-readonly' || 'infrastructure' }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Terraform ${{ env.TF_VERSION }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+        run: |
+          set -e
+          terraform init \
+            -backend-config="access_key=${{ secrets.TF_VAR_ACCESS_KEY }}" \
+            -backend-config="secret_key=${{ secrets.TF_VAR_SECRET_KEY }}"
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_access_key: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_rds_staging_password: ${{ secrets.TF_VAR_RDS_STAGING_PASSWORD }}
+          TF_VAR_rds_prod_password: ${{ secrets.TF_VAR_RDS_PROD_PASSWORD }}
+        run: |
+          set -e
+          terraform plan -no-color -out=tfplan
+
+      - name: Terraform Apply
+        if: github.event.inputs.action == 'apply'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_access_key: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_rds_staging_password: ${{ secrets.TF_VAR_RDS_STAGING_PASSWORD }}
+          TF_VAR_rds_prod_password: ${{ secrets.TF_VAR_RDS_PROD_PASSWORD }}
+        run: |
+          set -e
+          terraform apply -auto-approve tfplan
+
+      - name: Terraform Destroy（危险操作）
+        if: github.event.inputs.action == 'destroy'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_access_key: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          TF_VAR_secret_key: ${{ secrets.TF_VAR_SECRET_KEY }}
+          TF_VAR_rds_staging_password: ${{ secrets.TF_VAR_RDS_STAGING_PASSWORD }}
+          TF_VAR_rds_prod_password: ${{ secrets.TF_VAR_RDS_PROD_PASSWORD }}
+        run: |
+          set -e
+          echo "⚠️ 即将销毁所有阿里云资源，此操作不可逆！"
+          terraform destroy -auto-approve
+
+      - name: 输出关键资源信息
+        if: github.event.inputs.action == 'apply'
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
+        run: |
+          set -e
+          echo "====== 关键资源输出 ======"
+          echo "--- CLB 公网 IP ---"
+          terraform output clb_staging_eip_address || true
+          terraform output clb_prod_eip_address    || true
+          echo "--- RDS 连接地址 ---"
+          terraform output rds_connection_string    || true
+          echo "--- ACK 集群 ID ---"
+          terraform output ack_cluster_id           || true
+          echo "=========================="
+          echo ""
+          echo "✅ Terraform apply 完成！请将以上输出配置到 GitHub Secrets 和 K8s Ingress 中。"

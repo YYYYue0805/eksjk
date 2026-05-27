@@ -1,0 +1,18 @@
+# Production 后端 ClusterIP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: eksjk-backend
+  namespace: eksjk-prod
+  labels:
+    app: eksjk-backend
+    env: prod
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: eksjk-backend

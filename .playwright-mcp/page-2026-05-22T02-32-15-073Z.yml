@@ -1,0 +1,194 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5] [cursor=pointer]:
+      - img "Logo" [ref=e6]
+      - generic [ref=e7]: EKSJK
+    - menubar [ref=e11]:
+      - menuitem "工作台" [ref=e12] [cursor=pointer]:
+        - img [ref=e14]
+        - text: 工作台
+      - menuitem "病例管理" [expanded] [ref=e18]:
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e23]: 病例管理
+          - img [ref=e25]
+        - menu [ref=e27]:
+          - menuitem "性发育异常 (DSD)" [ref=e28] [cursor=pointer]
+          - menuitem "遗传性骨病 (FSS)" [ref=e29] [cursor=pointer]
+          - menuitem "中枢性性早熟 (CPP)" [ref=e30] [cursor=pointer]
+          - menuitem "McCune-Albright (MAS)" [ref=e31] [cursor=pointer]
+          - menuitem "小于胎龄儿 (SGA)" [ref=e32] [cursor=pointer]
+          - menuitem "家族性矮小 (SSS)" [ref=e33] [cursor=pointer]
+          - menuitem "E路童萌 (ELTM)" [ref=e34] [cursor=pointer]
+      - menuitem "健康筛查" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: 健康筛查
+      - menuitem "统计分析" [ref=e41] [cursor=pointer]:
+        - img [ref=e43]
+        - text: 统计分析
+      - menuitem "通知公告" [ref=e45] [cursor=pointer]:
+        - img [ref=e47]
+        - text: 通知公告
+      - menuitem "用户管理" [ref=e51] [cursor=pointer]:
+        - img [ref=e53]
+        - text: 用户管理
+      - menuitem "系统管理" [ref=e55]:
+        - generic [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e60]: 系统管理
+          - img [ref=e62]
+  - generic [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68] [cursor=pointer]
+        - navigation "面包屑" [ref=e70]:
+          - link "病例详情" [ref=e285]
+      - button "超 超级管理员" [ref=e75] [cursor=pointer]:
+        - generic [ref=e76]: 超
+        - generic [ref=e77]: 超级管理员
+        - img [ref=e79]
+    - generic [ref=e82]:
+      - generic [ref=e83]:
+        - heading "性发育异常 (DSD)" [level=2] [ref=e85]
+        - generic [ref=e86]:
+          - button "新建病例" [ref=e87] [cursor=pointer]:
+            - generic [ref=e88]:
+              - img [ref=e90]
+              - text: 新建病例
+          - button "导出Excel" [ref=e92] [cursor=pointer]:
+            - generic [ref=e93]:
+              - img [ref=e95]
+              - text: 导出Excel
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - generic [ref=e100]: 病例编号
+          - textbox "病例编号" [ref=e104]:
+            - /placeholder: 请输入病例编号
+        - generic [ref=e105]:
+          - generic [ref=e106]: 姓名
+          - textbox "姓名" [ref=e110]:
+            - /placeholder: 请输入患者姓名
+        - generic [ref=e111]:
+          - generic [ref=e112]: 性别
+          - generic [ref=e115] [cursor=pointer]:
+            - generic:
+              - combobox "性别" [ref=e117]
+              - generic: 全部
+            - img [ref=e120]
+        - generic [ref=e123]:
+          - button "搜索" [ref=e124] [cursor=pointer]:
+            - generic [ref=e125]:
+              - img [ref=e127]
+              - text: 搜索
+          - button "重置" [ref=e129] [cursor=pointer]:
+            - generic [ref=e130]:
+              - img [ref=e132]
+              - text: 重置
+      - generic [ref=e134]:
+        - generic [ref=e136]:
+          - table [ref=e138]:
+            - rowgroup [ref=e153]:
+              - row "选择所有行 病例编号 姓名 性别 年龄 病历号 身高(cm) 体重(kg) BMI 主诉 导入人员 上传时间 操作" [ref=e154]:
+                - columnheader "选择所有行" [ref=e155]:
+                  - generic "选择所有行" [ref=e157] [cursor=pointer]:
+                    - generic [ref=e158]:
+                      - checkbox "选择所有行"
+                - columnheader "病例编号" [ref=e160]:
+                  - generic [ref=e161]: 病例编号
+                - columnheader "姓名" [ref=e162]:
+                  - generic [ref=e163]: 姓名
+                - columnheader "性别" [ref=e164]:
+                  - generic [ref=e165]: 性别
+                - columnheader "年龄" [ref=e166]:
+                  - generic [ref=e167]: 年龄
+                - columnheader "病历号" [ref=e168]:
+                  - generic [ref=e169]: 病历号
+                - columnheader "身高(cm)" [ref=e170]:
+                  - generic [ref=e171]: 身高(cm)
+                - columnheader "体重(kg)" [ref=e172]:
+                  - generic [ref=e173]: 体重(kg)
+                - columnheader "BMI" [ref=e174]:
+                  - generic [ref=e175]: BMI
+                - columnheader "主诉" [ref=e176]:
+                  - generic [ref=e177]: 主诉
+                - columnheader "导入人员" [ref=e178]:
+                  - generic [ref=e179]: 导入人员
+                - columnheader "上传时间" [ref=e180]:
+                  - generic [ref=e181]: 上传时间
+                - columnheader "操作" [ref=e182]:
+                  - generic [ref=e183]: 操作
+          - table [ref=e188]:
+            - rowgroup [ref=e203]:
+              - row "选择当前行 CASE-008 周小燕 未知 查看 编辑 删除" [ref=e204]:
+                - cell "选择当前行" [ref=e205]:
+                  - generic "选择当前行" [ref=e207] [cursor=pointer]:
+                    - generic [ref=e208]:
+                      - checkbox "选择当前行"
+                - cell "CASE-008" [ref=e210]:
+                  - generic [ref=e211]: CASE-008
+                - cell "周小燕" [ref=e212]:
+                  - generic [ref=e213]: 周小燕
+                - cell "未知" [ref=e214]:
+                  - generic [ref=e215]: 未知
+                - cell [ref=e216]
+                - cell [ref=e217]
+                - cell [ref=e218]
+                - cell [ref=e219]
+                - cell [ref=e220]
+                - cell [ref=e221]
+                - cell [ref=e222]
+                - cell [ref=e223]
+                - cell "查看 编辑 删除" [ref=e224]:
+                  - generic [ref=e225]:
+                    - button "查看" [active] [ref=e226] [cursor=pointer]:
+                      - generic [ref=e227]: 查看
+                    - button "编辑" [ref=e228] [cursor=pointer]:
+                      - generic [ref=e229]: 编辑
+                    - button "删除" [ref=e230] [cursor=pointer]:
+                      - generic [ref=e231]: 删除
+              - row "选择当前行 CASE-001 王小明 未知 查看 编辑 删除" [ref=e232]:
+                - cell "选择当前行" [ref=e233]:
+                  - generic "选择当前行" [ref=e235] [cursor=pointer]:
+                    - generic [ref=e236]:
+                      - checkbox "选择当前行"
+                - cell "CASE-001" [ref=e238]:
+                  - generic [ref=e239]: CASE-001
+                - cell "王小明" [ref=e240]:
+                  - generic [ref=e241]: 王小明
+                - cell "未知" [ref=e242]:
+                  - generic [ref=e243]: 未知
+                - cell [ref=e244]
+                - cell [ref=e245]
+                - cell [ref=e246]
+                - cell [ref=e247]
+                - cell [ref=e248]
+                - cell [ref=e249]
+                - cell [ref=e250]
+                - cell [ref=e251]
+                - cell "查看 编辑 删除" [ref=e252]:
+                  - generic [ref=e253]:
+                    - button "查看" [ref=e254] [cursor=pointer]:
+                      - generic [ref=e255]: 查看
+                    - button "编辑" [ref=e256] [cursor=pointer]:
+                      - generic [ref=e257]: 编辑
+                    - button "删除" [ref=e258] [cursor=pointer]:
+                      - generic [ref=e259]: 删除
+        - generic [ref=e262]:
+          - generic [ref=e263]: 共 2 条
+          - generic [ref=e266] [cursor=pointer]:
+            - generic:
+              - combobox [ref=e268]
+              - generic [ref=e269]: 20条/页
+            - img [ref=e272]
+          - button "上一页" [disabled] [ref=e274]:
+            - generic:
+              - img
+          - list [ref=e275]:
+            - listitem "第 1 页" [ref=e276]: "1"
+          - button "下一页" [disabled] [ref=e277]:
+            - generic:
+              - img
+          - generic [ref=e278]:
+            - generic [ref=e279]: 前往
+            - spinbutton "页" [ref=e282]: "1"
+            - generic [ref=e283]: 页

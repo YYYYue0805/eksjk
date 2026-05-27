@@ -1,0 +1,109 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5] [cursor=pointer]:
+      - img "Logo" [ref=e6]
+      - generic [ref=e7]: EKSJK
+    - menubar [ref=e11]:
+      - menuitem "工作台" [ref=e12] [cursor=pointer]:
+        - img [ref=e14]
+        - text: 工作台
+      - menuitem "病例管理" [expanded] [ref=e18]:
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e23]: 病例管理
+          - img [ref=e25]
+        - menu [ref=e27]:
+          - menuitem "性发育异常 (DSD)" [ref=e28] [cursor=pointer]
+          - menuitem "遗传性骨病 (FSS)" [ref=e29] [cursor=pointer]
+          - menuitem "中枢性性早熟 (CPP)" [ref=e30] [cursor=pointer]
+          - menuitem "McCune-Albright (MAS)" [ref=e31] [cursor=pointer]
+          - menuitem "小于胎龄儿 (SGA)" [ref=e32] [cursor=pointer]
+          - menuitem "家族性矮小 (SSS)" [ref=e33] [cursor=pointer]
+          - menuitem "E路童萌 (ELTM)" [ref=e34] [cursor=pointer]
+      - menuitem "健康筛查" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: 健康筛查
+      - menuitem "统计分析" [ref=e41] [cursor=pointer]:
+        - img [ref=e43]
+        - text: 统计分析
+      - menuitem "通知公告" [ref=e45] [cursor=pointer]:
+        - img [ref=e47]
+        - text: 通知公告
+      - menuitem "用户管理" [ref=e51] [cursor=pointer]:
+        - img [ref=e53]
+        - text: 用户管理
+      - menuitem "系统管理" [ref=e55]:
+        - generic [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e60]: 系统管理
+          - img [ref=e62]
+  - generic [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68] [cursor=pointer]
+        - navigation "面包屑" [ref=e70]:
+          - link "病例详情" [ref=e262]
+      - button "超 超级管理员" [ref=e75] [cursor=pointer]:
+        - generic [ref=e76]: 超
+        - generic [ref=e77]: 超级管理员
+        - img [ref=e79]
+    - generic [ref=e265]:
+      - generic [ref=e266]:
+        - heading "遗传性骨病 (FSS) 病例详情" [level=2] [ref=e268]
+        - generic [ref=e269]:
+          - button "返回列表" [ref=e270] [cursor=pointer]:
+            - generic [ref=e271]: 返回列表
+          - button "编辑" [ref=e272] [cursor=pointer]:
+            - generic [ref=e273]: 编辑
+      - generic [ref=e275]:
+        - tablist [ref=e279]:
+          - tab "基本信息" [ref=e280]
+          - tab "基线-临床信息" [ref=e281]
+          - tab "基线-辅助检查" [ref=e282]
+          - tab "遗传学检查" [active] [selected] [ref=e283] [cursor=pointer]
+          - tab "随访记录" [ref=e284]
+          - tab "诊断" [ref=e285]
+        - generic [ref=e286]:
+          - text: "* * * * *"
+          - tabpanel "遗传学检查" [ref=e748]:
+            - generic [ref=e749]:
+              - generic [ref=e750]: 染色体核型
+              - generic [ref=e753]:
+                - generic [ref=e754]: 染色体核型
+                - textbox "染色体核型" [disabled] [ref=e758]:
+                  - /placeholder: 请输入染色体核型（如 46,XY）
+              - generic [ref=e759]: 基因突变检测
+              - generic [ref=e762]:
+                - table [ref=e764]:
+                  - rowgroup [ref=e772]:
+                    - row "基因名称 突变位点 突变类型 测序方法 遗传模式 致病性评级" [ref=e773]:
+                      - columnheader "基因名称" [ref=e774]:
+                        - generic [ref=e775]: 基因名称
+                      - columnheader "突变位点" [ref=e776]:
+                        - generic [ref=e777]: 突变位点
+                      - columnheader "突变类型" [ref=e778]:
+                        - generic [ref=e779]: 突变类型
+                      - columnheader "测序方法" [ref=e780]:
+                        - generic [ref=e781]: 测序方法
+                      - columnheader "遗传模式" [ref=e782]:
+                        - generic [ref=e783]: 遗传模式
+                      - columnheader "致病性评级" [ref=e784]:
+                        - generic [ref=e785]: 致病性评级
+                - generic [ref=e789]:
+                  - table:
+                    - rowgroup
+                  - generic [ref=e791]: 暂无数据
+              - generic [ref=e793]: 生物样本库
+              - generic [ref=e794]:
+                - generic [ref=e796]:
+                  - generic [ref=e797]: 患者样本
+                  - textbox "患者样本" [disabled] [ref=e801]:
+                    - /placeholder: 样本编号
+                - generic [ref=e803]:
+                  - generic [ref=e804]: 父亲样本
+                  - textbox "父亲样本" [disabled] [ref=e808]:
+                    - /placeholder: 样本编号
+                - generic [ref=e810]:
+                  - generic [ref=e811]: 母亲样本
+                  - textbox "母亲样本" [disabled] [ref=e815]:
+                    - /placeholder: 样本编号

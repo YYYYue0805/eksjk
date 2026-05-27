@@ -1,0 +1,162 @@
+/**
+ * 通用样式工具类
+ * 提供间距、对齐、文本截断、Flex 布局等辅助类
+ */
+
+/* ==================== 间距工具类 ==================== */
+/* margin */
+.mt-xs { margin-top: var(--ek-spacing-xs); }
+.mt-sm { margin-top: var(--ek-spacing-sm); }
+.mt-md { margin-top: var(--ek-spacing-md); }
+.mt-base { margin-top: var(--ek-spacing-base); }
+.mt-lg { margin-top: var(--ek-spacing-lg); }
+.mt-xl { margin-top: var(--ek-spacing-xl); }
+
+.mb-xs { margin-bottom: var(--ek-spacing-xs); }
+.mb-sm { margin-bottom: var(--ek-spacing-sm); }
+.mb-md { margin-bottom: var(--ek-spacing-md); }
+.mb-base { margin-bottom: var(--ek-spacing-base); }
+.mb-lg { margin-bottom: var(--ek-spacing-lg); }
+.mb-xl { margin-bottom: var(--ek-spacing-xl); }
+
+.ml-xs { margin-left: var(--ek-spacing-xs); }
+.ml-sm { margin-left: var(--ek-spacing-sm); }
+.ml-md { margin-left: var(--ek-spacing-md); }
+.ml-base { margin-left: var(--ek-spacing-base); }
+
+.mr-xs { margin-right: var(--ek-spacing-xs); }
+.mr-sm { margin-right: var(--ek-spacing-sm); }
+.mr-md { margin-right: var(--ek-spacing-md); }
+.mr-base { margin-right: var(--ek-spacing-base); }
+
+/* padding */
+.pt-xs { padding-top: var(--ek-spacing-xs); }
+.pt-sm { padding-top: var(--ek-spacing-sm); }
+.pt-md { padding-top: var(--ek-spacing-md); }
+.pt-base { padding-top: var(--ek-spacing-base); }
+.pt-lg { padding-top: var(--ek-spacing-lg); }
+
+.pb-xs { padding-bottom: var(--ek-spacing-xs); }
+.pb-sm { padding-bottom: var(--ek-spacing-sm); }
+.pb-md { padding-bottom: var(--ek-spacing-md); }
+.pb-base { padding-bottom: var(--ek-spacing-base); }
+.pb-lg { padding-bottom: var(--ek-spacing-lg); }
+
+.pl-xs { padding-left: var(--ek-spacing-xs); }
+.pl-sm { padding-left: var(--ek-spacing-sm); }
+.pl-md { padding-left: var(--ek-spacing-md); }
+.pl-base { padding-left: var(--ek-spacing-base); }
+
+.pr-xs { padding-right: var(--ek-spacing-xs); }
+.pr-sm { padding-right: var(--ek-spacing-sm); }
+.pr-md { padding-right: var(--ek-spacing-md); }
+.pr-base { padding-right: var(--ek-spacing-base); }
+
+.p-xs { padding: var(--ek-spacing-xs); }
+.p-sm { padding: var(--ek-spacing-sm); }
+.p-md { padding: var(--ek-spacing-md); }
+.p-base { padding: var(--ek-spacing-base); }
+.p-lg { padding: var(--ek-spacing-lg); }
+.p-xl { padding: var(--ek-spacing-xl); }
+
+/* ==================== 文本对齐 ==================== */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* ==================== 文本截断 ==================== */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.text-ellipsis-3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* ==================== Flex 布局辅助类 ==================== */
+.flex {
+  display: flex;
+}
+
+.flex-inline {
+  display: inline-flex;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* 主轴对齐 */
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+/* 交叉轴对齐 */
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+/* 常用组合 */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ==================== 其他工具类 ==================== */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }

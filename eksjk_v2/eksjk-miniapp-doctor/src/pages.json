@@ -1,0 +1,101 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "工作台"
+      }
+    },
+    {
+      "path": "pages/patient/index",
+      "style": {
+        "navigationBarTitleText": "患者"
+      }
+    },
+    {
+      "path": "pages/stats/index",
+      "style": {
+        "navigationBarTitleText": "统计"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "pages-sub",
+      "pages": [
+        {
+          "path": "login/index",
+          "style": { "navigationBarTitleText": "登录" }
+        },
+        {
+          "path": "login/bindAccount",
+          "style": { "navigationBarTitleText": "绑定账号" }
+        },
+        {
+          "path": "patient/detail",
+          "style": { "navigationBarTitleText": "患者详情" }
+        },
+        {
+          "path": "followup/create",
+          "style": { "navigationBarTitleText": "新增随访" }
+        },
+        {
+          "path": "review/index",
+          "style": { "navigationBarTitleText": "数据审核" }
+        },
+        {
+          "path": "review/detail",
+          "style": { "navigationBarTitleText": "审核详情" }
+        },
+        {
+          "path": "mine/qrcode",
+          "style": { "navigationBarTitleText": "我的二维码" }
+        }
+      ]
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "儿科生长发育管理(医生版)",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#409EFF",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "工作台",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/patient/index",
+        "text": "患者",
+        "iconPath": "static/tab/patient.png",
+        "selectedIconPath": "static/tab/patient-active.png"
+      },
+      {
+        "pagePath": "pages/stats/index",
+        "text": "统计",
+        "iconPath": "static/tab/stats.png",
+        "selectedIconPath": "static/tab/stats-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/tab/mine.png",
+        "selectedIconPath": "static/tab/mine-active.png"
+      }
+    ]
+  }
+}

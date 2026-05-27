@@ -1,0 +1,37 @@
+# Production Ingress 统一访问入口
+# CLB-prod 的 EIP 通过 Terraform 创建，绑定到此 Ingress 所在 Namespace
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eksjk-ingress
+  namespace: eksjk-prod
+  labels:
+    app: eksjk
+    env: prod
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    # 绑定 Terraform 创建的 CLB-prod 实例（填入 terraform output 中的 clb_prod_id）
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-id: "lb-uf61bz8yvbsk8z61y4mhx"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: prod.eksjk.zsmm.org.cn
+      http:
+        paths:
+          # API 请求转发至后端
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-backend
+                port:
+                  number: 8080
+          # 其他请求转发至前端
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-frontend
+                port:
+                  number: 80

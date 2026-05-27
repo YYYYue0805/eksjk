@@ -1,0 +1,60 @@
+# Production 前端 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-frontend
+  namespace: eksjk-prod
+  labels:
+    app: eksjk-frontend
+    env: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-frontend
+  template:
+    metadata:
+      labels:
+        app: eksjk-frontend
+        env: prod
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: eksjk-frontend-config
+            items:
+              - key: nginx.conf
+                path: default.conf
+      containers:
+        - name: frontend
+          # 镜像 tag 由 GitHub Actions CD 自动更新为 {version_tag}（如 v1.2.0）
+          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

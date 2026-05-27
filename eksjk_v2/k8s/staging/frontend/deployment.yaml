@@ -1,0 +1,60 @@
+# Staging 前端 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-frontend
+  namespace: eksjk-staging
+  labels:
+    app: eksjk-frontend
+    env: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-frontend
+  template:
+    metadata:
+      labels:
+        app: eksjk-frontend
+        env: staging
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: eksjk-frontend-config
+            items:
+              - key: nginx.conf
+                path: default.conf
+      containers:
+        - name: frontend
+          # 镜像 tag 由 GitHub Actions CI 自动更新为 develop-{short_sha}
+          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-frontend:develop-3d9dc2d
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

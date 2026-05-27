@@ -1,0 +1,120 @@
+/**
+ * 全局排版规范
+ * 定义标题层级、正文字号、行高等排版规则
+ */
+
+/* ==================== 标题层级 ==================== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ek-text-primary);
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  font-size: 12px;
+}
+
+/* ==================== 正文 ==================== */
+p {
+  color: var(--ek-text-regular);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ==================== 辅助文字 ==================== */
+small,
+.text-sm {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.text-xs {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.text-lg {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.text-xl {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* ==================== 文字颜色 ==================== */
+.text-primary {
+  color: var(--ek-text-primary) !important;
+}
+
+.text-regular {
+  color: var(--ek-text-regular) !important;
+}
+
+.text-secondary {
+  color: var(--ek-text-secondary) !important;
+}
+
+.text-placeholder {
+  color: var(--ek-text-placeholder) !important;
+}
+
+.text-disabled {
+  color: var(--ek-text-disabled) !important;
+}
+
+.text-success {
+  color: var(--ek-color-success) !important;
+}
+
+.text-warning {
+  color: var(--ek-color-warning) !important;
+}
+
+.text-danger {
+  color: var(--ek-color-danger) !important;
+}
+
+.text-info {
+  color: var(--ek-color-info) !important;
+}
+
+/* ==================== 文字粗细 ==================== */
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}

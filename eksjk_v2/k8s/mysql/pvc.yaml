@@ -1,0 +1,14 @@
+# MySQL 数据持久化存储
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eksjk-mysql-pvc
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

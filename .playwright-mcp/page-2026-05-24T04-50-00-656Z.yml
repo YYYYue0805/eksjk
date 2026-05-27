@@ -1,0 +1,94 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5] [cursor=pointer]:
+      - img "Logo" [ref=e6]
+      - generic [ref=e7]: EKSJK
+    - menubar [ref=e11]:
+      - menuitem "工作台" [ref=e12] [cursor=pointer]:
+        - img [ref=e14]
+        - text: 工作台
+      - menuitem "病例管理" [expanded] [ref=e18]:
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e23]: 病例管理
+          - img [ref=e25]
+        - menu [ref=e27]:
+          - menuitem "性发育异常 (DSD)" [ref=e28] [cursor=pointer]
+          - menuitem "遗传性骨病 (FSS)" [ref=e29] [cursor=pointer]
+          - menuitem "中枢性性早熟 (CPP)" [ref=e30] [cursor=pointer]
+          - menuitem "McCune-Albright (MAS)" [ref=e31] [cursor=pointer]
+          - menuitem "小于胎龄儿 (SGA)" [ref=e32] [cursor=pointer]
+          - menuitem "家族性矮小 (SSS)" [ref=e33] [cursor=pointer]
+          - menuitem "E路童萌 (ELTM)" [ref=e34] [cursor=pointer]
+      - menuitem "健康筛查" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: 健康筛查
+      - menuitem "统计分析" [ref=e41] [cursor=pointer]:
+        - img [ref=e43]
+        - text: 统计分析
+      - menuitem "通知公告" [ref=e45] [cursor=pointer]:
+        - img [ref=e47]
+        - text: 通知公告
+      - menuitem "用户管理" [ref=e51] [cursor=pointer]:
+        - img [ref=e53]
+        - text: 用户管理
+      - menuitem "系统管理" [ref=e55]:
+        - generic [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e60]: 系统管理
+          - img [ref=e62]
+  - generic [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68] [cursor=pointer]
+        - navigation "面包屑" [ref=e70]:
+          - link "病例详情" [ref=e262]
+      - button "超 超级管理员" [ref=e75] [cursor=pointer]:
+        - generic [ref=e76]: 超
+        - generic [ref=e77]: 超级管理员
+        - img [ref=e79]
+    - generic [ref=e265]:
+      - generic [ref=e266]:
+        - heading "遗传性骨病 (FSS) 病例详情" [level=2] [ref=e268]
+        - generic [ref=e269]:
+          - button "返回列表" [ref=e270] [cursor=pointer]:
+            - generic [ref=e271]: 返回列表
+          - button "编辑" [ref=e272] [cursor=pointer]:
+            - generic [ref=e273]: 编辑
+      - generic [ref=e275]:
+        - tablist [ref=e279]:
+          - tab "基本信息" [ref=e280]
+          - tab "基线-临床信息" [ref=e281]
+          - tab "基线-辅助检查" [ref=e282]
+          - tab "遗传学检查" [ref=e283]
+          - tab "随访记录" [active] [selected] [ref=e284] [cursor=pointer]
+          - tab "诊断" [ref=e285]
+        - generic [ref=e286]:
+          - text: "* * * * *"
+          - tabpanel "随访记录" [ref=e816]:
+            - button "新增随访" [disabled] [ref=e818]:
+              - generic [ref=e819]:
+                - img [ref=e821]
+                - text: 新增随访
+            - generic [ref=e823]:
+              - radiogroup "radio-group" [ref=e825]:
+                - generic [ref=e826]:
+                  - radio "身高" [checked] [disabled] [ref=e827]
+                  - generic [ref=e828]: 身高
+                - generic [ref=e829]:
+                  - radio "体重" [disabled] [ref=e830]
+                  - generic [ref=e831]: 体重
+                - generic [ref=e832]:
+                  - radio "BMI" [disabled] [ref=e833]
+                  - generic [ref=e834]: BMI
+              - list [ref=e838]:
+                - listitem [ref=e839]:
+                  - generic [ref=e841]:
+                    - generic [ref=e842]: 2026/5/12
+                    - generic [ref=e847] [cursor=pointer]:
+                      - button "查看" [disabled] [ref=e848]:
+                        - generic [ref=e849]: 查看
+                      - button "编辑" [disabled] [ref=e850]:
+                        - generic [ref=e851]: 编辑
+                      - button "删除" [disabled] [ref=e852]:
+                        - generic [ref=e853]: 删除

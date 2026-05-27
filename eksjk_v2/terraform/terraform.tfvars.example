@@ -1,0 +1,43 @@
+# ============================================================
+# terraform.tfvars 示例文件
+# 复制此文件为 terraform.tfvars 并填入真实值
+# 注意：terraform.tfvars 已加入 .gitignore，不会提交到 Git
+# ============================================================
+
+# 阿里云认证（必填）
+access_key = "YOUR_ALIYUN_ACCESS_KEY_ID"
+secret_key = "YOUR_ALIYUN_ACCESS_KEY_SECRET"
+
+# 地域配置（可选，默认华东2上海）
+region            = "cn-shanghai"
+availability_zone = "cn-shanghai-b"
+
+# 网络配置（可选，使用默认值即可）
+vpc_cidr     = "172.16.0.0/12"
+vswitch_cidr = "172.16.0.0/24"
+
+# ACK 集群配置（可选）
+k8s_version          = "1.34.3-aliyun.1"
+# 上海 B 区可用规格（经 data "alicloud_instance_types" 实测）：
+#   2C8G: ecs.g7a.large / ecs.g6a.large / ecs.u1-c1m4.large / ecs.g9i.large
+#   2C4G: ecs.c7a.large / ecs.u1-c1m2.large / ecs.c9i.large
+#   4C8G: ecs.c7a.xlarge / ecs.hfc7.xlarge / ecs.c9i.xlarge
+# 注意：标准 ecs.g7.large / ecs.c6.xlarge / ecs.g6.xlarge 在本账号 B 区未授权
+worker_instance_type = "ecs.g7a.large"
+worker_disk_size     = 40
+
+# RDS 配置（Serverless，上海 Serverless MySQL 仅 cn-shanghai-m 支持）
+rds_instance_type            = "mysql.n2.serverless.1c"
+rds_storage_size             = 20
+rds_zone_id                  = "cn-shanghai-m"
+rds_vswitch_cidr             = "172.16.1.0/24"
+rds_serverless_min_capacity  = 0.5
+rds_serverless_max_capacity  = 4
+
+# RDS 数据库账号密码（必填，请使用强密码）
+# 密码要求：8-32位，包含大小写字母、数字、特殊字符
+rds_staging_password = "Staging@Eksjk2024!"
+rds_prod_password    = "Prod@Eksjk2024!"
+
+# 项目名称（可选，默认 eksjk）
+project_name = "eksjk"

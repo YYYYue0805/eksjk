@@ -1,0 +1,22 @@
+# Staging 命名空间
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eksjk-staging
+  labels:
+    env: staging
+    app: eksjk
+---
+# Staging 资源配额，防止抢占 prod 资源
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: eksjk-staging-quota
+  namespace: eksjk-staging
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "4Gi"
+    limits.cpu: "3500m"
+    limits.memory: "10Gi"
+    pods: "10"

@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-minio
+  namespace: eksjk
+  labels:
+    app: eksjk-minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-minio
+  template:
+    metadata:
+      labels:
+        app: eksjk-minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        env:
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+        # 注意：官方 minio/minio 镜像不支持 MINIO_DEFAULT_BUCKETS（那是 bitnami 的特性），
+        # 所以使用 command 在 server 启动后用 mc 创建桶（已存在则忽略，幂等）
+        command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          # 后台启动 MinIO server
+          minio server /data --console-address ":9001" &
+          MINIO_PID=$!
+          # 等待 MinIO 就绪后创建默认桶
+          until mc alias set local http://127.0.0.1:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; do
+            sleep 1
+          done
+          mc mb --ignore-existing local/eksjk-files
+          echo "[init] bucket eksjk-files ready"
+          # 前台等待 MinIO 主进程
+          wait $MINIO_PID
+        volumeMounts:
+        - name: minio-data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /minio/health/ready
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: minio-data
+        persistentVolumeClaim:
+          claimName: eksjk-minio-pvc

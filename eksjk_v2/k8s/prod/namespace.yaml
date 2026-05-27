@@ -1,0 +1,22 @@
+# Production 命名空间
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eksjk-prod
+  labels:
+    env: prod
+    app: eksjk
+---
+# Production 资源配额，防止被 staging 抢占
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: eksjk-prod-quota
+  namespace: eksjk-prod
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "3"
+    limits.memory: "3Gi"
+    pods: "10"

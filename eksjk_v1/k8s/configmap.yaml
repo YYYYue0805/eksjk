@@ -1,0 +1,49 @@
+# ============================================================
+# K8s 命名空间 + ConfigMap + Secret
+# ============================================================
+
+---
+# 创建专用命名空间
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eksjk
+  labels:
+    app: eksjk
+
+---
+# ConfigMap - 非敏感配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eksjk-config
+  namespace: eksjk
+  labels:
+    app: eksjk
+data:
+  # 数据库名称
+  db-name: "eksjk"
+  # Django 配置
+  django-debug: "False"
+  django-allowed-hosts: "*"
+  # 存储根路径
+  storage-root: "/data/storage"
+
+---
+# Secret - 敏感配置（base64 编码）
+# 注意：部署脚本会自动生成此文件，这里仅作为模板
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eksjk-secret
+  namespace: eksjk
+  labels:
+    app: eksjk
+type: Opaque
+data:
+  # echo -n 'root' | base64
+  db-user: cm9vdA==
+  # echo -n '123456' | base64
+  db-password: MTIzNDU2
+  # echo -n 'p@m&_v$ijv7hsd0w_4h4i#j9ra6j75-b*l)f$_27j+$#ix1i8y' | base64
+  django-secret-key: cEBtJl92JGlqdjdoc2Qwd180aDRpI2o5cmE2ajc1LWIqbClmJF8yN2orJCNpeDFpOHk=

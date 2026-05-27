@@ -1,0 +1,55 @@
+# 后端 Spring Boot K8S 专用配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eksjk-backend-config
+  namespace: eksjk
+  labels:
+    app: eksjk-backend
+data:
+  application-k8s.yml: |
+    # EKSJK V2 后端 — K8S 环境配置
+    spring:
+      datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://eksjk-mysql.eksjk.svc.cluster.local:3306/eksjk?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: ${SPRING_DATASOURCE_USERNAME:eksjk}
+        password: ${SPRING_DATASOURCE_PASSWORD:eksjk123}
+        hikari:
+          minimum-idle: 5
+          maximum-pool-size: 20
+          idle-timeout: 30000
+          max-lifetime: 1800000
+          connection-timeout: 30000
+          pool-name: EksjkHikariPool
+
+    # K8S 环境日志级别
+    logging:
+      level:
+        root: INFO
+        com.eksjk: DEBUG
+
+    # 文件上传配置 - S3对象存储（MinIO）
+    eksjk:
+      upload:
+        storage-type: s3
+        s3:
+          endpoint: http://eksjk-minio.eksjk.svc.cluster.local:9000
+          region: us-east-1
+          bucket: eksjk-files
+          access-key: minioadmin
+          secret-key: minioadmin
+
+    # Actuator 暴露更多端点（含 Prometheus）
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,metrics
+      endpoint:
+        health:
+          show-details: always
+      metrics:
+        export:
+          prometheus:
+            enabled: true

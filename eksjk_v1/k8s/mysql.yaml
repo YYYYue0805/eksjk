@@ -1,0 +1,119 @@
+# ============================================================
+# MySQL 数据库 K8s 部署清单
+# 包含: PersistentVolumeClaim + Deployment + Service
+# ============================================================
+
+---
+# MySQL 数据持久化存储卷声明
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# MySQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-mysql
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: eksjk-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eksjk-secret
+                  key: db-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: eksjk-config
+                  key: db-name
+            - name: MYSQL_CHARSET
+              value: "utf8mb4"
+          args:
+            - "--character-set-server=utf8mb4"
+            - "--collation-server=utf8mb4_unicode_ci"
+            - "--max-connections=200"
+            - "--default-authentication-plugin=mysql_native_password"
+            - "--innodb-strict-mode=0"
+            - "--innodb-default-row-format=dynamic"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "mysql -h localhost -u root -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+# MySQL Service（集群内部访问）
+apiVersion: v1
+kind: Service
+metadata:
+  name: eksjk-mysql
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: eksjk-mysql

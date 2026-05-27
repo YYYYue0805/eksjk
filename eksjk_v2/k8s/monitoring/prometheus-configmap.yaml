@@ -1,0 +1,28 @@
+# Prometheus 抓取配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eksjk-prometheus-config
+  namespace: eksjk
+  labels:
+    app: eksjk-prometheus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      # 抓取后端 Spring Boot Actuator Prometheus 端点
+      - job_name: 'eksjk-backend'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets: ['eksjk-backend.eksjk.svc.cluster.local:8080']
+            labels:
+              application: 'eksjk-backend'
+              environment: 'k8s-local'
+
+      # Prometheus 自身监控
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']

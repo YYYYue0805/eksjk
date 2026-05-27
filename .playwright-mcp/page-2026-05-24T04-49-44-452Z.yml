@@ -1,0 +1,149 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5] [cursor=pointer]:
+      - img "Logo" [ref=e6]
+      - generic [ref=e7]: EKSJK
+    - menubar [ref=e11]:
+      - menuitem "工作台" [ref=e12] [cursor=pointer]:
+        - img [ref=e14]
+        - text: 工作台
+      - menuitem "病例管理" [expanded] [ref=e18]:
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e23]: 病例管理
+          - img [ref=e25]
+        - menu [ref=e27]:
+          - menuitem "性发育异常 (DSD)" [ref=e28] [cursor=pointer]
+          - menuitem "遗传性骨病 (FSS)" [ref=e29] [cursor=pointer]
+          - menuitem "中枢性性早熟 (CPP)" [ref=e30] [cursor=pointer]
+          - menuitem "McCune-Albright (MAS)" [ref=e31] [cursor=pointer]
+          - menuitem "小于胎龄儿 (SGA)" [ref=e32] [cursor=pointer]
+          - menuitem "家族性矮小 (SSS)" [ref=e33] [cursor=pointer]
+          - menuitem "E路童萌 (ELTM)" [ref=e34] [cursor=pointer]
+      - menuitem "健康筛查" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: 健康筛查
+      - menuitem "统计分析" [ref=e41] [cursor=pointer]:
+        - img [ref=e43]
+        - text: 统计分析
+      - menuitem "通知公告" [ref=e45] [cursor=pointer]:
+        - img [ref=e47]
+        - text: 通知公告
+      - menuitem "用户管理" [ref=e51] [cursor=pointer]:
+        - img [ref=e53]
+        - text: 用户管理
+      - menuitem "系统管理" [ref=e55]:
+        - generic [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+          - generic [ref=e60]: 系统管理
+          - img [ref=e62]
+  - generic [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - img [ref=e68] [cursor=pointer]
+        - navigation "面包屑" [ref=e70]:
+          - link "病例详情" [ref=e262]
+      - button "超 超级管理员" [ref=e75] [cursor=pointer]:
+        - generic [ref=e76]: 超
+        - generic [ref=e77]: 超级管理员
+        - img [ref=e79]
+    - generic [ref=e265]:
+      - generic [ref=e266]:
+        - heading "遗传性骨病 (FSS) 病例详情" [level=2] [ref=e268]
+        - generic [ref=e269]:
+          - button "返回列表" [ref=e270] [cursor=pointer]:
+            - generic [ref=e271]: 返回列表
+          - button "编辑" [ref=e272] [cursor=pointer]:
+            - generic [ref=e273]: 编辑
+      - generic [ref=e275]:
+        - tablist [ref=e279]:
+          - tab "基本信息" [ref=e280]
+          - tab "基线-临床信息" [ref=e281]
+          - tab "基线-辅助检查" [active] [selected] [ref=e282] [cursor=pointer]
+          - tab "遗传学检查" [ref=e283]
+          - tab "随访记录" [ref=e284]
+          - tab "诊断" [ref=e285]
+        - generic [ref=e286]:
+          - text: "* * * * *"
+          - tabpanel "基线-辅助检查" [ref=e595]:
+            - generic [ref=e596]:
+              - generic [ref=e597]: 性激素及相关
+              - generic [ref=e598]:
+                - generic [ref=e600]:
+                  - generic [ref=e601]: LH (mIU/mL)
+                  - textbox "LH (mIU/mL)" [disabled] [ref=e605]:
+                    - /placeholder: LH
+                - generic [ref=e607]:
+                  - generic [ref=e608]: FSH (mIU/mL)
+                  - textbox "FSH (mIU/mL)" [disabled] [ref=e612]:
+                    - /placeholder: FSH
+                - generic [ref=e614]:
+                  - generic [ref=e615]: E2 (pg/mL)
+                  - textbox "E2 (pg/mL)" [disabled] [ref=e619]:
+                    - /placeholder: E2
+                - generic [ref=e621]:
+                  - generic [ref=e622]: T (ng/dL)
+                  - textbox "T (ng/dL)" [disabled] [ref=e626]:
+                    - /placeholder: T
+                - generic [ref=e628]:
+                  - generic [ref=e629]: PRL (ng/mL)
+                  - textbox "PRL (ng/mL)" [disabled] [ref=e633]:
+                    - /placeholder: PRL
+              - generic [ref=e634]: 生长因子与代谢
+              - generic [ref=e635]:
+                - generic [ref=e637]:
+                  - generic [ref=e638]: IGF-1 (ng/mL)
+                  - textbox "IGF-1 (ng/mL)" [disabled] [ref=e642]:
+                    - /placeholder: IGF-1
+                - generic [ref=e644]:
+                  - generic [ref=e645]: IGFBP-3 (ug/mL)
+                  - textbox "IGFBP-3 (ug/mL)" [disabled] [ref=e649]:
+                    - /placeholder: IGFBP-3
+                - generic [ref=e651]:
+                  - generic [ref=e652]: 空腹血糖 (mmol/L)
+                  - textbox "空腹血糖 (mmol/L)" [disabled] [ref=e656]:
+                    - /placeholder: 空腹血糖
+                - generic [ref=e658]:
+                  - generic [ref=e659]: 空腹胰岛素 (uIU/mL)
+                  - textbox "空腹胰岛素 (uIU/mL)" [disabled] [ref=e663]:
+                    - /placeholder: 空腹胰岛素
+                - generic [ref=e665]:
+                  - generic [ref=e666]: 糖化血红蛋白 (%)
+                  - textbox "糖化血红蛋白 (%)" [disabled] [ref=e670]:
+                    - /placeholder: 糖化血红蛋白
+              - generic [ref=e671]: 肾上腺激素
+              - generic [ref=e672]:
+                - generic [ref=e674]:
+                  - generic [ref=e675]: ACTH (pg/mL)
+                  - textbox "ACTH (pg/mL)" [disabled] [ref=e679]:
+                    - /placeholder: ACTH
+                - generic [ref=e681]:
+                  - generic [ref=e682]: 皮质醇 (ug/dL)
+                  - textbox "皮质醇 (ug/dL)" [disabled] [ref=e686]:
+                    - /placeholder: 皮质醇
+                - generic [ref=e688]:
+                  - generic [ref=e689]: DHEA-S (ug/dL)
+                  - textbox "DHEA-S (ug/dL)" [disabled] [ref=e693]:
+                    - /placeholder: DHEA-S
+              - generic [ref=e694]: 影像检查
+              - generic [ref=e695]:
+                - generic [ref=e697]:
+                  - generic [ref=e698]: 性腺B超
+                  - textbox "性腺B超" [disabled] [ref=e701]
+                - generic [ref=e703]:
+                  - generic [ref=e704]: 垂体MRI
+                  - textbox "垂体MRI" [disabled] [ref=e707]
+                - generic [ref=e709]:
+                  - generic [ref=e710]: 甲状腺B超
+                  - textbox "甲状腺B超" [disabled] [ref=e713]
+                - generic [ref=e715]:
+                  - generic [ref=e716]: 骨密度
+                  - textbox "骨密度" [disabled] [ref=e719]
+              - generic [ref=e720]: 影像资料上传
+              - generic [ref=e721]:
+                - list [ref=e723]:
+                  - button [ref=e724] [cursor=pointer]:
+                    - img [ref=e726]
+                - generic [ref=e728]:
+                  - img [ref=e730]
+                  - paragraph [ref=e747]: 暂无影像资料

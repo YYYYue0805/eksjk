@@ -1,0 +1,58 @@
+{
+  "name": "wjw-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "area-data-vue": "^1.0.9",
+    "area-linkage-vue": "^5.1.2",
+    "axios": "^0.19.2",
+    "core-js": "^3.6.4",
+    "cornerstone-core": "^2.3.0",
+    "cornerstone-tools": "^4.12.5",
+    "dicom-parser": "^1.8.5",
+    "echarts": "^4.8.0",
+    "element-china-area-data": "^5.0.2",
+    "element-ui": "^2.13.0",
+    "jsencrypt": "^3.0.0-rc.1",
+    "qrcode.vue": "^1.7.0",
+    "utif": "^3.1.0",
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.5",
+    "vue-simple-uploader": "^0.7.5",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.2.0",
+    "@vue/cli-plugin-eslint": "~4.2.0",
+    "@vue/cli-service": "~4.2.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.1.2",
+    "less": "^3.11.1",
+    "less-loader": "^5.0.0",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}

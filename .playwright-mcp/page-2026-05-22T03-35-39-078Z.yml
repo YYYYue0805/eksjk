@@ -1,0 +1,202 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e49]:
+    - generic [ref=e50]:
+      - generic [ref=e51] [cursor=pointer]:
+        - img "Logo" [ref=e52]
+        - generic [ref=e53]: EKSJK
+      - menubar [ref=e57]:
+        - menuitem "工作台" [ref=e58] [cursor=pointer]:
+          - img [ref=e60]
+          - text: 工作台
+        - menuitem "病例管理" [expanded] [ref=e64]:
+          - generic [ref=e65] [cursor=pointer]:
+            - img [ref=e67]
+            - generic [ref=e69]: 病例管理
+            - img [ref=e71]
+          - menu [ref=e73]:
+            - menuitem "性发育异常 (DSD)" [ref=e74] [cursor=pointer]
+            - menuitem "遗传性骨病 (FSS)" [ref=e75] [cursor=pointer]
+            - menuitem "中枢性性早熟 (CPP)" [ref=e76] [cursor=pointer]
+            - menuitem "McCune-Albright (MAS)" [ref=e77] [cursor=pointer]
+            - menuitem "小于胎龄儿 (SGA)" [ref=e78] [cursor=pointer]
+            - menuitem "家族性矮小 (SSS)" [ref=e79] [cursor=pointer]
+            - menuitem "E路童萌 (ELTM)" [ref=e80] [cursor=pointer]
+        - menuitem "健康筛查" [ref=e81] [cursor=pointer]:
+          - img [ref=e83]
+          - text: 健康筛查
+        - menuitem "统计分析" [ref=e87] [cursor=pointer]:
+          - img [ref=e89]
+          - text: 统计分析
+        - menuitem "通知公告" [ref=e91] [cursor=pointer]:
+          - img [ref=e93]
+          - text: 通知公告
+        - menuitem "用户管理" [ref=e97] [cursor=pointer]:
+          - img [ref=e99]
+          - text: 用户管理
+        - menuitem "系统管理" [ref=e101]:
+          - generic [ref=e102] [cursor=pointer]:
+            - img [ref=e104]
+            - generic [ref=e106]: 系统管理
+            - img [ref=e108]
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - generic [ref=e112]:
+          - img [ref=e114] [cursor=pointer]
+          - navigation "面包屑" [ref=e116]:
+            - link "病例管理" [ref=e118]
+        - button "超 超级管理员" [ref=e121] [cursor=pointer]:
+          - generic [ref=e122]: 超
+          - generic [ref=e123]: 超级管理员
+          - img [ref=e125]
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - heading "性发育异常 (DSD)" [level=2] [ref=e131]
+          - generic [ref=e132]:
+            - button "新建病例" [ref=e133] [cursor=pointer]:
+              - generic [ref=e134]:
+                - img [ref=e136]
+                - text: 新建病例
+            - button "导出Excel" [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]:
+                - img [ref=e141]
+                - text: 导出Excel
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: 病例编号
+            - textbox "病例编号" [ref=e150]:
+              - /placeholder: 请输入病例编号
+          - generic [ref=e151]:
+            - generic [ref=e152]: 姓名
+            - textbox "姓名" [ref=e156]:
+              - /placeholder: 请输入患者姓名
+          - generic [ref=e157]:
+            - generic [ref=e158]: 性别
+            - generic [ref=e161] [cursor=pointer]:
+              - generic:
+                - combobox "性别" [ref=e163]
+                - generic: 全部
+              - img [ref=e166]
+          - generic [ref=e169]:
+            - button "搜索" [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]:
+                - img [ref=e173]
+                - text: 搜索
+            - button "重置" [ref=e175] [cursor=pointer]:
+              - generic [ref=e176]:
+                - img [ref=e178]
+                - text: 重置
+        - generic [ref=e180]:
+          - generic [ref=e182]:
+            - table [ref=e184]:
+              - rowgroup [ref=e200]:
+                - row "选择所有行 病例编号 姓名 性别 年龄 病历号 身高(cm) 体重(kg) BMI 主诉 ICD 导入人员 上传时间 操作" [ref=e201]:
+                  - columnheader "选择所有行" [ref=e202]:
+                    - generic "选择所有行" [ref=e204] [cursor=pointer]:
+                      - generic [ref=e205]:
+                        - checkbox "选择所有行"
+                  - columnheader "病例编号" [ref=e207]:
+                    - generic [ref=e208]: 病例编号
+                  - columnheader "姓名" [ref=e209]:
+                    - generic [ref=e210]: 姓名
+                  - columnheader "性别" [ref=e211]:
+                    - generic [ref=e212]: 性别
+                  - columnheader "年龄" [ref=e213]:
+                    - generic [ref=e214]: 年龄
+                  - columnheader "病历号" [ref=e215]:
+                    - generic [ref=e216]: 病历号
+                  - columnheader "身高(cm)" [ref=e217]:
+                    - generic [ref=e218]: 身高(cm)
+                  - columnheader "体重(kg)" [ref=e219]:
+                    - generic [ref=e220]: 体重(kg)
+                  - columnheader "BMI" [ref=e221]:
+                    - generic [ref=e222]: BMI
+                  - columnheader "主诉" [ref=e223]:
+                    - generic [ref=e224]: 主诉
+                  - columnheader "ICD" [ref=e225]:
+                    - generic [ref=e226]: ICD
+                  - columnheader "导入人员" [ref=e227]:
+                    - generic [ref=e228]: 导入人员
+                  - columnheader "上传时间" [ref=e229]:
+                    - generic [ref=e230]: 上传时间
+                  - columnheader "操作" [ref=e231]:
+                    - generic [ref=e232]: 操作
+            - table [ref=e237]:
+              - rowgroup [ref=e253]:
+                - row "选择当前行 CASE-008 周小燕 未知 查看 编辑 删除" [ref=e254]:
+                  - cell "选择当前行" [ref=e255]:
+                    - generic "选择当前行" [ref=e257] [cursor=pointer]:
+                      - generic [ref=e258]:
+                        - checkbox "选择当前行"
+                  - cell "CASE-008" [ref=e260]:
+                    - generic [ref=e261]: CASE-008
+                  - cell "周小燕" [ref=e262]:
+                    - generic [ref=e263]: 周小燕
+                  - cell "未知" [ref=e264]:
+                    - generic [ref=e265]: 未知
+                  - cell [ref=e266]
+                  - cell [ref=e267]
+                  - cell [ref=e268]
+                  - cell [ref=e269]
+                  - cell [ref=e270]
+                  - cell [ref=e271]
+                  - cell [ref=e272]
+                  - cell [ref=e273]
+                  - cell [ref=e274]
+                  - cell "查看 编辑 删除" [ref=e275]:
+                    - generic [ref=e276]:
+                      - button "查看" [ref=e277] [cursor=pointer]:
+                        - generic [ref=e278]: 查看
+                      - button "编辑" [ref=e279] [cursor=pointer]:
+                        - generic [ref=e280]: 编辑
+                      - button "删除" [ref=e281] [cursor=pointer]:
+                        - generic [ref=e282]: 删除
+                - row "选择当前行 CASE-001 王小明 未知 查看 编辑 删除" [ref=e283]:
+                  - cell "选择当前行" [ref=e284]:
+                    - generic "选择当前行" [ref=e286] [cursor=pointer]:
+                      - generic [ref=e287]:
+                        - checkbox "选择当前行"
+                  - cell "CASE-001" [ref=e289]:
+                    - generic [ref=e290]: CASE-001
+                  - cell "王小明" [ref=e291]:
+                    - generic [ref=e292]: 王小明
+                  - cell "未知" [ref=e293]:
+                    - generic [ref=e294]: 未知
+                  - cell [ref=e295]
+                  - cell [ref=e296]
+                  - cell [ref=e297]
+                  - cell [ref=e298]
+                  - cell [ref=e299]
+                  - cell [ref=e300]
+                  - cell [ref=e301]
+                  - cell [ref=e302]
+                  - cell [ref=e303]
+                  - cell "查看 编辑 删除" [ref=e304]:
+                    - generic [ref=e305]:
+                      - button "查看" [ref=e306] [cursor=pointer]:
+                        - generic [ref=e307]: 查看
+                      - button "编辑" [ref=e308] [cursor=pointer]:
+                        - generic [ref=e309]: 编辑
+                      - button "删除" [ref=e310] [cursor=pointer]:
+                        - generic [ref=e311]: 删除
+          - generic [ref=e314]:
+            - generic [ref=e315]: 共 2 条
+            - generic [ref=e318] [cursor=pointer]:
+              - generic:
+                - combobox [ref=e320]
+                - generic [ref=e321]: 20条/页
+              - img [ref=e324]
+            - button "上一页" [disabled] [ref=e326]:
+              - generic:
+                - img
+            - list [ref=e327]:
+              - listitem "第 1 页" [ref=e328]: "1"
+            - button "下一页" [disabled] [ref=e329]:
+              - generic:
+                - img
+            - generic [ref=e330]:
+              - generic [ref=e331]: 前往
+              - spinbutton "页" [ref=e334]: "1"
+              - generic [ref=e335]: 页
+  - alert [ref=e336]:
+    - img [ref=e338]
+    - paragraph [ref=e340]: 登录成功

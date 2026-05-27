@@ -1,0 +1,131 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e275]:
+    - generic [ref=e276]:
+      - generic [ref=e277] [cursor=pointer]:
+        - img "Logo" [ref=e278]
+        - generic [ref=e279]: EKSJK
+      - menubar [ref=e283]:
+        - menuitem "工作台" [ref=e284] [cursor=pointer]:
+          - img [ref=e286]
+          - text: 工作台
+        - menuitem "病例管理" [ref=e290]:
+          - generic [ref=e291] [cursor=pointer]:
+            - img [ref=e293]
+            - generic [ref=e295]: 病例管理
+            - img [ref=e297]
+        - menuitem "健康筛查" [ref=e299] [cursor=pointer]:
+          - img [ref=e301]
+          - text: 健康筛查
+        - menuitem "统计分析" [ref=e305] [cursor=pointer]:
+          - img [ref=e307]
+          - text: 统计分析
+        - menuitem "通知公告" [ref=e309] [cursor=pointer]:
+          - img [ref=e311]
+          - text: 通知公告
+        - menuitem "用户管理" [ref=e315] [cursor=pointer]:
+          - img [ref=e317]
+          - text: 用户管理
+        - menuitem "系统管理" [ref=e319]:
+          - generic [ref=e320] [cursor=pointer]:
+            - img [ref=e322]
+            - generic [ref=e324]: 系统管理
+            - img [ref=e326]
+    - generic [ref=e328]:
+      - generic [ref=e329]:
+        - generic [ref=e330]:
+          - img [ref=e332] [cursor=pointer]
+          - navigation "面包屑" [ref=e334]:
+            - link "工作台" [ref=e336]
+        - button "超 超级管理员" [ref=e339] [cursor=pointer]:
+          - generic [ref=e340]: 超
+          - generic [ref=e341]: 超级管理员
+          - img [ref=e343]
+      - generic [ref=e346]:
+        - heading "工作台" [level=2] [ref=e349]
+        - generic [ref=e350]:
+          - generic [ref=e354] [cursor=pointer]:
+            - generic [ref=e355]:
+              - generic [ref=e356]: 病例总数
+              - generic [ref=e357]: "11"
+            - img [ref=e359]
+          - generic [ref=e364] [cursor=pointer]:
+            - generic [ref=e365]:
+              - generic [ref=e366]: 本月新增
+              - generic [ref=e367]: "7"
+            - img [ref=e369]
+          - generic [ref=e374] [cursor=pointer]:
+            - generic [ref=e375]:
+              - generic [ref=e376]: 待随访
+              - generic [ref=e377]: "7"
+            - img [ref=e379]
+          - generic [ref=e386] [cursor=pointer]:
+            - generic [ref=e387]:
+              - generic [ref=e388]: 注册用户
+              - generic [ref=e389]: "6"
+            - img [ref=e391]
+        - generic [ref=e393]:
+          - generic [ref=e395]:
+            - generic [ref=e396]: 疾病类型分布
+            - generic [ref=e398]:
+              - generic [ref=e399]:
+                - generic [ref=e401]: 性发育异常(DSD)
+                - generic [ref=e402]: "3"
+              - generic [ref=e403]:
+                - generic [ref=e405]: 遗传性骨病(FSS)
+                - generic [ref=e406]: "1"
+              - generic [ref=e407]:
+                - generic [ref=e409]: 中枢性性早熟(CPP)
+                - generic [ref=e410]: "2"
+              - generic [ref=e411]:
+                - generic [ref=e413]: McCune-Albright(MAS)
+                - generic [ref=e414]: "1"
+              - generic [ref=e415]:
+                - generic [ref=e417]: 小于胎龄儿(SGA)
+                - generic [ref=e418]: "2"
+              - generic [ref=e419]:
+                - generic [ref=e421]: 家族性矮小(SSS)
+                - generic [ref=e422]: "1"
+              - generic [ref=e423]:
+                - generic [ref=e425]: E路童萌(ELTM)
+                - generic [ref=e426]: "1"
+          - generic [ref=e428]:
+            - generic [ref=e429]: 用户角色分布
+            - generic [ref=e431]:
+              - generic [ref=e432]:
+                - generic [ref=e433]: 超级管理员
+                - generic [ref=e435]: "1"
+              - generic [ref=e436]:
+                - generic [ref=e437]: 医院管理员
+                - generic [ref=e439]: "1"
+              - generic [ref=e440]:
+                - generic [ref=e441]: 普通医生
+                - generic [ref=e443]: "3"
+              - generic [ref=e444]:
+                - generic [ref=e445]: 家长
+                - generic [ref=e447]: "1"
+        - generic [ref=e448]:
+          - generic [ref=e450]:
+            - generic [ref=e451]: 快捷操作
+            - generic [ref=e453]:
+              - button "新建病例" [ref=e454] [cursor=pointer]:
+                - generic [ref=e455]:
+                  - img [ref=e457]
+                  - text: 新建病例
+              - button "健康筛查" [ref=e459] [cursor=pointer]:
+                - generic [ref=e460]:
+                  - img [ref=e462]
+                  - text: 健康筛查
+              - button "统计分析" [ref=e466] [cursor=pointer]:
+                - generic [ref=e467]:
+                  - img [ref=e469]
+                  - text: 统计分析
+          - generic [ref=e472]:
+            - generic [ref=e474]:
+              - generic [ref=e475]: 系统公告
+              - generic [ref=e477] [cursor=pointer]: 查看全部
+            - generic [ref=e480]:
+              - img [ref=e482]
+              - paragraph [ref=e499]: 暂无公告
+  - alert [ref=e500]:
+    - img [ref=e502]
+    - paragraph [ref=e504]: 登录成功

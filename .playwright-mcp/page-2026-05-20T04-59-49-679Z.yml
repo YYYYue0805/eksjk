@@ -1,0 +1,23 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - img "Logo" [ref=e6]
+    - heading "EKSJK" [level=1] [ref=e7]
+    - heading "儿科生长发育数据管理系统" [level=2] [ref=e8]
+    - paragraph [ref=e9]: 专注于儿童内分泌疾病的临床数据管理、患者随访跟踪与生长发育监测
+  - generic [ref=e11]:
+    - heading "欢迎登录" [level=3] [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e17]:
+        - img [ref=e20]
+        - textbox "请输入用户名" [ref=e22]
+      - generic [ref=e26]:
+        - img [ref=e29]
+        - textbox "请输入密码" [ref=e32]
+      - generic [ref=e33]:
+        - generic [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]:
+            - checkbox "记住用户名"
+          - generic [ref=e37]: 记住用户名
+        - generic [ref=e39] [cursor=pointer]: 忘记密码?
+      - button "登 录" [ref=e42] [cursor=pointer]:
+        - generic [ref=e43]: 登 录

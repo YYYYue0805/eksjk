@@ -1,0 +1,62 @@
+# Staging 后端 Spring Boot Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-backend
+  namespace: eksjk-staging
+  labels:
+    app: eksjk-backend
+    env: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-backend
+  template:
+    metadata:
+      labels:
+        app: eksjk-backend
+        env: staging
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+        - name: backend
+          # 镜像 tag 由 GitHub Actions CI 自动更新为 develop-{short_sha}
+          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:develop-3d9dc2d
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          # 通过 Secret 注入所有敏感配置
+          envFrom:
+            - secretRef:
+                name: eksjk-staging-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "cloud"
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

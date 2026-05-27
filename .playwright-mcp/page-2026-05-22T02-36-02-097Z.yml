@@ -1,0 +1,145 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5] [cursor=pointer]:
+      - img "Logo" [ref=e6]
+      - generic [ref=e7]: EKSJK
+    - menubar [ref=e11]:
+      - menuitem "工作台" [ref=e12] [cursor=pointer]:
+        - img [ref=e14]
+        - text: 工作台
+      - menuitem "病例管理" [ref=e18]:
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e21]
+          - generic [ref=e23]: 病例管理
+          - img [ref=e25]
+      - menuitem "健康筛查" [ref=e27] [cursor=pointer]:
+        - img [ref=e29]
+        - text: 健康筛查
+      - menuitem "统计分析" [ref=e33] [cursor=pointer]:
+        - img [ref=e35]
+        - text: 统计分析
+      - menuitem "通知公告" [ref=e37] [cursor=pointer]:
+        - img [ref=e39]
+        - text: 通知公告
+      - menuitem "用户管理" [ref=e43] [cursor=pointer]:
+        - img [ref=e45]
+        - text: 用户管理
+      - menuitem "系统管理" [ref=e47]:
+        - generic [ref=e48] [cursor=pointer]:
+          - img [ref=e50]
+          - generic [ref=e52]: 系统管理
+          - img [ref=e54]
+  - generic [ref=e56]:
+    - generic [ref=e57]:
+      - generic [ref=e58]:
+        - img [ref=e60] [cursor=pointer]
+        - navigation "面包屑" [ref=e62]:
+          - link "编辑病例" [ref=e64]
+      - button "超 超级管理员" [ref=e67] [cursor=pointer]:
+        - generic [ref=e68]: 超
+        - generic [ref=e69]: 超级管理员
+        - img [ref=e71]
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - heading "编辑 性发育异常 (DSD) 病例" [level=2] [ref=e77]
+        - generic [ref=e78]:
+          - button "返回列表" [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: 返回列表
+          - button "上一步" [ref=e81] [cursor=pointer]:
+            - generic [ref=e82]: 上一步
+          - button "下一步" [active] [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]: 下一步
+          - button "保存" [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]: 保存
+      - generic [ref=e88]:
+        - tablist [ref=e92]:
+          - tab "基本信息" [ref=e93]
+          - tab "临床资料" [selected] [ref=e94]
+          - tab "性发育异常 (DSD) 专项数据" [ref=e95]
+          - tab "随访记录" [ref=e96]
+          - tab "影像资料" [ref=e97]
+        - generic [ref=e98]:
+          - text: "* * * * *"
+          - tabpanel "临床资料" [ref=e99]:
+            - generic [ref=e100]: 体格检查
+            - generic [ref=e101]:
+              - generic [ref=e103]:
+                - generic [ref=e104]: 身高
+                - generic [ref=e107]:
+                  - textbox "身高" [ref=e108]:
+                    - /placeholder: cm
+                  - generic [ref=e109]: cm
+              - generic [ref=e111]:
+                - generic [ref=e112]: 体重
+                - generic [ref=e115]:
+                  - textbox "体重" [ref=e116]:
+                    - /placeholder: kg
+                  - generic [ref=e117]: kg
+              - generic [ref=e119]:
+                - generic [ref=e120]: BMI
+                - textbox "BMI" [disabled] [ref=e124]
+              - generic [ref=e126]:
+                - generic [ref=e127]: R型骨龄
+                - generic [ref=e130]:
+                  - textbox "R型骨龄" [ref=e131]:
+                    - /placeholder: 岁
+                  - generic [ref=e132]: 岁
+              - generic [ref=e134]:
+                - generic [ref=e135]: C型骨龄
+                - generic [ref=e138]:
+                  - textbox "C型骨龄" [ref=e139]:
+                    - /placeholder: 岁
+                  - generic [ref=e140]: 岁
+            - separator [ref=e141]
+            - generic [ref=e142]: 家族史
+            - generic [ref=e143]:
+              - generic [ref=e145]:
+                - generic [ref=e146]: 父亲身高
+                - generic [ref=e149]:
+                  - textbox "父亲身高" [ref=e150]:
+                    - /placeholder: cm
+                  - generic [ref=e151]: cm
+              - generic [ref=e153]:
+                - generic [ref=e154]: 母亲身高
+                - generic [ref=e157]:
+                  - textbox "母亲身高" [ref=e158]:
+                    - /placeholder: cm
+                  - generic [ref=e159]: cm
+              - generic [ref=e161]:
+                - generic [ref=e162]: 父亲体重
+                - generic [ref=e165]:
+                  - textbox "父亲体重" [ref=e166]:
+                    - /placeholder: kg
+                  - generic [ref=e167]: kg
+              - generic [ref=e169]:
+                - generic [ref=e170]: 母亲体重
+                - generic [ref=e173]:
+                  - textbox "母亲体重" [ref=e174]:
+                    - /placeholder: kg
+                  - generic [ref=e175]: kg
+              - generic [ref=e177]:
+                - generic [ref=e178]: 初潮年龄
+                - textbox "初潮年龄" [ref=e182]:
+                  - /placeholder: 岁
+              - generic [ref=e184]:
+                - generic [ref=e185]: 有无兄弟姐妹
+                - generic [ref=e188] [cursor=pointer]:
+                  - generic:
+                    - combobox "有无兄弟姐妹" [ref=e190]
+                    - generic [ref=e191]: 请选择
+                  - img [ref=e194]
+              - generic [ref=e197]:
+                - generic [ref=e198]: 家族史
+                - textbox "家族史" [ref=e201]:
+                  - /placeholder: 请输入家族史
+            - separator [ref=e202]
+            - generic [ref=e203]: 既往史
+            - generic [ref=e204]:
+              - generic [ref=e206]:
+                - generic [ref=e207]: 既往史
+                - textbox "既往史" [ref=e210]:
+                  - /placeholder: 请输入既往史
+              - generic [ref=e212]:
+                - generic [ref=e213]: 确诊年龄
+                - textbox "确诊年龄" [ref=e217]:
+                  - /placeholder: 岁

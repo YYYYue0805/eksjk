@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKSJK 儿科数据管理系统 - 项目汇报</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #1d4ed8;
+            --primary-dark: #1e40af;
+            --secondary: #059669;
+            --accent: #d97706;
+            --bg-dark: #ffffff;
+            --bg-card: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #ffffff;
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* 幻灯片容器 */
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        /* 封面页 */
+        .slide-cover {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 50%, #eff6ff 100%);
+            text-align: center;
+        }
+
+        .slide-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 40%);
+        }
+
+        .slide-cover .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .slide-cover h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d4ed8, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .slide-cover .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .slide-cover .meta {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .slide-cover .logo-icon {
+            font-size: 5rem;
+            margin-bottom: 30px;
+        }
+
+        /* 通用幻灯片样式 */
+        .slide-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .slide-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--gradient-3);
+            margin: 12px auto 0;
+            border-radius: 2px;
+        }
+
+        /* 卡片网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 42%;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 2px var(--primary);
+            z-index: 1;
+        }
+
+        .timeline-content h4 {
+            color: var(--primary-light);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* 架构图 */
+        .arch-diagram {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+        }
+
+        .arch-layer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .arch-box {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .arch-arrow {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin: 8px 0;
+        }
+
+        .layer-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        /* 技术栈表格 */
+        .tech-table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+        }
+
+        .tech-table th,
+        .tech-table td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tech-table th {
+            background: #eff6ff;
+            color: var(--primary-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .tech-table td {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .tech-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* 流程图 */
+        .flow-steps {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1100px;
+        }
+
+        .flow-step {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            min-width: 120px;
+        }
+
+        .flow-step .step-num {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .flow-step .step-title {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .flow-step .step-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .flow-arrow {
+            color: var(--primary-light);
+            font-size: 1.2rem;
+        }
+
+        /* 统计数字 */
+        .stats-row {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d4ed8, #0891b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* 列表样式 */
+        .feature-list {
+            list-style: none;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .feature-list li .icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-list li .text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .feature-list li .text strong {
+            color: var(--text-primary);
+        }
+
+        /* 导航控制 */
+        .nav-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 24px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-3);
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        /* 侧边目录 */
+        .sidebar-toc {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toc-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .toc-dot.active {
+            background: var(--primary);
+            transform: scale(1.4);
+        }
+
+        .toc-dot:hover::after {
+            content: attr(data-title);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ffffff;
+            color: var(--text-primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 两栏布局 */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .col-content h3 {
+            font-size: 1.1rem;
+            color: var(--primary-light);
+            margin-bottom: 12px;
+        }
+
+        .col-content p, .col-content li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .col-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .col-content ul li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .col-content ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #059669;
+        }
+
+        /* 高亮标签 */
+        .highlight-tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .tag-java { background: #fff7ed; color: #c2410c; }
+        .tag-vue { background: #ecfdf5; color: #047857; }
+        .tag-k8s { background: #eff6ff; color: #1d4ed8; }
+        .tag-aliyun { background: #fffbeb; color: #b45309; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 30px;
+            }
+            .slide-cover h1 {
+                font-size: 2rem;
+            }
+            .slide-title {
+                font-size: 1.6rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item,
+            .timeline-item:nth-child(odd) {
+                flex-direction: row;
+                padding-left: 50px;
+            }
+            .timeline-content {
+                width: 100%;
+            }
+            .timeline-dot {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="sidebar-toc" id="sidebarToc"></div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- 第1页：封面 -->
+        <div class="slide slide-cover active" data-title="封面">
+            <div class="content">
+                <div class="logo-icon">🏥</div>
+                <h1>EKSJK 儿科数据管理系统</h1>
+                <p class="subtitle">项目汇报 · 架构演进与技术实践</p>
+                <p class="meta">2024 - 2026 | 版本 V1 → V2 全面重构</p>
+            </div>
+        </div>
+
+        <!-- 第2页：目录 -->
+        <div class="slide" data-title="目录">
+            <h2 class="slide-title">汇报目录</h2>
+            <div class="card-grid" style="max-width: 800px;">
+                <div class="card" style="cursor:pointer" onclick="goToSlide(2)">
+                    <div class="card-icon">📜</div>
+                    <h3>一、项目背景</h3>
+                    <p>业务需求与项目起源</p>
+                </div>
+                <div class="card" style="cursor:pointer" onclick="goToSlide(4)">
+                    <div class="card-icon">🏗️</div>
+                    <h3>二、架构演进</h3>
+                    <p>V1 → V2 技术栈升级</p>
+                </div>
+                <div class="card" style="cursor:pointer" onclick="goToSlide(7)">
+                    <div class="card-icon">📦</div>
+                    <h3>三、功能模块</h3>
+                    <p>核心业务功能介绍</p>
+                </div>
+                <div class="card" style="cursor:pointer" onclick="goToSlide(9)">
+                    <div class="card-icon">🚀</div>
+                    <h3>四、部署流程</h3>
+                    <p>云原生部署实践</p>
+                </div>
+                <div class="card" style="cursor:pointer" onclick="goToSlide(11)">
+                    <div class="card-icon">🔮</div>
+                    <h3>五、后续规划</h3>
+                    <p>未来发展方向</p>
+                </div>
+                <div class="card" style="cursor:pointer" onclick="goToSlide(12)">
+                    <div class="card-icon">🤝</div>
+                    <h3>六、项目协作</h3>
+                    <p>基于 Multica 的 AI 协作</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第3页：项目背景 -->
+        <div class="slide" data-title="项目背景">
+            <h2 class="slide-title">项目背景</h2>
+            <div class="two-col">
+                <div class="col-content">
+                    <h3>🎯 业务需求</h3>
+                    <p>EKSJK（儿科数据管理系统）是面向医疗健康领域的全栈 Web 应用，专注于：</p>
+                    <ul>
+                        <li>儿童内分泌疾病的临床数据管理</li>
+                        <li>患者随访跟踪与生长发育监测</li>
+                        <li>医学影像处理与存储</li>
+                        <li>多角色协同（医生、管理员、家长）</li>
+                        <li>学校筛查批量数据处理</li>
+                    </ul>
+                </div>
+                <div class="col-content">
+                    <h3>💡 项目价值</h3>
+                    <ul>
+                        <li>覆盖 <strong>7 大疾病类型</strong>（DSD、FSS、CPP、MAS、SGA、SSS、ELTM）</li>
+                        <li>支持 <strong>多端协同</strong>：PC管理后台 + 医生小程序 + 家长小程序</li>
+                        <li>实现 <strong>全流程数字化</strong>：从数据采集到统计分析</li>
+                        <li>提供 <strong>智能随访</strong>：自动化提醒和进度跟踪</li>
+                        <li>支撑 <strong>科研数据</strong>：多维度数据分析和报表导出</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第4页：架构演进时间线 -->
+        <div class="slide" data-title="架构演进">
+            <h2 class="slide-title">架构演进历程</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>V1 初始版本 (2024)</h4>
+                        <p>Python Django + Vue 2 + Element UI<br>单体架构，Docker + K8s 部署<br>Redis 缓存 + Celery 异步任务</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>V2 重构启动 (2025 Q1)</h4>
+                        <p>技术栈全面升级：Java 21 + Spring Boot 3<br>前端升级 Vue 3 + Element Plus<br>引入 MyBatis-Plus、Sa-Token</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>云原生改造 (2025 Q2)</h4>
+                        <p>Terraform 基础设施即代码<br>阿里云 ACK + RDS Serverless + OSS<br>多环境部署（Staging / Production）</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>持续优化 (2025 Q3 - 至今)</h4>
+                        <p>性能优化：Caffeine 替代 Redis<br>小程序端开发（家长端 + 医生端）<br>可观测性建设 & CI/CD 流水线</p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第5页：V1 vs V2 对比 -->
+        <div class="slide" data-title="技术对比">
+            <h2 class="slide-title">V1 → V2 技术栈对比</h2>
+            <table class="tech-table">
+                <thead>
+                    <tr>
+                        <th>维度</th>
+                        <th>V1（旧版）</th>
+                        <th>V2（新版）</th>
+                        <th>提升</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>后端语言</td>
+                        <td>Python 3.7 + Django 3</td>
+                        <td><span class="tech-badge tag-java">Java 21</span> Spring Boot 3.4</td>
+                        <td>类型安全、性能提升</td>
+                    </tr>
+                    <tr>
+                        <td>前端框架</td>
+                        <td>Vue 2 + Element UI</td>
+                        <td><span class="tech-badge tag-vue">Vue 3</span> Element Plus + Vite</td>
+                        <td>Composition API、构建速度</td>
+                    </tr>
+                    <tr>
+                        <td>ORM</td>
+                        <td>Django ORM</td>
+                        <td>MyBatis-Plus 3.5</td>
+                        <td>灵活 SQL、分页插件</td>
+                    </tr>
+                    <tr>
+                        <td>认证</td>
+                        <td>Django Auth + JWT</td>
+                        <td>Sa-Token + JWT</td>
+                        <td>轻量级、注解式鉴权</td>
+                    </tr>
+                    <tr>
+                        <td>缓存</td>
+                        <td>Redis</td>
+                        <td>Caffeine 本地缓存</td>
+                        <td>减少中间件依赖</td>
+                    </tr>
+                    <tr>
+                        <td>文件存储</td>
+                        <td>本地文件系统</td>
+                        <td>阿里云 OSS（S3 兼容）</td>
+                        <td>高可用、CDN 加速</td>
+                    </tr>
+                    <tr>
+                        <td>基础设施</td>
+                        <td>手动部署</td>
+                        <td><span class="tech-badge tag-k8s">Terraform</span> + ACK</td>
+                        <td>基础设施即代码</td>
+                    </tr>
+                    <tr>
+                        <td>小程序</td>
+                        <td>微信原生开发</td>
+                        <td>uni-app (Vue 3) 跨端</td>
+                        <td>代码复用、开发效率</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 第6页：系统架构图 -->
+        <div class="slide" data-title="系统架构">
+            <h2 class="slide-title">系统架构设计</h2>
+            <div class="arch-diagram">
+                <div class="layer-label">客户端层</div>
+                <div class="arch-layer">
+                    <div class="arch-box" style="background: #ecfdf5; border: 1px solid #a7f3d0;">
+                        🖥️ PC 管理后台<br><small>Vue 3 + Element Plus</small>
+                    </div>
+                    <div class="arch-box" style="background: #fffbeb; border: 1px solid #fde68a;">
+                        📱 家长小程序<br><small>uni-app (Vue 3)</small>
+                    </div>
+                    <div class="arch-box" style="background: #f5f3ff; border: 1px solid #ddd6fe;">
+                        👨‍⚕️ 医生小程序<br><small>uni-app (Vue 3)</small>
+                    </div>
+                </div>
+                <div class="arch-arrow">⬇️</div>
+                <div class="layer-label">网关层</div>
+                <div class="arch-layer">
+                    <div class="arch-box" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                        🌐 Nginx Ingress + CLB<br><small>反向代理 / 负载均衡 / SSL</small>
+                    </div>
+                </div>
+                <div class="arch-arrow">⬇️</div>
+                <div class="layer-label">应用层</div>
+                <div class="arch-layer">
+                    <div class="arch-box" style="background: #fff7ed; border: 1px solid #fed7aa;">
+                        ⚙️ Spring Boot 3.4<br><small>Controller → Service → Mapper</small>
+                    </div>
+                </div>
+                <div class="arch-arrow">⬇️</div>
+                <div class="layer-label">数据层</div>
+                <div class="arch-layer">
+                    <div class="arch-box" style="background: #eff6ff; border: 1px solid #bfdbfe;">
+                        🗄️ RDS MySQL<br><small>Serverless 弹性伸缩</small>
+                    </div>
+                    <div class="arch-box" style="background: #ecfdf5; border: 1px solid #a7f3d0;">
+                        📁 阿里云 OSS<br><small>S3 兼容 / 影像存储</small>
+                    </div>
+                    <div class="arch-box" style="background: #fffbeb; border: 1px solid #fde68a;">
+                        ⚡ Caffeine<br><small>本地内存缓存</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第7页：后端模块 -->
+        <div class="slide" data-title="后端模块">
+            <h2 class="slide-title">后端模块设计</h2>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Maven 子模块</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">疾病类型</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">角色权限</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">部署环境</div>
+                </div>
+            </div>
+            <div class="card-grid" style="grid-template-columns: repeat(5, 1fr);">
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">🔧</div>
+                    <h3>eksjk-common</h3>
+                    <p>公共工具类<br>常量定义<br>通用异常</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">📋</div>
+                    <h3>eksjk-model</h3>
+                    <p>Entity<br>DTO / VO<br>MapStruct</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">🗃️</div>
+                    <h3>eksjk-mapper</h3>
+                    <p>MyBatis-Plus<br>Mapper 接口<br>XML 映射</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">⚙️</div>
+                    <h3>eksjk-service</h3>
+                    <p>业务逻辑<br>事务管理<br>数据处理</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">🌐</div>
+                    <h3>eksjk-web</h3>
+                    <p>Controller<br>启动类<br>API 入口</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第8页：功能模块 -->
+        <div class="slide" data-title="功能模块">
+            <h2 class="slide-title">核心功能模块</h2>
+            <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="card">
+                    <div class="card-icon">👶</div>
+                    <h3>患者管理</h3>
+                    <p>患者信息 CRUD、多疾病类型关联、Hashids ID 混淆、数据权限过滤</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <h3>病例记录</h3>
+                    <p>7 大疾病独立表单、诊断记录、医学影像上传、OSS 云存储</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔄</div>
+                    <h3>随访管理</h3>
+                    <p>多类型随访记录、自动化提醒、进度跟踪、MAS 独立随访模型</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>数据统计</h3>
+                    <p>ECharts 可视化、生长曲线、多维度报表、Excel 导出</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏫</div>
+                    <h3>学校筛查</h3>
+                    <p>批量数据导入、问卷评估、筛查报告生成、学校管理</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👥</div>
+                    <h3>权限系统</h3>
+                    <p>RBAC 四级角色、Sa-Token 注解鉴权、数据范围自动过滤</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第9页：多端协同 -->
+        <div class="slide" data-title="多端协同">
+            <h2 class="slide-title">多端协同架构</h2>
+            <div class="card-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 1000px;">
+                <div class="card" style="border-top: 3px solid #2563eb;">
+                    <div class="card-icon">🖥️</div>
+                    <h3>PC 管理后台</h3>
+                    <p style="margin-bottom: 12px;">面向医生和管理员的全功能管理平台</p>
+                    <p><span class="highlight-tag tag-vue">Vue 3</span><span class="highlight-tag" style="background: #f5f3ff; color: #6d28d9;">Element Plus</span></p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 患者管理</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 病例录入</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 数据统计</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 系统管理</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-top: 3px solid #059669;">
+                    <div class="card-icon">📱</div>
+                    <h3>家长端小程序</h3>
+                    <p style="margin-bottom: 12px;">家长自助录入儿童生长数据</p>
+                    <p><span class="highlight-tag tag-vue">uni-app</span><span class="highlight-tag" style="background: #ecfdf5; color: #047857;">uni-ui</span></p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 生长数据录入</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 随访提醒</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 报告查看</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 消息通知</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-top: 3px solid #d97706;">
+                    <div class="card-icon">👨‍⚕️</div>
+                    <h3>医生端小程序</h3>
+                    <p style="margin-bottom: 12px;">医生移动端便捷操作入口</p>
+                    <p><span class="highlight-tag tag-vue">uni-app</span><span class="highlight-tag" style="background: #fffbeb; color: #b45309;">uni-ui</span></p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 患者查看</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 随访记录</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 快速诊断</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">✅ 数据同步</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第10页：部署架构 -->
+        <div class="slide" data-title="部署流程">
+            <h2 class="slide-title">云原生部署架构</h2>
+            <div class="flow-steps" style="margin-bottom: 40px;">
+                <div class="flow-step">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Terraform</div>
+                    <div class="step-desc">创建云资源</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">2</div>
+                    <div class="step-title">ACK 集群</div>
+                    <div class="step-desc">初始化 K8s</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">3</div>
+                    <div class="step-title">Docker Build</div>
+                    <div class="step-desc">构建镜像</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">4</div>
+                    <div class="step-title">ACR Push</div>
+                    <div class="step-desc">推送镜像</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">5</div>
+                    <div class="step-title">K8s Deploy</div>
+                    <div class="step-desc">部署资源</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">6</div>
+                    <div class="step-title">DNS 配置</div>
+                    <div class="step-desc">域名绑定</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-num">7</div>
+                    <div class="step-title">验证上线</div>
+                    <div class="step-desc">功能检查</div>
+                </div>
+            </div>
+            <div class="card-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">☁️</div>
+                    <h3>阿里云 ACK</h3>
+                    <p>托管 K8s 集群<br>自动伸缩</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">🗄️</div>
+                    <h3>RDS Serverless</h3>
+                    <p>MySQL 8.0<br>按需计费</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">📦</div>
+                    <h3>阿里云 OSS</h3>
+                    <p>对象存储<br>S3 兼容协议</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon">🔄</div>
+                    <h3>ACR 镜像仓库</h3>
+                    <p>容器镜像<br>版本管理</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第11页：环境管理 -->
+        <div class="slide" data-title="环境管理">
+            <h2 class="slide-title">多环境管理策略</h2>
+            <table class="tech-table">
+                <thead>
+                    <tr>
+                        <th>环境</th>
+                        <th>命名空间</th>
+                        <th>域名</th>
+                        <th>数据库</th>
+                        <th>镜像 Tag</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tech-badge" style="background: #ecfdf5; color: #047857;">Dev</span></td>
+                        <td>本地</td>
+                        <td>localhost</td>
+                        <td>本地 MySQL</td>
+                        <td>-</td>
+                        <td>本地开发调试</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tech-badge" style="background: #fffbeb; color: #b45309;">Staging</span></td>
+                        <td>eksjk-staging</td>
+                        <td>staging.eksjk.zsmm.org.cn</td>
+                        <td>RDS eksjk_staging</td>
+                        <td>develop-{sha}</td>
+                        <td>测试验证</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tech-badge" style="background: #fef2f2; color: #b91c1c;">Production</span></td>
+                        <td>eksjk-prod</td>
+                        <td>prod.eksjk.zsmm.org.cn</td>
+                        <td>RDS eksjk_prod</td>
+                        <td>v{x.y.z}</td>
+                        <td>正式生产</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 30px; max-width: 800px;">
+                <div class="col-content">
+                    <h3>🔑 关键设计决策</h3>
+                    <ul>
+                        <li>Staging 和 Production 共用 <strong>cloud</strong> Profile，通过 K8s Secret 注入不同环境变量</li>
+                        <li>敏感配置（数据库密码、AK/SK、JWT 密钥）全部通过 Secret 管理，不入代码库</li>
+                        <li>Terraform 管理所有云资源生命周期，支持一键创建/销毁</li>
+                        <li>月度成本约 <strong>¥400</strong>（低负载），RDS Serverless 空闲自动缩容</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第12页：后续规划 -->
+        <div class="slide" data-title="后续规划">
+            <h2 class="slide-title">后续规划</h2>
+            <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="card" style="border-left: 4px solid #2563eb;">
+                    <div class="card-icon">📱</div>
+                    <h3>小程序端重点开发</h3>
+                    <p>重点建设家长端和医生端小程序，实现随时随地录入数据、查看报告、随访管理，让医生和家长摆脱 PC 束缚，提升使用便捷性和数据采集效率</p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 家长端：生长数据录入、报告查看</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 医生端：随访管理、快速诊断</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 移动优先，PC 端聚焦管理分析</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-left: 4px solid #7c3aed;">
+                    <div class="card-icon">🤖</div>
+                    <h3>开放 MCP 接口</h3>
+                    <p>开放 Model Context Protocol (MCP) 标准接口，与 Work Buddy 等 AI Agent 打通，支持以自然语言方式查询患者数据、生成报表、触发随访提醒</p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 自然语言查询患者和病例数据</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ AI 自动生成统计报表</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 智能随访提醒与建议</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-left: 4px solid #059669;">
+                    <div class="card-icon">🔗</div>
+                    <h3>E路童萌数据互通</h3>
+                    <p>与 E路童萌 平台数据接口打通，实现患者生长数据、评估结果的实时双向同步，消除数据孤岛，构建统一的儿童健康数据生态</p>
+                    <ul style="list-style: none; margin-top: 12px; padding: 0;">
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 生长数据实时双向同步</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 评估结果互通共享</li>
+                        <li style="color: var(--text-secondary); font-size: 0.8rem; padding: 3px 0;">▸ 构建统一儿童健康数据生态</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 40px; max-width: 900px; width: 100%;">
+                <div class="col-content">
+                    <h3>🎯 规划目标</h3>
+                    <ul>
+                        <li><strong>移动优先</strong> — 小程序成为主要数据入口，PC 端聚焦管理和分析</li>
+                        <li><strong>AI 赋能</strong> — 通过 MCP 接口让 AI Agent 成为医生的智能助手</li>
+                        <li><strong>生态互联</strong> — 与 E路童萌 数据打通，形成完整的儿童健康管理闭环</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第13页：项目协作 -->
+        <div class="slide" data-title="项目协作">
+            <h2 class="slide-title">项目协作 · 基于 Multica</h2>
+            <div class="two-col" style="max-width: 1200px; margin-bottom: 30px;">
+                <div class="col-content">
+                    <h3>🤖 什么是 Multica</h3>
+                    <p style="margin-bottom: 12px;">Multica 是一个开源的 <strong>AI Agent 协作开发平台</strong>，把 AI 编程智能体当作真正的团队成员来使用，类似「带 AI 员工的 Linear」。</p>
+                    <ul>
+                        <li>统一工作区：人类开发者与 AI Agent 协同</li>
+                        <li>Issue 驱动：创建任务并分配给人或 Agent</li>
+                        <li>本地执行：代码、API Key、工具链全在本地</li>
+                        <li>多工具兼容：Claude Code / Codex / Cursor / Gemini 等 11+ 编程工具</li>
+                        <li>开源生态：GitHub 22K+ Star，自托管可控</li>
+                    </ul>
+                </div>
+                <div class="col-content">
+                    <h3>🏗️ Multica 核心组件</h3>
+                    <ul>
+                        <li><strong>Frontend</strong> — Next.js Web / Electron 桌面端，统一交互界面</li>
+                        <li><strong>Backend</strong> — Go 服务，管理工作区、Issue、Agent 配置</li>
+                        <li><strong>PostgreSQL</strong> — 持久化用户、任务、评论数据</li>
+                        <li><strong>Runtime / Daemon</strong> — 部署在本地的执行机器</li>
+                        <li><strong>Agent</strong> — 角色配置（Coding / Planning Agent）</li>
+                        <li><strong>CLI Agent</strong> — 实际调用的 AI 编程工具</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="max-width: 1200px; width: 100%;">
+                <h3 style="text-align: center; color: var(--primary-light); margin-bottom: 20px; font-size: 1.1rem;">📋 EKSJK 项目协作落地方案</h3>
+                <div class="card-grid" style="grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                    <div class="card" style="border-top: 3px solid #2563eb; padding: 20px;">
+                        <div class="card-icon" style="font-size: 2rem;">📝</div>
+                        <h3 style="font-size: 1rem;">需求管理</h3>
+                        <p style="font-size: 0.82rem;">在 Multica 工作区中创建 Issue，记录需求、Bug、技术债，统一任务入口</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid #7c3aed; padding: 20px;">
+                        <div class="card-icon" style="font-size: 2rem;">🎯</div>
+                        <h3 style="font-size: 1rem;">智能分配</h3>
+                        <p style="font-size: 0.82rem;">简单任务交给 Coding Agent 自动开发，复杂任务由人类主导、Agent 辅助</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid #059669; padding: 20px;">
+                        <div class="card-icon" style="font-size: 2rem;">⚙️</div>
+                        <h3 style="font-size: 1rem;">自动开发</h3>
+                        <p style="font-size: 0.82rem;">Agent 在本地 Runtime 自动读代码、写代码、跑测试、提交 PR</p>
+                    </div>
+                    <div class="card" style="border-top: 3px solid #d97706; padding: 20px;">
+                        <div class="card-icon" style="font-size: 2rem;">📊</div>
+                        <h3 style="font-size: 1rem;">过程追踪</h3>
+                        <p style="font-size: 0.82rem;">任务状态、执行日志、阻塞点全程可视化，过程透明可审计</p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 25px; max-width: 1100px; width: 100%;">
+                <div class="col-content">
+                    <h3>💡 预期收益</h3>
+                    <ul>
+                        <li><strong>开发提效</strong> — 重复性编码工作交给 AI Agent，开发者聚焦架构设计和核心业务</li>
+                        <li><strong>过程可视</strong> — 所有任务、进度、决策在 Multica 中沉淀，方便回溯和复盘</li>
+                        <li><strong>知识沉淀</strong> — Agent 执行过程产生的代码、文档、讨论形成项目知识库</li>
+                        <li><strong>人机协同</strong> — 探索 AI 时代的研发新范式，为团队积累 AI 协作经验</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第14页：总结 -->
+        <div class="slide slide-cover" data-title="总结">
+            <div class="content">
+                <div class="logo-icon">✨</div>
+                <h1 style="font-size: 2.8rem;">项目总结</h1>
+                <div style="max-width: 700px; margin: 30px auto; text-align: left;">
+                    <ul class="feature-list">
+                        <li>
+                            <span class="icon">🏗️</span>
+                            <span class="text"><strong>架构现代化</strong> — 从 Python 单体到 Java 微服务，技术栈全面升级</span>
+                        </li>
+                        <li>
+                            <span class="icon">☁️</span>
+                            <span class="text"><strong>云原生实践</strong> — Terraform + K8s + 阿里云全家桶，基础设施即代码</span>
+                        </li>
+                        <li>
+                            <span class="icon">📱</span>
+                            <span class="text"><strong>多端覆盖</strong> — PC 后台 + 家长小程序 + 医生小程序，全场景触达</span>
+                        </li>
+                        <li>
+                            <span class="icon">🔒</span>
+                            <span class="text"><strong>安全可靠</strong> — RBAC 权限、ID 混淆、密码加密、敏感数据保护</span>
+                        </li>
+                        <li>
+                            <span class="icon">💰</span>
+                            <span class="text"><strong>成本可控</strong> — Serverless 按需计费，月度成本约 ¥400</span>
+                        </li>
+                    </ul>
+                </div>
+                <p class="meta" style="margin-top: 40px;">感谢聆听 · 欢迎交流</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 导航控制 -->
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">‹</button>
+        <span class="page-indicator" id="pageIndicator">1 / 14</span>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">›</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progressBar');
+        const pageIndicator = document.getElementById('pageIndicator');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const sidebarToc = document.getElementById('sidebarToc');
+
+        // 初始化侧边目录
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'toc-dot' + (index === 0 ? ' active' : '');
+            dot.setAttribute('data-title', slide.getAttribute('data-title') || `第${index + 1}页`);
+            dot.onclick = () => goToSlide(index);
+            sidebarToc.appendChild(dot);
+        });
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            // 更新进度条
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = progress + '%';
+
+            // 更新页码
+            pageIndicator.textContent = `${currentSlide + 1} / ${totalSlides}`;
+
+            // 更新按钮状态
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            // 更新侧边目录
+            document.querySelectorAll('.toc-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateSlide();
+            }
+        }
+
+        // 键盘导航
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides - 1);
+            }
+        });
+
+        // 触摸滑动支持
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) nextSlide();
+                else prevSlide();
+            }
+        });
+
+        // 鼠标滚轮支持（带防抖）
+        let wheelTimeout;
+        document.addEventListener('wheel', (e) => {
+            if (wheelTimeout) return;
+            wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+            
+            if (e.deltaY > 0) nextSlide();
+            else if (e.deltaY < 0) prevSlide();
+        });
+    </script>
+</body>
+</html>

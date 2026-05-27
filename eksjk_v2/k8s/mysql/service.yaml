@@ -1,0 +1,17 @@
+# MySQL ClusterIP Service（仅集群内部访问）
+apiVersion: v1
+kind: Service
+metadata:
+  name: eksjk-mysql
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      name: mysql
+  selector:
+    app: eksjk-mysql

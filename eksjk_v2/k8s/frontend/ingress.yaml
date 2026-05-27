@@ -1,0 +1,49 @@
+# Ingress 统一访问入口
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eksjk-ingress
+  namespace: eksjk
+  labels:
+    app: eksjk
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          # API 请求转发至后端
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-backend
+                port:
+                  number: 8080
+          # Actuator 端点转发至后端
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-backend
+                port:
+                  number: 8080
+          # Grafana 访问路由
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-grafana
+                port:
+                  number: 3000
+          # 其他请求转发至前端
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eksjk-frontend
+                port:
+                  number: 80

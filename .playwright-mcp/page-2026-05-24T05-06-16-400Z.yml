@@ -1,0 +1,177 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5] [cursor=pointer]:
+        - img "Logo" [ref=e6]
+        - generic [ref=e7]: EKSJK
+      - menubar [ref=e11]:
+        - menuitem "工作台" [ref=e12] [cursor=pointer]:
+          - img [ref=e14]
+          - text: 工作台
+        - menuitem "病例管理" [ref=e18]:
+          - generic [ref=e19] [cursor=pointer]:
+            - img [ref=e21]
+            - generic [ref=e23]: 病例管理
+            - img [ref=e25]
+        - menuitem "健康筛查" [ref=e27] [cursor=pointer]:
+          - img [ref=e29]
+          - text: 健康筛查
+        - menuitem "统计分析" [ref=e33] [cursor=pointer]:
+          - img [ref=e35]
+          - text: 统计分析
+        - menuitem "通知公告" [ref=e37] [cursor=pointer]:
+          - img [ref=e39]
+          - text: 通知公告
+        - menuitem "用户管理" [ref=e43] [cursor=pointer]:
+          - img [ref=e45]
+          - text: 用户管理
+        - menuitem "系统管理" [ref=e47]:
+          - generic [ref=e48] [cursor=pointer]:
+            - img [ref=e50]
+            - generic [ref=e52]: 系统管理
+            - img [ref=e54]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img [ref=e60] [cursor=pointer]
+          - navigation "面包屑" [ref=e62]:
+            - link "新建病例" [ref=e64]
+        - button "超 超级管理员" [ref=e67] [cursor=pointer]:
+          - generic [ref=e68]: 超
+          - generic [ref=e69]: 超级管理员
+          - img [ref=e71]
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - heading "新建 遗传性骨病 (FSS) 病例" [level=2] [ref=e77]
+          - generic [ref=e78]:
+            - button "返回列表" [ref=e79] [cursor=pointer]:
+              - generic [ref=e80]: 返回列表
+            - button "上一步" [disabled] [ref=e81]:
+              - generic [ref=e82]: 上一步
+            - button "下一步" [ref=e83] [cursor=pointer]:
+              - generic [ref=e84]: 下一步
+            - button "保存" [active] [ref=e85] [cursor=pointer]:
+              - generic [ref=e86]: 保存
+        - generic [ref=e88]:
+          - tablist [ref=e92]:
+            - tab "基本信息" [selected] [ref=e93]
+            - tab "基线-临床信息" [ref=e94]
+            - tab "基线-辅助检查" [ref=e95]
+            - tab "遗传学检查" [ref=e96]
+            - tab "随访记录" [ref=e97]
+            - tab "诊断" [ref=e98]
+          - tabpanel "基本信息" [ref=e100]:
+            - generic [ref=e101]:
+              - generic [ref=e103]:
+                - generic [ref=e104]: "* 患者姓名"
+                - textbox "* 患者姓名" [ref=e108]:
+                  - /placeholder: 请输入患者姓名
+                  - text: 测试患者
+              - generic [ref=e110]:
+                - generic [ref=e111]: 病例编号
+                - textbox "病例编号" [disabled] [ref=e115]:
+                  - /placeholder: 保存后自动生成
+              - generic [ref=e117]:
+                - generic [ref=e118]: "* 病历号"
+                - textbox "* 病历号" [ref=e122]:
+                  - /placeholder: 请输入病历号
+                  - text: TEST-007
+              - generic [ref=e124]:
+                - generic [ref=e125]: "* 性别"
+                - generic [ref=e128] [cursor=pointer]:
+                  - generic:
+                    - combobox "* 性别" [ref=e130]
+                    - generic [ref=e131]: 男
+                  - img [ref=e134]
+              - generic [ref=e137]:
+                - generic [ref=e138]: 国际疾病分类
+                - combobox [ref=e140]:
+                  - textbox "国际疾病分类" [ref=e143]:
+                    - /placeholder: 请输入ICD编码或疾病名称搜索
+              - generic [ref=e145]:
+                - generic [ref=e146]: 致病基因
+                - textbox "致病基因" [ref=e150]:
+                  - /placeholder: 请输入致病基因
+              - generic [ref=e152]:
+                - generic [ref=e153]: "* 出生日期"
+                - generic [ref=e156]:
+                  - img [ref=e159]
+                  - combobox "* 出生日期" [ref=e161]: 2020-01-01
+              - generic [ref=e163]:
+                - generic [ref=e164]: "* 身份证号码"
+                - generic [ref=e165]:
+                  - textbox "* 身份证号码" [ref=e168]:
+                    - /placeholder: 请输入身份证号码
+                  - generic: 请输入身份证号码
+              - generic [ref=e170]:
+                - generic [ref=e171]: 家庭地址
+                - textbox "家庭地址" [ref=e175]:
+                  - /placeholder: 请输入家庭地址
+              - generic [ref=e177]:
+                - generic [ref=e178]: 联系人姓名
+                - textbox "联系人姓名" [ref=e182]:
+                  - /placeholder: 请输入联系人姓名
+              - generic [ref=e184]:
+                - generic [ref=e185]: 与患者关系
+                - textbox "与患者关系" [ref=e189]:
+                  - /placeholder: 请输入与患者关系
+              - generic [ref=e191]:
+                - generic [ref=e192]: "* 联系电话"
+                - textbox "* 联系电话" [ref=e196]:
+                  - /placeholder: 请输入联系电话
+                  - text: "13800001111"
+              - generic [ref=e198]:
+                - generic [ref=e199]: "* 出生体重"
+                - generic [ref=e202]:
+                  - textbox "* 出生体重" [ref=e203]:
+                    - /placeholder: kg
+                    - text: "3.5"
+                  - generic [ref=e204]: kg
+              - generic [ref=e206]:
+                - generic [ref=e207]: 出生身长
+                - generic [ref=e210]:
+                  - textbox "出生身长" [ref=e211]:
+                    - /placeholder: cm
+                  - generic [ref=e212]: cm
+              - generic [ref=e214]:
+                - generic [ref=e215]: "* 孕周"
+                - generic [ref=e216]:
+                  - generic [ref=e218]:
+                    - textbox "* 孕周" [ref=e219]:
+                      - /placeholder: 周
+                    - generic [ref=e220]: 周
+                  - generic: 请输入孕周
+              - generic [ref=e222]:
+                - generic [ref=e223]: "* 分娩方式"
+                - generic [ref=e224]:
+                  - generic [ref=e226] [cursor=pointer]:
+                    - generic:
+                      - combobox "* 分娩方式" [ref=e228]
+                      - generic [ref=e229]: 请选择
+                    - img [ref=e232]
+                  - generic: 请选择分娩方式
+              - generic [ref=e235]:
+                - generic [ref=e236]: 窒息抢救史
+                - generic [ref=e239] [cursor=pointer]:
+                  - generic:
+                    - combobox "窒息抢救史" [ref=e241]
+                    - generic [ref=e242]: 请选择
+                  - img [ref=e245]
+              - generic [ref=e248]:
+                - generic [ref=e249]: 民族
+                - textbox "民族" [ref=e253]:
+                  - /placeholder: 请输入民族（选填）
+              - generic [ref=e255]:
+                - generic [ref=e256]: 性腺性别
+                - generic [ref=e259] [cursor=pointer]:
+                  - generic:
+                    - combobox "性腺性别" [ref=e261]
+                    - generic [ref=e262]: 请选择
+                  - img [ref=e265]
+              - generic [ref=e268]:
+                - generic [ref=e269]: 主诉
+                - textbox "主诉" [ref=e272]:
+                  - /placeholder: 请输入主诉
+  - alert [ref=e273]:
+    - img [ref=e275]
+    - paragraph [ref=e277]: 请完善必填信息

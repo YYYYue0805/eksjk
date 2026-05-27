@@ -1,0 +1,101 @@
+# MySQL StatefulSet 部署
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eksjk-mysql
+  namespace: eksjk
+  labels:
+    app: eksjk-mysql
+spec:
+  serviceName: eksjk-mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-mysql
+  template:
+    metadata:
+      labels:
+        app: eksjk-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eksjk-mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              value: eksjk
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: eksjk-mysql-secret
+                  key: mysql-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eksjk-mysql-secret
+                  key: mysql-password
+            - name: TZ
+              value: Asia/Shanghai
+          args:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+            - --default-authentication-plugin=mysql_native_password
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d/my.cnf
+              subPath: my.cnf
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: eksjk-mysql-pvc
+        - name: mysql-config
+          configMap:
+            name: eksjk-mysql-config
+            items:
+              - key: my.cnf
+                path: my.cnf
+        - name: mysql-initdb
+          configMap:
+            name: eksjk-mysql-config
+            items:
+              - key: init.sql
+                path: init.sql

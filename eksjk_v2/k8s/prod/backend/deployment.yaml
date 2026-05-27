@@ -1,0 +1,62 @@
+# Production 后端 Spring Boot Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-backend
+  namespace: eksjk-prod
+  labels:
+    app: eksjk-backend
+    env: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-backend
+  template:
+    metadata:
+      labels:
+        app: eksjk-backend
+        env: prod
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+        - name: backend
+          # 镜像 tag 由 GitHub Actions CD 自动更新为 {version_tag}（如 v1.2.0）
+          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          # 通过 Secret 注入所有敏感配置
+          envFrom:
+            - secretRef:
+                name: eksjk-prod-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "cloud"
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

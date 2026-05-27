@@ -1,0 +1,23 @@
+{
+  "name": "儿科生长发育管理(医生版)",
+  "appid": "",
+  "description": "儿科生长发育数据管理系统 - 医生端小程序",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true
+    },
+    "usingComponents": true,
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于获取您的位置信息"
+      }
+    }
+  }
+}

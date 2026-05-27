@@ -1,0 +1,105 @@
+# Grafana 数据持久化
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: eksjk-grafana-pvc
+  namespace: eksjk
+  labels:
+    app: eksjk-grafana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Grafana 数据源配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eksjk-grafana-datasource
+  namespace: eksjk
+  labels:
+    app: eksjk-grafana
+data:
+  datasource.yml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://eksjk-prometheus.eksjk.svc.cluster.local:9090
+        isDefault: true
+        editable: true
+---
+# Grafana Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksjk-grafana
+  namespace: eksjk
+  labels:
+    app: eksjk-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksjk-grafana
+  template:
+    metadata:
+      labels:
+        app: eksjk-grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.4.0
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+            - name: GF_SERVER_ROOT_URL
+              value: "%(protocol)s://%(domain)s/grafana/"
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "true"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/grafana
+            - name: datasource
+              mountPath: /etc/grafana/provisioning/datasources/datasource.yml
+              subPath: datasource.yml
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: eksjk-grafana-pvc
+        - name: datasource
+          configMap:
+            name: eksjk-grafana-datasource
+---
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: eksjk-grafana
+  namespace: eksjk
+  labels:
+    app: eksjk-grafana
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: eksjk-grafana
