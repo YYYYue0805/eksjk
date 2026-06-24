@@ -1,5 +1,5 @@
 <template>
-  <div class="data-table" v-loading="loading">
+  <div class="data-table">
     <!-- 表格 -->
     <el-table
       ref="tableRef"

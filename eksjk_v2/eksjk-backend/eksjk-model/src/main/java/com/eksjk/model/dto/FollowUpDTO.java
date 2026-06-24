@@ -68,8 +68,23 @@ public class FollowUpDTO {
 
     // ==================== 甲状腺功能 ====================
 
-    /** 甲功 */
+    /** 甲功（V1兼容） */
     private String jiagong;
+
+    /** TSH (uIU/mL) */
+    private String tsh;
+
+    /** FT3 (pg/mL) */
+    private String ft3;
+
+    /** FT4 (ng/dL) */
+    private String ft4;
+
+    /** TPOAb (IU/mL) */
+    private String tpoab;
+
+    /** TgAb (IU/mL) */
+    private String tgab;
 
     // ==================== 血糖/胰岛素 ====================
 

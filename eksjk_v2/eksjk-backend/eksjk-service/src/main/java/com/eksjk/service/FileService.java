@@ -53,4 +53,20 @@ public interface FileService {
      * @return ZIP文件字节数组
      */
     byte[] batchDownload(List<Long> patientIds);
+
+    /**
+     * 更新文件备注
+     *
+     * @param filePath 文件路径
+     * @param note     备注内容（null或空字符串时删除备注）
+     */
+    void updateNote(String filePath, String note);
+
+    /**
+     * 获取文件备注
+     *
+     * @param filePath 文件路径
+     * @return 备注内容，无备注时返回null
+     */
+    String getNote(String filePath);
 }

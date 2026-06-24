@@ -2,11 +2,29 @@
   <div class="case-list">
     <PageHeader :title="pageTitle">
       <template #actions>
-        <el-button type="primary" @click="handleCreate">
+        <el-dropdown v-if="diseaseType === 'eltm'" @command="handleCreateByType">
+          <el-button type="primary">
+            <el-icon><Plus /></el-icon>新建病例<el-icon class="el-icon--right"><ArrowDown /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item v-for="(item, key) in diseaseTypes" :key="key" :command="key">
+                {{ item.name }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-button v-else type="primary" @click="handleCreate">
           <el-icon><Plus /></el-icon>新建病例
         </el-button>
         <el-button @click="handleExport">
           <el-icon><Download /></el-icon>导出Excel
+        </el-button>
+        <el-button v-if="diseaseType === 'eltm'" type="success" @click="handleSync" :loading="syncing">
+          <el-icon><Refresh /></el-icon>同步数据
+        </el-button>
+        <el-button v-if="diseaseType === 'eltm'" type="warning" @click="handleDiagnose" :loading="diagnosing">
+          <el-icon><Cpu /></el-icon>智能诊断
         </el-button>
       </template>
     </PageHeader>
@@ -44,6 +62,7 @@
                :page-num="queryForm.pageNum" :page-size="queryForm.pageSize"
                @page-change="handlePageChange" @row-dblclick="handleView">
       <el-table-column type="selection" width="50" />
+      <el-table-column v-if="diseaseType === 'eltm'" prop="disClassName" label="疾病类型" width="160" />
       <el-table-column prop="caseNum" label="病例编号" width="160" show-overflow-tooltip />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="sexName" label="性别" width="70" align="center" />
@@ -55,7 +74,16 @@
       <el-table-column prop="chiCom" label="主诉" min-width="150" show-overflow-tooltip />
       <el-table-column label="ICD" width="200" show-overflow-tooltip>
         <template #default="{ row }">
-          {{ row.icd ? (icdLabelMap[row.icd] ? `${row.icd} ${icdLabelMap[row.icd]}` : row.icd) : '' }}
+          {{ row.icd || '' }}
+        </template>
+      </el-table-column>
+      <el-table-column v-if="diseaseType === 'eltm'" label="诊断状态" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.diagnosisStatus === 'diagnosed'" type="success" size="small">已诊断</el-tag>
+          <el-tag v-else-if="row.diagnosisStatus === 'auto_classified'" type="success" size="small">已归类</el-tag>
+          <el-tag v-else-if="row.diagnosisStatus === 'suggested'" type="warning" size="small">建议中</el-tag>
+          <el-tag v-else-if="row.diagnosisStatus === 'uncertain'" type="danger" size="small">待审查</el-tag>
+          <span v-else style="color: #909399">未分类</span>
         </template>
       </el-table-column>
       <el-table-column prop="impPer" label="导入人员" width="100" />
@@ -84,15 +112,15 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { shallowRef, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Plus, Download } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Download, Refresh, Cpu, ArrowDown } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
-import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType } from '@/api/patient'
-import { icdLabelMap } from '@/data/icdData'
+import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType, getDiseaseTypeByCode } from '@/api/patient'
+import { syncEltmData, diagnoseBatch } from '@/api/eltm'
 
 const route = useRoute()
 const router = useRouter()
@@ -117,9 +145,11 @@ const queryForm = reactive({
 })
 
 const dateRange = ref(null)
-const tableData = ref([])
+const tableData = shallowRef([])
 const total = ref(0)
 const loading = ref(false)
+const syncing = ref(false)
+const diagnosing = ref(false)
 
 // 监听日期范围变化
 watch(dateRange, (val) => {
@@ -148,7 +178,8 @@ async function loadData() {
   loading.value = true
   try {
     const res = await getPatientList(queryForm)
-    tableData.value = res.data?.records || []
+    const records = res.data?.records || []
+    tableData.value = records.map(r => Object.freeze(r))
     total.value = res.data?.total || 0
   } catch (error) {
     console.error('加载病例列表失败', error)
@@ -184,12 +215,20 @@ function handleCreate() {
   router.push(`/case/${diseaseType.value}/create`)
 }
 
+function handleCreateByType(type) {
+  router.push(`/case/${type}/create`)
+}
+
+function getTypeByRow(row) {
+  return getDiseaseTypeByCode(row.disClass) || diseaseType.value
+}
+
 function handleView(row) {
-  router.push(`/case/${diseaseType.value}/${row.id}`)
+  router.push(`/case/${getTypeByRow(row)}/${row.id}`)
 }
 
 function handleEdit(row) {
-  router.push(`/case/${diseaseType.value}/${row.id}/edit`)
+  router.push(`/case/${getTypeByRow(row)}/${row.id}/edit`)
 }
 
 async function handleDelete(row) {
@@ -199,6 +238,45 @@ async function handleDelete(row) {
     loadData()
   } catch (error) {
     console.error('删除失败', error)
+  }
+}
+
+async function handleSync() {
+  try {
+    await ElMessageBox.confirm('将从外部系统同步ELTM数据，是否继续？', '确认同步', { type: 'info' })
+  } catch { return }
+  syncing.value = true
+  try {
+    const res = await syncEltmData()
+    const data = res.data || {}
+    ElMessage.success(`同步完成：新增 ${data.newCount || 0} 条，更新 ${data.updatedCount || 0} 条`)
+    loadData()
+  } catch (error) {
+    ElMessage.error('同步失败，请检查外部系统连接')
+  } finally {
+    syncing.value = false
+  }
+}
+
+async function handleDiagnose() {
+  try {
+    await ElMessageBox.confirm(
+      '系统将根据检查指标自动分析所有未分类的ELTM病例，高置信度自动归类，不确定的标记为待审查。是否继续？',
+      '确认智能诊断',
+      { type: 'info', confirmButtonText: '开始诊断' }
+    )
+  } catch { return }
+  diagnosing.value = true
+  try {
+    const res = await diagnoseBatch()
+    const data = res.data || {}
+    const msg = `诊断完成：自动归类 ${data.autoClassified || 0} 例，建议归类 ${data.suggested || 0} 例，待审查 ${data.uncertain || 0} 例`
+    ElMessage.success(msg)
+    loadData()
+  } catch (error) {
+    ElMessage.error('智能诊断失败')
+  } finally {
+    diagnosing.value = false
   }
 }
 

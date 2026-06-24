@@ -1,5 +1,6 @@
 package com.eksjk.web.config;
 
+import com.eksjk.mapper.FileNoteMapper;
 import com.eksjk.service.impl.S3FileServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,8 +79,8 @@ public class S3Config {
     }
 
     @Bean
-    public S3FileServiceImpl s3FileService(S3Client s3Client) {
+    public S3FileServiceImpl s3FileService(S3Client s3Client, FileNoteMapper fileNoteMapper) {
         log.info("创建S3文件服务实现");
-        return new S3FileServiceImpl(s3Client);
+        return new S3FileServiceImpl(s3Client, fileNoteMapper);
     }
 }

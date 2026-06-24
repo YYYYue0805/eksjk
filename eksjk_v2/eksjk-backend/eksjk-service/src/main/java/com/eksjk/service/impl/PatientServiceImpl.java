@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.eksjk.common.constant.AuditStatusConstants;
 import com.eksjk.common.constant.RoleConstants;
 import com.eksjk.common.exception.BusinessException;
 import com.eksjk.common.result.PageResult;
@@ -78,11 +79,26 @@ public class PatientServiceImpl implements PatientService {
         Page<Patient> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());
 
         LambdaQueryWrapper<Patient> wrapper = new LambdaQueryWrapper<>();
+        // 列表查询仅选取必要列，避免拉取 TEXT/JSON 大字段（~150 列 → ~20 列）
+        wrapper.select(Patient::getId, Patient::getCaseNum, Patient::getName, Patient::getSex,
+                Patient::getAge, Patient::getAgeY, Patient::getAgeM, Patient::getMedrecNum,
+                Patient::getHeight, Patient::getWeight, Patient::getBmi, Patient::getChiCom,
+                Patient::getIcd, Patient::getDisClass, Patient::getImpPer, Patient::getCTime,
+                Patient::getHospitalName, Patient::getAuditStatus, Patient::getDiagnosisStatus,
+                Patient::getDelFlg);
         // 只查询有效数据
         wrapper.eq(Patient::getDelFlg, "1");
 
-        // 疾病分类过滤
-        if (StringUtils.isNotBlank(queryDTO.getDisClass())) {
+        // 审核状态过滤：默认只展示已发放的病例，审核模块使用独立的 AuditService 接口
+        if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
+            wrapper.eq(Patient::getAuditStatus, queryDTO.getAuditStatus());
+        } else {
+            wrapper.eq(Patient::getAuditStatus, AuditStatusConstants.RELEASED);
+        }
+
+        // 疾病分类过滤 — ELTM(10000007) 查询全部病例
+        if (StringUtils.isNotBlank(queryDTO.getDisClass())
+                && !"10000007".equals(queryDTO.getDisClass())) {
             wrapper.eq(Patient::getDisClass, queryDTO.getDisClass());
         }
 
@@ -135,6 +151,10 @@ public class PatientServiceImpl implements PatientService {
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("病例不存在");
         }
+        // 病例管理中只能查看已发放的病例
+        if (!AuditStatusConstants.RELEASED.equals(patient.getAuditStatus())) {
+            throw new BusinessException("病例尚未发放，无法查看");
+        }
 
         PatientVO vo = convertToVO(patient);
 
@@ -171,6 +191,12 @@ public class PatientServiceImpl implements PatientService {
         patient.setModifyTime(LocalDateTime.now());
         patient.setOneTime(LocalDateTime.now());
         patient.setDelFlg("1");
+        patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
+
+        // 自动生成家庭分组ID
+        if (StringUtils.isBlank(patient.getFamilyId())) {
+            patient.setFamilyId(UUID.randomUUID().toString());
+        }
 
         // 计算BMI
         if (StringUtils.isNotBlank(patientDTO.getHeight()) && StringUtils.isNotBlank(patientDTO.getWeight())) {
@@ -224,6 +250,13 @@ public class PatientServiceImpl implements PatientService {
         patient.setOneTime(originalOneTime);
         patient.setModifyTime(LocalDateTime.now());
         patient.setModifyPer(SecurityUtil.getCurrentUsername());
+
+        // 驳回后编辑自动重置为待审核
+        if (AuditStatusConstants.REJECTED.equals(patient.getAuditStatus())) {
+            patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
+            patient.setAuditTime(null);
+            patient.setAuditBy(null);
+        }
 
         // 重新计算BMI
         if (StringUtils.isNotBlank(patientDTO.getHeight()) && StringUtils.isNotBlank(patientDTO.getWeight())) {
@@ -325,7 +358,7 @@ public class PatientServiceImpl implements PatientService {
     /**
      * 生成病例编号（格式：疾病类型前缀 + 年月 + 序号）
      */
-    private synchronized String generateCaseNum(String disClass) {
+    private String generateCaseNum(String disClass) {
         String prefix = DIS_PREFIX_MAP.getOrDefault(disClass, "UNK");
         String yearMonth = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
 
@@ -360,6 +393,11 @@ public class PatientServiceImpl implements PatientService {
         BeanUtils.copyProperties(patient, vo, "id");
         vo.setId(HashidsUtil.encode(patient.getId()));
         vo.setDisClassName(DIS_CLASS_MAP.getOrDefault(patient.getDisClass(), "未知"));
+
+        // 非ELTM病种视为"已诊断"
+        if (patient.getDisClass() != null && !"10000007".equals(patient.getDisClass())) {
+            vo.setDiagnosisStatus("diagnosed");
+        }
 
         // 性别名称
         if ("1".equals(patient.getSex())) {
@@ -398,7 +436,7 @@ public class PatientServiceImpl implements PatientService {
                     new LambdaQueryWrapper<EltmCase>().eq(EltmCase::getPatientId, patientId));
         }
         if (entity != null) {
-            return BeanUtil.beanToMap(entity, false, true);
+            return BeanUtil.beanToMap(entity, false, false);
         }
         return new HashMap<>();
     }
@@ -525,6 +563,172 @@ public class PatientServiceImpl implements PatientService {
         } else {
             eltmCaseMapper.insert(entity);
         }
+    }
+
+    // ==================== 家庭关联 ====================
+
+    @Override
+    public PatientVO searchByMedrecNum(String medrecNum) {
+        if (StringUtils.isBlank(medrecNum)) {
+            throw new BusinessException("病历号不能为空");
+        }
+        LambdaQueryWrapper<Patient> searchWrapper = new LambdaQueryWrapper<>();
+        searchWrapper.select(Patient::getId, Patient::getCaseNum, Patient::getName, Patient::getSex,
+                        Patient::getAge, Patient::getMedrecNum, Patient::getChiCom,
+                        Patient::getIcd, Patient::getDisClass, Patient::getImpPer, Patient::getCTime,
+                        Patient::getHospitalName, Patient::getFamilyId, Patient::getDelFlg)
+                .eq(Patient::getMedrecNum, medrecNum)
+                .eq(Patient::getDelFlg, "1");
+        Patient patient = patientMapper.selectOne(searchWrapper);
+        if (patient == null) {
+            return null;
+        }
+        return convertToVO(patient);
+    }
+
+    @Override
+    public List<PatientVO> getFamilyMembers(String familyId) {
+        if (StringUtils.isBlank(familyId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<Patient> familyWrapper = new LambdaQueryWrapper<>();
+        familyWrapper.select(Patient::getId, Patient::getCaseNum, Patient::getName, Patient::getSex,
+                        Patient::getAge, Patient::getMedrecNum, Patient::getChiCom,
+                        Patient::getIcd, Patient::getDisClass, Patient::getImpPer, Patient::getCTime,
+                        Patient::getHospitalName, Patient::getFamilyId, Patient::getDelFlg)
+                .eq(Patient::getFamilyId, familyId)
+                .eq(Patient::getDelFlg, "1");
+        List<Patient> patients = patientMapper.selectList(familyWrapper);
+        return patients.stream().map(this::convertToVO).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void linkFamily(Long id, String targetMedrecNum) {
+        if (StringUtils.isBlank(targetMedrecNum)) {
+            throw new BusinessException("目标病历号不能为空");
+        }
+
+        Patient currentPatient = patientMapper.selectById(id);
+        if (currentPatient == null || "0".equals(currentPatient.getDelFlg())) {
+            throw new BusinessException("当前患者不存在");
+        }
+
+        // 查找目标患者
+        Patient targetPatient = patientMapper.selectOne(
+                new LambdaQueryWrapper<Patient>()
+                        .eq(Patient::getMedrecNum, targetMedrecNum)
+                        .eq(Patient::getDelFlg, "1")
+        );
+        if (targetPatient == null) {
+            throw new BusinessException("未找到目标患者，请检查病历号");
+        }
+
+        if (targetPatient.getId().equals(id)) {
+            throw new BusinessException("不能关联自身");
+        }
+
+        String targetFamilyId = targetPatient.getFamilyId();
+        if (StringUtils.isBlank(targetFamilyId)) {
+            targetFamilyId = UUID.randomUUID().toString();
+            targetPatient.setFamilyId(targetFamilyId);
+            patientMapper.updateById(targetPatient);
+        }
+
+        // 更新当前患者的 familyId
+        currentPatient.setFamilyId(targetFamilyId);
+        patientMapper.updateById(currentPatient);
+
+        log.info("家庭关联成功: patientId={}, targetMedrecNum={}, familyId={}", id, targetMedrecNum, targetFamilyId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void unlinkFamily(Long id) {
+        Patient patient = patientMapper.selectById(id);
+        if (patient == null || "0".equals(patient.getDelFlg())) {
+            throw new BusinessException("患者不存在");
+        }
+
+        // 生成新的独立 familyId
+        patient.setFamilyId(UUID.randomUUID().toString());
+        patientMapper.updateById(patient);
+
+        log.info("解除家庭关联: patientId={}, newFamilyId={}", id, patient.getFamilyId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String reclassify(Long patientId, String targetDisClass) {
+        if (targetDisClass == null || !DIS_CLASS_MAP.containsKey(targetDisClass)) {
+            throw new BusinessException("无效的目标疾病类型: " + targetDisClass);
+        }
+        if ("10000007".equals(targetDisClass)) {
+            throw new BusinessException("不能重新分类为ELTM");
+        }
+
+        Patient patient = patientMapper.selectById(patientId);
+        if (patient == null || "0".equals(patient.getDelFlg())) {
+            throw new BusinessException("患者不存在");
+        }
+        if (!"10000007".equals(patient.getDisClass())) {
+            throw new BusinessException("仅ELTM患者支持重新分类，当前类型: " + patient.getDisClass());
+        }
+
+        String oldDisClass = patient.getDisClass();
+        String newCaseNum = generateCaseNum(targetDisClass);
+
+        patient.setDisClass(targetDisClass);
+        patient.setCaseNum(newCaseNum);
+        patient.setModifyTime(LocalDateTime.now());
+        patient.setModifyPer(SecurityUtil.getCurrentUsername());
+        patientMapper.updateById(patient);
+
+        // 创建目标病种子表空记录
+        LocalDateTime now = LocalDateTime.now();
+        switch (targetDisClass) {
+            case "10000001" -> {
+                DsdCase dsd = new DsdCase();
+                dsd.setPatientId(patientId);
+                dsd.setCreateTime(now);
+                dsdCaseMapper.insert(dsd);
+            }
+            case "10000002" -> {
+                FssCase fss = new FssCase();
+                fss.setPatientId(patientId);
+                fss.setCreateTime(now);
+                fssCaseMapper.insert(fss);
+            }
+            case "10000003" -> {
+                CppCase cpp = new CppCase();
+                cpp.setPatientId(patientId);
+                cpp.setCreateTime(now);
+                cppCaseMapper.insert(cpp);
+            }
+            case "10000004" -> {
+                MasCase mas = new MasCase();
+                mas.setPatientId(patientId);
+                mas.setCreateTime(now);
+                masCaseMapper.insert(mas);
+            }
+            case "10000005" -> {
+                SgaCase sga = new SgaCase();
+                sga.setPatientId(patientId);
+                sga.setCreateTime(now);
+                sgaCaseMapper.insert(sga);
+            }
+            case "10000006" -> {
+                SssCase sss = new SssCase();
+                sss.setPatientId(patientId);
+                sss.setCreateTime(now);
+                sssCaseMapper.insert(sss);
+            }
+        }
+
+        log.info("重新分类成功: patientId={}, {} -> {}, newCaseNum={}, operator={}",
+                patientId, oldDisClass, targetDisClass, newCaseNum,
+                SecurityUtil.getCurrentUsername() != null ? SecurityUtil.getCurrentUsername() : "unknown");
+        return newCaseNum;
     }
 
     /**

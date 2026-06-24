@@ -7,7 +7,7 @@
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
       :before-upload="beforeUpload"
-      :file-list="fileList"
+      :show-file-list="false"
       list-type="picture-card"
       :disabled="disabled"
       multiple
@@ -38,6 +38,25 @@
           <el-icon v-else :size="40" color="#909399"><Document /></el-icon>
         </div>
         <div class="file-name" :title="file.name">{{ file.name }}</div>
+        <div class="file-note" @click.stop>
+          <template v-if="editingNotePath === file.path">
+            <el-input
+              v-model="editingNoteText"
+              size="small"
+              placeholder="添加备注"
+              @blur="handleNoteBlur(file)"
+              @keyup.enter="handleNoteBlur(file)"
+              maxlength="200"
+            />
+          </template>
+          <template v-else>
+            <span
+              class="note-text"
+              :class="{ 'note-placeholder': !file.note }"
+              @click="handleNoteEdit(file)"
+            >{{ file.note || '添加备注' }}</span>
+          </template>
+        </div>
         <div class="file-actions" v-if="!disabled">
           <el-button link type="primary" size="small" @click.stop="handleDownload(file)">下载</el-button>
           <el-popconfirm title="确定删除该文件吗？" @confirm="handleDelete(file)">
@@ -53,10 +72,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Monitor, Document, Picture } from '@element-plus/icons-vue'
-import { getFileList, deleteFile, getFileDownloadUrl, fetchFileBlobUrl } from '@/api/file'
+import { getFileList, deleteFile, getFileDownloadUrl, fetchFileBlobUrl, updateFileNote } from '@/api/file'
 import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
@@ -70,6 +89,10 @@ const fileList = ref([])
 const loading = ref(false)
 const previewVisible = ref(false)
 const previewUrl = ref('')
+
+// 备注编辑状态
+const editingNotePath = ref(null)
+const editingNoteText = ref('')
 
 // blob URL 缓存，key 为文件 path，避免重复请求
 const blobUrls = ref({})
@@ -180,6 +203,29 @@ async function handleDelete(file) {
   }
 }
 
+function handleNoteEdit(file) {
+  editingNotePath.value = file.path
+  editingNoteText.value = file.note || ''
+  nextTick(() => {
+    const input = document.querySelector('.file-note .el-input__inner')
+    if (input) input.focus()
+  })
+}
+
+async function handleNoteBlur(file) {
+  const newNote = editingNoteText.value.trim()
+  try {
+    await updateFileNote(file.path, newNote)
+    file.note = newNote || null
+  } catch (error) {
+    console.error('保存备注失败', error)
+    ElMessage.error('保存备注失败')
+  } finally {
+    editingNotePath.value = null
+    editingNoteText.value = ''
+  }
+}
+
 function isImage(type) {
   return ['jpg', 'jpeg', 'png', 'gif', 'bmp'].includes(type?.toLowerCase())
 }
@@ -239,5 +285,22 @@ function getThumbUrl(file) {
 }
 .file-actions {
   margin-top: 4px;
+}
+.file-note {
+  margin-top: 2px;
+  min-height: 22px;
+}
+.note-text {
+  font-size: 11px;
+  color: #606266;
+  cursor: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: inline-block;
+}
+.note-placeholder {
+  color: #c0c4cc;
 }
 </style>

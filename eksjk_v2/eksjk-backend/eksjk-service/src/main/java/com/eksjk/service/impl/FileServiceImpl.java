@@ -1,7 +1,11 @@
 package com.eksjk.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.common.exception.BusinessException;
+import com.eksjk.mapper.FileNoteMapper;
+import com.eksjk.model.entity.FileNote;
 import com.eksjk.service.FileService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,12 +36,32 @@ public class FileServiceImpl implements FileService {
     @Value("${eksjk.upload.path:./uploads}")
     private String uploadBasePath;
 
+    private final FileNoteMapper fileNoteMapper;
+
+    public FileServiceImpl(FileNoteMapper fileNoteMapper) {
+        this.fileNoteMapper = fileNoteMapper;
+    }
+
+    @PostConstruct
+    public void init() {
+        Path path = Paths.get(uploadBasePath);
+        if (!path.isAbsolute()) {
+            uploadBasePath = path.toAbsolutePath().normalize().toString();
+        }
+        log.info("文件上传基础路径: {}", uploadBasePath);
+        try {
+            Files.createDirectories(Paths.get(uploadBasePath));
+        } catch (IOException e) {
+            log.error("无法创建上传目录: {}", uploadBasePath, e);
+        }
+    }
+
     @Value("${eksjk.upload.max-size:52428800}")
     private long maxFileSize; // 默认50MB
 
     /** 允许的文件扩展名 */
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
-            "jpg", "jpeg", "png", "gif", "bmp",
+            "jpg", "jpeg", "png", "gif", "bmp", "webp",
             "dcm", "dicom",
             "pdf", "doc", "docx", "xls", "xlsx",
             "zip", "rar"
@@ -112,19 +136,26 @@ public class FileServiceImpl implements FileService {
         }
 
         try {
+            String patientIdStr = "/" + patientId + "/";
             Files.walk(basePath)
                     .filter(Files::isRegularFile)
-                    .filter(p -> p.toString().contains("/" + patientId + "/"))
+                    .filter(p -> p.toString().replace('\\', '/').contains(patientIdStr))
                     .forEach(p -> {
                         Map<String, Object> fileInfo = new HashMap<>();
                         try {
                             fileInfo.put("name", p.getFileName().toString());
-                            fileInfo.put("path", basePath.getParent().relativize(p).toString());
+                            String relativePath = basePath.getParent().relativize(p).toString().replace('\\', '/');
+                            fileInfo.put("path", relativePath);
                             fileInfo.put("size", Files.size(p));
                             fileInfo.put("lastModified", Files.getLastModifiedTime(p).toMillis());
                             String ext = getFileExtension(p.getFileName().toString());
                             fileInfo.put("type", ext);
                             fileInfo.put("isDicom", "dcm".equalsIgnoreCase(ext) || "dicom".equalsIgnoreCase(ext));
+                            // 查询文件备注
+                            LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
+                            noteQuery.eq(FileNote::getFilePath, relativePath);
+                            FileNote fileNote = fileNoteMapper.selectOne(noteQuery);
+                            fileInfo.put("note", fileNote != null ? fileNote.getNote() : null);
                             fileList.add(fileInfo);
                         } catch (IOException ignored) {
                         }
@@ -145,11 +176,46 @@ public class FileServiceImpl implements FileService {
 
         try {
             Files.delete(path);
+            // 同步删除文件备注
+            LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
+            noteQuery.eq(FileNote::getFilePath, filePath);
+            fileNoteMapper.delete(noteQuery);
             log.info("文件删除成功: path={}", filePath);
         } catch (IOException e) {
             log.error("文件删除失败", e);
             throw new BusinessException("文件删除失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void updateNote(String filePath, String note) {
+        LambdaQueryWrapper<FileNote> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FileNote::getFilePath, filePath);
+        FileNote existingNote = fileNoteMapper.selectOne(queryWrapper);
+
+        if (note == null || note.trim().isEmpty()) {
+            if (existingNote != null) {
+                fileNoteMapper.deleteById(existingNote.getId());
+            }
+        } else {
+            if (existingNote != null) {
+                existingNote.setNote(note.trim());
+                fileNoteMapper.updateById(existingNote);
+            } else {
+                FileNote newNote = new FileNote();
+                newNote.setFilePath(filePath);
+                newNote.setNote(note.trim());
+                fileNoteMapper.insert(newNote);
+            }
+        }
+    }
+
+    @Override
+    public String getNote(String filePath) {
+        LambdaQueryWrapper<FileNote> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FileNote::getFilePath, filePath);
+        FileNote fileNote = fileNoteMapper.selectOne(queryWrapper);
+        return fileNote != null ? fileNote.getNote() : null;
     }
 
     @Override

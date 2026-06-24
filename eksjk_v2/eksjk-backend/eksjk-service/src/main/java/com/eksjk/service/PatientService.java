@@ -46,4 +46,34 @@ public interface PatientService {
      * 获取工作台统计数据
      */
     java.util.Map<String, Object> getDashboardStats();
+
+    // ==================== 家庭关联 ====================
+
+    /**
+     * 按病历号精确搜索患者（用于家庭关联）
+     */
+    PatientVO searchByMedrecNum(String medrecNum);
+
+    /**
+     * 查询同一家庭的所有患者
+     */
+    java.util.List<PatientVO> getFamilyMembers(String familyId);
+
+    /**
+     * 将患者关联到目标患者的家庭
+     */
+    void linkFamily(Long id, String targetMedrecNum);
+
+    /**
+     * 解除患者与家庭的关联
+     */
+    void unlinkFamily(Long id);
+
+    /**
+     * 重新分类患者疾病类型（ELTM → 目标病种）
+     * @param patientId 患者ID
+     * @param targetDisClass 目标疾病分类编码（如"10000003"=CPP）
+     * @return 新的病例编号
+     */
+    String reclassify(Long patientId, String targetDisClass);
 }

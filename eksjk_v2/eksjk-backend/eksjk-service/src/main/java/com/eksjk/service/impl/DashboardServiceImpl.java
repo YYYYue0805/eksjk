@@ -115,7 +115,9 @@ public class DashboardServiceImpl implements DashboardService {
      */
     private Map<String, Long> getDiseaseDistribution() {
         LambdaQueryWrapper<Patient> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Patient::getDelFlg, "1")
+        // 只查 dis_class 一列，避免加载全部 192 列到内存
+        wrapper.select(Patient::getDisClass)
+                .eq(Patient::getDelFlg, "1")
                 .isNotNull(Patient::getDisClass)
                 .ne(Patient::getDisClass, "");
         List<Patient> patients = patientMapper.selectList(wrapper);

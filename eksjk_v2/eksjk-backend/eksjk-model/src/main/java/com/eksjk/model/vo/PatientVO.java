@@ -28,6 +28,9 @@ public class PatientVO {
     /** 病历号 */
     private String medrecNum;
 
+    /** 家庭分组ID */
+    private String familyId;
+
     /** 患者编号 */
     private String userNum;
 
@@ -86,11 +89,18 @@ public class PatientVO {
     private String menAge;
     private String familyHis;
 
+    /** 家族成员信息（JSON数组） */
+    private String familyMembers;
+
     /** 有无兄弟姐妹 */
     private String isBot;
 
     /** 既往史 */
     private String pastHis;
+
+    /** 既往测量时间 */
+    private LocalDateTime pastTime;
+
 
     /** 生长速率选择（1=不详, 2=已选择数值） */
     private String growRate;
@@ -101,8 +111,17 @@ public class PatientVO {
     /** 是否有一般检查（1=有, 0=无） */
     private String hasGeneralExam;
 
+    /** 一般检查描述 */
+    private String generalExamDesc;
+
     /** 初次遗精 */
     private String firstEjaculation;
+
+    /** 是否有初次遗精/月经初潮（1=有, 0=无） */
+    private String hasFirstEjaculation;
+
+    /** 初次遗精/月经初潮时间（年月） */
+    private String firstEjaculationDate;
 
     /** 是否有第二性征（1=有, 0=无） */
     private String hasSecondarySexual;
@@ -155,6 +174,16 @@ public class PatientVO {
     private String weightSds;
     private String lowerMeasure;
 
+    private String armLength;
+    private String specialFace;
+    private String specialFaceDesc;
+    private String scoliosis;
+    private String scoliosisDesc;
+    private String rash;
+    private String rashDesc;
+    private String breastDevLeft;
+    private String breastDevRight;
+
     // ==================== 性激素 ====================
 
     private String lh;
@@ -201,9 +230,64 @@ public class PatientVO {
     private String tpoab;
     private String tgab;
 
+    /** 甲状腺功能（1=正常, 2|描述=异常） */
+    private String thyroidFunction;
+
+    // ==================== 检查日期（每个检验项独立日期） ====================
+
+    private String lhCheckDate;
+    private String fshCheckDate;
+    private String e2CheckDate;
+    private String tCheckDate;
+    private String prlCheckDate;
+    private String dhtCheckDate;
+    private String ftCheckDate;
+    private String shbgCheckDate;
+    private String amhCheckDate;
+    private String inhbCheckDate;
+
+    private String igf1CheckDate;
+    private String igfbp3CheckDate;
+    private String fasBloodGluCheckDate;
+    private String fasInsulinCheckDate;
+    private String glyHemCheckDate;
+
+    private String acthCheckDate;
+    private String cortisolCheckDate;
+    private String ohpCheckDate;
+    private String dheasCheckDate;
+    private String androstenedioneCheckDate;
+
+    private String hcgCheckDate;
+    private String hcgtCheckDate;
+    private String hcgdhtCheckDate;
+    private String hcgadCheckDate;
+    private String lhMaxCheckDate;
+    private String fshMaxCheckDate;
+
+    private String tshCheckDate;
+    private String ft3CheckDate;
+    private String ft4CheckDate;
+    private String tpoabCheckDate;
+    private String tgabCheckDate;
+
+    @Deprecated private String hormoneCheckDate;
+    @Deprecated private String thyroidCheckDate;
+    @Deprecated private String adrenalCheckDate;
+    @Deprecated private String growthFactorCheckDate;
+    @Deprecated private String provocationCheckDate;
+
+    // ==================== 常规实验室检查 ====================
+
+    private String bloodRoutine;
+    private String urineRoutine;
+    private String hepatitisB;
+    private String liverKidneyElectrolyte;
+
     // ==================== 影像描述 ====================
 
     private String gonBUlt;
+    private String gonBUltDetail;
     private String pituitaryMri;
     private String thyroidUlt;
     private String bonMinDen;
@@ -218,9 +302,47 @@ public class PatientVO {
     /** 基因突变检测数据(JSON) */
     private String genData;
 
+    /** 手术情况 */
+    private String surgeryNote;
+
+    /** 病理结果 */
+    private String pathologyResult;
+
+    /** 处理意见 */
+    private String treatmentOpinion;
+
+    /** 遗传学其他 */
+    private String geneticsOther;
+
+    /** 生物样本库详情(JSON数组) */
+    private String biologBankData;
+
     /** 疾病专项数据 */
     private Map<String, Object> diseaseData;
 
     /** 随访记录数量 */
     private Integer followUpCount;
+
+    /** ELTM诊断状态: unclassified/suggested/auto_classified/uncertain */
+    private String diagnosisStatus;
+
+    // ==================== 审核发放字段 ====================
+
+    /** 审核状态 */
+    private String auditStatus;
+
+    /** 审核人 */
+    private String auditBy;
+
+    /** 审核时间 */
+    private LocalDateTime auditTime;
+
+    /** 发放人 */
+    private String releaseBy;
+
+    /** 发放时间 */
+    private LocalDateTime releaseTime;
+
+    /** 审核意见 */
+    private String auditRemark;
 }

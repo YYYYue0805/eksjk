@@ -83,6 +83,28 @@ public class MasCase implements Serializable {
     /** 创建时间 */
     private LocalDateTime createTime;
 
+    // ==================== 遗传学检查 ====================
+
+    /** GNAS基因测定: 1=是, 2=否, 3=不详 */
+    private String gnas;
+
+    /** 标本采样类型或部位 */
+    private String gnasSamLoc;
+
+    /** 遗传学检测方法 */
+    private String genTesMet;
+
+    /** 检测结果 */
+    private String detRes;
+
+    /** 检测版本 */
+    private String detVer;
+
+    /** 突变位点 */
+    private String mutSit;
+
+    // ==================== 管理字段 ====================
+
     /** 更新时间 */
     private LocalDateTime updateTime;
 

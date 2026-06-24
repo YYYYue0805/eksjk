@@ -19,6 +19,26 @@ public class FollowUpVO {
     /** 病例主表ID（Hashids编码） */
     private String patientId;
 
+    // ==================== 关联患者信息（审核列表展示用） ====================
+
+    /** 患者病例编号 */
+    private String patientCaseNum;
+
+    /** 患者姓名 */
+    private String patientName;
+
+    /** 患者性别 */
+    private String patientSex;
+
+    /** 患者审核状态 */
+    private String patientAuditStatus;
+
+    /** 患者所属医院（数据隔离用） */
+    private String patientHospitalName;
+
+    /** 患者导入人员（数据隔离用） */
+    private String patientImpPer;
+
     /** 随访日期 */
     private LocalDateTime follTime;
 
@@ -74,8 +94,23 @@ public class FollowUpVO {
 
     // ==================== 甲状腺功能 ====================
 
-    /** 甲功 */
+    /** 甲功（V1兼容） */
     private String jiagong;
+
+    /** TSH (uIU/mL) */
+    private String tsh;
+
+    /** FT3 (pg/mL) */
+    private String ft3;
+
+    /** FT4 (ng/dL) */
+    private String ft4;
+
+    /** TPOAb (IU/mL) */
+    private String tpoab;
+
+    /** TgAb (IU/mL) */
+    private String tgab;
 
     // ==================== 血糖/胰岛素 ====================
 
@@ -140,4 +175,24 @@ public class FollowUpVO {
 
     /** MAS专用随访数据 */
     private Map<String, Object> masFollowUpData;
+
+    // ==================== 审核发放字段 ====================
+
+    /** 审核状态 */
+    private String auditStatus;
+
+    /** 审核人 */
+    private String auditBy;
+
+    /** 审核时间 */
+    private LocalDateTime auditTime;
+
+    /** 发放人 */
+    private String releaseBy;
+
+    /** 发放时间 */
+    private LocalDateTime releaseTime;
+
+    /** 审核意见 */
+    private String auditRemark;
 }

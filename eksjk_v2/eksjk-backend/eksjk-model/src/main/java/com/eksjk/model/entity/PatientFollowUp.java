@@ -86,9 +86,24 @@ public class PatientFollowUp implements Serializable {
 
     // ==================== 甲状腺功能 ====================
 
-    /** 甲功 */
+    /** 甲功（V1兼容，正常/异常 + 描述） */
     @TableField("Jiagong")
     private String jiagong;
+
+    /** TSH (uIU/mL) */
+    private String tsh;
+
+    /** FT3 (pg/mL) */
+    private String ft3;
+
+    /** FT4 (ng/dL) */
+    private String ft4;
+
+    /** TPOAb (IU/mL) */
+    private String tpoab;
+
+    /** TgAb (IU/mL) */
+    private String tgab;
 
     // ==================== 血糖/胰岛素 ====================
 
@@ -223,4 +238,24 @@ public class PatientFollowUp implements Serializable {
 
     /** 删除标志 */
     private String delFlg;
+
+    // ==================== 审核发放字段 ====================
+
+    /** 审核状态: pending_review/pending_release/released/rejected */
+    private String auditStatus;
+
+    /** 审核人(用户名) */
+    private String auditBy;
+
+    /** 审核时间 */
+    private LocalDateTime auditTime;
+
+    /** 发放人(用户名) */
+    private String releaseBy;
+
+    /** 发放时间 */
+    private LocalDateTime releaseTime;
+
+    /** 审核意见 */
+    private String auditRemark;
 }

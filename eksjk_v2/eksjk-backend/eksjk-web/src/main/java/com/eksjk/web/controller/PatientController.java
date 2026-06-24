@@ -97,4 +97,63 @@ public class PatientController {
         Map<String, Object> stats = patientService.getDashboardStats();
         return R.ok(stats);
     }
+
+    // ==================== 家庭关联 ====================
+
+    /**
+     * 按病历号精确搜索患者（用于家庭关联）
+     */
+    @GetMapping("/search-by-medrec")
+    public R<PatientVO> searchByMedrecNum(@RequestParam String medrecNum) {
+        PatientVO vo = patientService.searchByMedrecNum(medrecNum);
+        return R.ok(vo);
+    }
+
+    /**
+     * 查询同一家庭的所有患者
+     */
+    @GetMapping("/family/{familyId}")
+    public R<Map<String, Object>> getFamilyMembers(@PathVariable String familyId) {
+        java.util.List<PatientVO> members = patientService.getFamilyMembers(familyId);
+        return R.ok(Map.of("familyId", familyId, "members", members));
+    }
+
+    /**
+     * 将患者关联到目标患者的家庭
+     */
+    @PutMapping("/{id}/link-family")
+    public R<Void> linkFamily(@PathVariable String id, @RequestBody Map<String, String> body) {
+        long patientId = HashidsUtil.decode(id);
+        String targetMedrecNum = body.get("targetMedrecNum");
+        patientService.linkFamily(patientId, targetMedrecNum);
+        return R.ok();
+    }
+
+    /**
+     * 解除患者与家庭的关联
+     */
+    @PutMapping("/{id}/unlink-family")
+    public R<Void> unlinkFamily(@PathVariable String id) {
+        long patientId = HashidsUtil.decode(id);
+        patientService.unlinkFamily(patientId);
+        return R.ok();
+    }
+
+    /**
+     * 重新分类患者疾病类型（ELTM → 目标病种）
+     */
+    @PutMapping("/{id}/reclassify")
+    public R<Map<String, String>> reclassify(@PathVariable String id, @RequestBody Map<String, String> body) {
+        try {
+            long patientId = HashidsUtil.decode(id);
+            String targetDisClass = body.get("targetDisClass");
+            if (targetDisClass == null || targetDisClass.isBlank()) {
+                return R.fail(400, "目标疾病类型不能为空");
+            }
+            String newCaseNum = patientService.reclassify(patientId, targetDisClass);
+            return R.ok(Map.of("caseNum", newCaseNum));
+        } catch (Exception e) {
+            return R.fail(500, "重新分类失败: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+    }
 }

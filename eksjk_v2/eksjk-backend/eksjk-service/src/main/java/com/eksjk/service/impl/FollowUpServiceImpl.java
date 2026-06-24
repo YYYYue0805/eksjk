@@ -85,6 +85,7 @@ public class FollowUpServiceImpl implements FollowUpService {
         followUp.setPatientId(patientId);
         followUp.setUpTime(LocalDateTime.now());
         followUp.setDelFlg("1");
+        followUp.setAuditStatus("pending_review");
 
         // 自动计算BMI
         if (followUp.getHt() != null && followUp.getWt() != null) {
@@ -143,6 +144,13 @@ public class FollowUpServiceImpl implements FollowUpService {
         existing.setId(originalId);
         existing.setPatientId(originalPatientId);
         existing.setDelFlg(originalDelFlg);
+
+        // 驳回后编辑自动重置为待审核
+        if ("rejected".equals(existing.getAuditStatus())) {
+            existing.setAuditStatus("pending_review");
+            existing.setAuditTime(null);
+            existing.setAuditBy(null);
+        }
 
         // 重新计算BMI
         if (existing.getHt() != null && existing.getWt() != null) {

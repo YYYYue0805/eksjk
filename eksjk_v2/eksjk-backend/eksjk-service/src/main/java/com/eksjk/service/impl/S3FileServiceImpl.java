@@ -1,9 +1,13 @@
 package com.eksjk.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.common.exception.BusinessException;
+import com.eksjk.mapper.FileNoteMapper;
+import com.eksjk.model.entity.FileNote;
 import com.eksjk.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +35,11 @@ import java.util.zip.ZipOutputStream;
 @Slf4j
 @Primary
 @Service
+@ConditionalOnProperty(name = "eksjk.upload.storage-type", havingValue = "s3", matchIfMissing = false)
 public class S3FileServiceImpl implements FileService {
 
     private final S3Client s3Client;
+    private final FileNoteMapper fileNoteMapper;
 
     @Value("${eksjk.upload.s3.bucket:eksjk-files}")
     private String bucketName;
@@ -43,14 +49,15 @@ public class S3FileServiceImpl implements FileService {
 
     /** 允许的文件扩展名 */
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
-            "jpg", "jpeg", "png", "gif", "bmp",
+            "jpg", "jpeg", "png", "gif", "bmp", "webp",
             "dcm", "dicom",
             "pdf", "doc", "docx", "xls", "xlsx",
             "zip", "rar"
     );
 
-    public S3FileServiceImpl(S3Client s3Client) {
+    public S3FileServiceImpl(S3Client s3Client, FileNoteMapper fileNoteMapper) {
         this.s3Client = s3Client;
+        this.fileNoteMapper = fileNoteMapper;
     }
 
     @Override
@@ -158,6 +165,11 @@ public class S3FileServiceImpl implements FileService {
                     String ext = getFileExtension(key);
                     fileInfo.put("type", ext);
                     fileInfo.put("isDicom", "dcm".equalsIgnoreCase(ext) || "dicom".equalsIgnoreCase(ext));
+                    // 查询文件备注
+                    LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
+                    noteQuery.eq(FileNote::getFilePath, key);
+                    FileNote fileNote = fileNoteMapper.selectOne(noteQuery);
+                    fileInfo.put("note", fileNote != null ? fileNote.getNote() : null);
                     fileList.add(fileInfo);
                 }
             }
@@ -182,11 +194,46 @@ public class S3FileServiceImpl implements FileService {
                     .build();
 
             s3Client.deleteObject(deleteRequest);
+            // 同步删除文件备注
+            LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
+            noteQuery.eq(FileNote::getFilePath, filePath);
+            fileNoteMapper.delete(noteQuery);
             log.info("文件删除成功: path={}", filePath);
         } catch (S3Exception e) {
             log.error("文件删除失败", e);
             throw new BusinessException("文件删除失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void updateNote(String filePath, String note) {
+        LambdaQueryWrapper<FileNote> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FileNote::getFilePath, filePath);
+        FileNote existingNote = fileNoteMapper.selectOne(queryWrapper);
+
+        if (note == null || note.trim().isEmpty()) {
+            if (existingNote != null) {
+                fileNoteMapper.deleteById(existingNote.getId());
+            }
+        } else {
+            if (existingNote != null) {
+                existingNote.setNote(note.trim());
+                fileNoteMapper.updateById(existingNote);
+            } else {
+                FileNote newNote = new FileNote();
+                newNote.setFilePath(filePath);
+                newNote.setNote(note.trim());
+                fileNoteMapper.insert(newNote);
+            }
+        }
+    }
+
+    @Override
+    public String getNote(String filePath) {
+        LambdaQueryWrapper<FileNote> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FileNote::getFilePath, filePath);
+        FileNote fileNote = fileNoteMapper.selectOne(queryWrapper);
+        return fileNote != null ? fileNote.getNote() : null;
     }
 
     @Override

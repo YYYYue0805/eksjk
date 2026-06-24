@@ -21,6 +21,9 @@ public class PatientDTO {
     /** 病历号 */
     private String medrecNum;
 
+    /** 家庭分组ID */
+    private String familyId;
+
     /** 患者编号 */
     private String userNum;
 
@@ -97,6 +100,9 @@ public class PatientDTO {
     /** 家族史 */
     private String familyHis;
 
+    /** 家族成员信息（JSON数组） */
+    private String familyMembers;
+
     // ==================== 出生信息 ====================
 
     /** 胎龄周 */
@@ -116,6 +122,10 @@ public class PatientDTO {
 
     /** 既往史 */
     private String pastHis;
+
+    /** 既往测量时间 */
+    private LocalDateTime pastTime;
+
 
     /** 窒息抢救史 */
     private String cesaAsphyxia;
@@ -143,8 +153,17 @@ public class PatientDTO {
     /** 是否有一般检查（1=有, 0=无） */
     private String hasGeneralExam;
 
+    /** 一般检查描述 */
+    private String generalExamDesc;
+
     /** 初次遗精 */
     private String firstEjaculation;
+
+    /** 是否有初次遗精/月经初潮（1=有, 0=无） */
+    private String hasFirstEjaculation;
+
+    /** 初次遗精/月经初潮时间（年月） */
+    private String firstEjaculationDate;
 
     /** 是否有第二性征（1=有, 0=无） */
     private String hasSecondarySexual;
@@ -168,6 +187,33 @@ public class PatientDTO {
     private String heightSds;
     private String weightSds;
     private String lowerMeasure;
+
+    /** 臂长(cm) */
+    private String armLength;
+
+    /** 特殊面容（1=无, 2=有） */
+    private String specialFace;
+
+    /** 特殊面容描述 */
+    private String specialFaceDesc;
+
+    /** 脊柱侧弯（1=无, 2=有） */
+    private String scoliosis;
+
+    /** 脊柱侧弯描述 */
+    private String scoliosisDesc;
+
+    /** 皮疹（1=无, 2=有） */
+    private String rash;
+
+    /** 皮疹描述 */
+    private String rashDesc;
+
+    /** 左侧乳腺发育 B1-B5 */
+    private String breastDevLeft;
+
+    /** 右侧乳腺发育 B1-B5 */
+    private String breastDevRight;
 
     // ==================== 性激素 ====================
 
@@ -215,9 +261,64 @@ public class PatientDTO {
     private String tpoab;
     private String tgab;
 
+    /** 甲状腺功能（1=正常, 2|描述=异常） */
+    private String thyroidFunction;
+
+    // ==================== 检查日期（每个检验项独立日期） ====================
+
+    private String lhCheckDate;
+    private String fshCheckDate;
+    private String e2CheckDate;
+    private String tCheckDate;
+    private String prlCheckDate;
+    private String dhtCheckDate;
+    private String ftCheckDate;
+    private String shbgCheckDate;
+    private String amhCheckDate;
+    private String inhbCheckDate;
+
+    private String igf1CheckDate;
+    private String igfbp3CheckDate;
+    private String fasBloodGluCheckDate;
+    private String fasInsulinCheckDate;
+    private String glyHemCheckDate;
+
+    private String acthCheckDate;
+    private String cortisolCheckDate;
+    private String ohpCheckDate;
+    private String dheasCheckDate;
+    private String androstenedioneCheckDate;
+
+    private String hcgCheckDate;
+    private String hcgtCheckDate;
+    private String hcgdhtCheckDate;
+    private String hcgadCheckDate;
+    private String lhMaxCheckDate;
+    private String fshMaxCheckDate;
+
+    private String tshCheckDate;
+    private String ft3CheckDate;
+    private String ft4CheckDate;
+    private String tpoabCheckDate;
+    private String tgabCheckDate;
+
+    @Deprecated private String hormoneCheckDate;
+    @Deprecated private String thyroidCheckDate;
+    @Deprecated private String adrenalCheckDate;
+    @Deprecated private String growthFactorCheckDate;
+    @Deprecated private String provocationCheckDate;
+
+    // ==================== 常规实验室检查 ====================
+
+    private String bloodRoutine;
+    private String urineRoutine;
+    private String hepatitisB;
+    private String liverKidneyElectrolyte;
+
     // ==================== 影像描述 ====================
 
     private String gonBUlt;
+    private String gonBUltDetail;
     private String pituitaryMri;
     private String thyroidUlt;
     private String bonMinDen;
@@ -231,6 +332,21 @@ public class PatientDTO {
 
     /** 基因突变检测数据(JSON) */
     private String genData;
+
+    /** 手术情况 */
+    private String surgeryNote;
+
+    /** 病理结果 */
+    private String pathologyResult;
+
+    /** 处理意见 */
+    private String treatmentOpinion;
+
+    /** 遗传学其他 */
+    private String geneticsOther;
+
+    /** 生物样本库详情(JSON数组) */
+    private String biologBankData;
 
     // ==================== 疾病专项数据（动态字段） ====================
 

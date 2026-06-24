@@ -86,6 +86,17 @@ public class FileController {
     }
 
     /**
+     * 更新文件备注
+     */
+    @PutMapping("/note")
+    public R<Void> updateNote(
+            @RequestParam("path") String filePath,
+            @RequestParam("note") String note) {
+        fileService.updateNote(filePath, note);
+        return R.ok();
+    }
+
+    /**
      * 批量打包下载
      */
     @PostMapping("/batch-download")

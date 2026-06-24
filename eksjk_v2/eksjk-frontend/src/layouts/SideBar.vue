@@ -13,8 +13,8 @@
         :collapse="collapsed"
         :unique-opened="true"
         :collapse-transition="false"
-        router
         class="sidebar__menu"
+        @select="handleMenuSelect"
       >
         <template v-for="menu in menus" :key="menu.path">
           <!-- 有子菜单 -->
@@ -48,7 +48,7 @@
  * 侧边栏组件
  */
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({
   /** 是否折叠 */
@@ -64,11 +64,19 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const router = useRouter()
 
 /** 当前激活的菜单 */
 const activeMenu = computed(() => {
   return route.meta?.activeMenu || route.path
 })
+
+/** 菜单选择事件：直接使用 router.push 替代 el-menu 的 router 属性 */
+function handleMenuSelect(index) {
+  if (index && index !== route.path) {
+    router.push(index)
+  }
+}
 </script>
 
 <style scoped>

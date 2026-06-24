@@ -30,14 +30,6 @@
 
     <el-row :gutter="16">
       <el-col :span="24">
-        <el-form-item label="治疗方案">
-          <el-input v-model="localData.treatmentPlan" type="textarea" :rows="4" :disabled="disabled" placeholder="请输入治疗方案" />
-        </el-form-item>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="16">
-      <el-col :span="24">
         <el-form-item label="标签">
           <el-input v-model="tagsStr" :disabled="disabled" placeholder="请输入标签，多个用逗号分隔" @blur="onTagsBlur" />
         </el-form-item>
@@ -59,7 +51,6 @@ const emit = defineEmits(['update:modelValue'])
 const localData = reactive({
   diagnosis: '',
   secondaryDiagnosis: '',
-  treatmentPlan: '',
   isTreated: '',
   tags: []
 })

@@ -1,18 +1,21 @@
 <template>
   <el-autocomplete
-    :model-value="modelValue"
+    v-model="displayText"
     :fetch-suggestions="querySearch"
     :placeholder="placeholder"
     :disabled="disabled"
     clearable
-    value-key="value"
-    @update:model-value="$emit('update:modelValue', $event)"
+    value-key="label"
     @select="handleSelect"
-  />
+  >
+    <template #default="{ item }">
+      <div class="icd-suggestion-item">{{ item.label }}</div>
+    </template>
+  </el-autocomplete>
 </template>
 
 <script setup>
-import { icdOptions } from '@/data/icdData'
+import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -22,24 +25,61 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-function querySearch(queryString, callback) {
+// 动态加载 ICD 数据，仅在用户使用自动补全时才下载 2MB 数据
+let icdCache = null
+async function ensureIcdData() {
+  if (!icdCache) {
+    const mod = await import('@/data/icdData')
+    icdCache = { options: mod.icdOptions, labelMap: mod.icdLabelMap }
+  }
+  return icdCache
+}
+
+async function codeToLabel(code) {
+  if (!code) return ''
+  try {
+    const { labelMap } = await ensureIcdData()
+    const name = labelMap[code]
+    return name ? `${code} ${name}` : code
+  } catch { return code }
+}
+
+const displayText = ref(props.modelValue || '')
+
+// 异步加载 ICD 标签
+onMounted(async () => {
+  if (props.modelValue) {
+    displayText.value = await codeToLabel(props.modelValue)
+  }
+})
+
+watch(() => props.modelValue, async (val) => {
+  displayText.value = val ? await codeToLabel(val) : ''
+})
+
+watch(displayText, (val) => {
+  if (!val) {
+    emit('update:modelValue', '')
+  }
+})
+
+async function querySearch(queryString, callback) {
+  const { options } = await ensureIcdData()
   if (!queryString || queryString.trim() === '') {
-    callback(icdOptions.slice(0, 20))
+    callback(options.slice(0, 20))
     return
   }
   const q = queryString.trim().toLowerCase()
   const results = []
-  // 先匹配编码前缀
-  for (const item of icdOptions) {
+  for (const item of options) {
     if (item.value.toLowerCase().startsWith(q)) {
       results.push(item)
       if (results.length >= 20) break
     }
   }
-  // 再匹配名称包含
   if (results.length < 20) {
     const existingValues = new Set(results.map(r => r.value))
-    for (const item of icdOptions) {
+    for (const item of options) {
       if (!existingValues.has(item.value) && item.label.toLowerCase().includes(q)) {
         results.push(item)
         existingValues.add(item.value)
@@ -51,6 +91,15 @@ function querySearch(queryString, callback) {
 }
 
 function handleSelect(item) {
+  displayText.value = item.label
   emit('update:modelValue', item.value)
 }
 </script>
+
+<style scoped>
+.icd-suggestion-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

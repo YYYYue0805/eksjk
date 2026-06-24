@@ -4,34 +4,84 @@
     <div class="section-title">性激素及相关</div>
     <el-row :gutter="16">
       <el-col v-if="showBasicHormones" :span="8">
-        <el-form-item label="LH (mIU/mL)"><el-input v-model="localData.lh" :disabled="disabled" placeholder="LH" /></el-form-item>
+        <el-form-item label="LH (mIU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.lh" :disabled="disabled" placeholder="LH" class="exam-val" />
+            <el-date-picker v-model="localData.lhCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showBasicHormones" :span="8">
-        <el-form-item label="FSH (mIU/mL)"><el-input v-model="localData.fsh" :disabled="disabled" placeholder="FSH" /></el-form-item>
+        <el-form-item label="FSH (mIU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.fsh" :disabled="disabled" placeholder="FSH" class="exam-val" />
+            <el-date-picker v-model="localData.fshCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showBasicHormones" :span="8">
-        <el-form-item label="E2 (pg/mL)"><el-input v-model="localData.e2" :disabled="disabled" placeholder="E2" /></el-form-item>
+        <el-form-item label="E2 (pg/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.e2" :disabled="disabled" placeholder="E2" class="exam-val" />
+            <el-date-picker v-model="localData.e2CheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showBasicHormones" :span="8">
-        <el-form-item label="T (ng/dL)"><el-input v-model="localData.t" :disabled="disabled" placeholder="T" /></el-form-item>
+        <el-form-item label="T (ng/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.t" :disabled="disabled" placeholder="T" class="exam-val" />
+            <el-date-picker v-model="localData.tCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showBasicHormones" :span="8">
-        <el-form-item label="PRL (ng/mL)"><el-input v-model="localData.prl" :disabled="disabled" placeholder="PRL" /></el-form-item>
+        <el-form-item label="PRL (ng/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.prl" :disabled="disabled" placeholder="PRL" class="exam-val" />
+            <el-date-picker v-model="localData.prlCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showDsdHormones" :span="8">
-        <el-form-item label="DHT (ng/dL)"><el-input v-model="localData.dht" :disabled="disabled" placeholder="DHT" /></el-form-item>
+        <el-form-item label="DHT (ng/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.dht" :disabled="disabled" placeholder="DHT" class="exam-val" />
+            <el-date-picker v-model="localData.dhtCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showDsdHormones" :span="8">
-        <el-form-item label="FT (ng/dL)"><el-input v-model="localData.ft" :disabled="disabled" placeholder="FT" /></el-form-item>
+        <el-form-item label="FT (ng/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.ft" :disabled="disabled" placeholder="FT" class="exam-val" />
+            <el-date-picker v-model="localData.ftCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showDsdHormones" :span="8">
-        <el-form-item label="SHBG (nmol/L)"><el-input v-model="localData.shbg" :disabled="disabled" placeholder="SHBG" /></el-form-item>
+        <el-form-item label="SHBG (nmol/L)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.shbg" :disabled="disabled" placeholder="SHBG" class="exam-val" />
+            <el-date-picker v-model="localData.shbgCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showDsdHormones" :span="8">
-        <el-form-item label="AMH (ng/mL)"><el-input v-model="localData.amh" :disabled="disabled" placeholder="AMH" /></el-form-item>
+        <el-form-item label="AMH (ng/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.amh" :disabled="disabled" placeholder="AMH" class="exam-val" />
+            <el-date-picker v-model="localData.amhCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="showDsdHormones" :span="8">
-        <el-form-item label="INHB (pg/mL)"><el-input v-model="localData.inhb" :disabled="disabled" placeholder="INHB" /></el-form-item>
+        <el-form-item label="INHB (pg/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.inhb" :disabled="disabled" placeholder="INHB" class="exam-val" />
+            <el-date-picker v-model="localData.inhbCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -39,19 +89,44 @@
     <div class="section-title">生长因子与代谢</div>
     <el-row :gutter="16">
       <el-col :span="8">
-        <el-form-item label="IGF-1 (ng/mL)"><el-input v-model="localData.igf1" :disabled="disabled" placeholder="IGF-1" /></el-form-item>
+        <el-form-item label="IGF-1 (ng/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.igf1" :disabled="disabled" placeholder="IGF-1" class="exam-val" />
+            <el-date-picker v-model="localData.igf1CheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="IGFBP-3 (ug/mL)"><el-input v-model="localData.igfbp3" :disabled="disabled" placeholder="IGFBP-3" /></el-form-item>
+        <el-form-item label="IGFBP-3 (ug/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.igfbp3" :disabled="disabled" placeholder="IGFBP-3" class="exam-val" />
+            <el-date-picker v-model="localData.igfbp3CheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="空腹血糖 (mmol/L)"><el-input v-model="localData.fasBloodGlu" :disabled="disabled" placeholder="空腹血糖" /></el-form-item>
+        <el-form-item label="空腹血糖 (mmol/L)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.fasBloodGlu" :disabled="disabled" placeholder="空腹血糖" class="exam-val" />
+            <el-date-picker v-model="localData.fasBloodGluCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="空腹胰岛素 (uIU/mL)"><el-input v-model="localData.fasInsulin" :disabled="disabled" placeholder="空腹胰岛素" /></el-form-item>
+        <el-form-item label="空腹胰岛素 (uIU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.fasInsulin" :disabled="disabled" placeholder="空腹胰岛素" class="exam-val" />
+            <el-date-picker v-model="localData.fasInsulinCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="糖化血红蛋白 (%)"><el-input v-model="localData.glyHem" :disabled="disabled" placeholder="糖化血红蛋白" /></el-form-item>
+        <el-form-item label="糖化血红蛋白 (%)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.glyHem" :disabled="disabled" placeholder="糖化血红蛋白" class="exam-val" />
+            <el-date-picker v-model="localData.glyHemCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -59,19 +134,44 @@
     <div class="section-title" v-if="showAdrenal">肾上腺激素</div>
     <el-row v-if="showAdrenal" :gutter="16">
       <el-col :span="8">
-        <el-form-item label="ACTH (pg/mL)"><el-input v-model="localData.acth" :disabled="disabled" placeholder="ACTH" /></el-form-item>
+        <el-form-item label="ACTH (pg/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.acth" :disabled="disabled" placeholder="ACTH" class="exam-val" />
+            <el-date-picker v-model="localData.acthCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="皮质醇 (ug/dL)"><el-input v-model="localData.cortisol" :disabled="disabled" placeholder="皮质醇" /></el-form-item>
+        <el-form-item label="皮质醇 (ug/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.cortisol" :disabled="disabled" placeholder="皮质醇" class="exam-val" />
+            <el-date-picker v-model="localData.cortisolCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="isDsd" :span="8">
-        <el-form-item label="17-OHP (ng/mL)"><el-input v-model="localData.ohp" :disabled="disabled" placeholder="17-OHP" /></el-form-item>
+        <el-form-item label="17-OHP (ng/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.ohp" :disabled="disabled" placeholder="17-OHP" class="exam-val" />
+            <el-date-picker v-model="localData.ohpCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="DHEA-S (ug/dL)"><el-input v-model="localData.dheas" :disabled="disabled" placeholder="DHEA-S" /></el-form-item>
+        <el-form-item label="DHEA-S (ug/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.dheas" :disabled="disabled" placeholder="DHEA-S" class="exam-val" />
+            <el-date-picker v-model="localData.dheasCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col v-if="isDsd" :span="8">
-        <el-form-item label="雄烯二酮 (ng/mL)"><el-input v-model="localData.androstenedione" :disabled="disabled" placeholder="雄烯二酮" /></el-form-item>
+        <el-form-item label="雄烯二酮 (ng/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.androstenedione" :disabled="disabled" placeholder="雄烯二酮" class="exam-val" />
+            <el-date-picker v-model="localData.androstenedioneCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -81,24 +181,54 @@
       <!-- HCG 激发 (DSD) -->
       <template v-if="isDsd">
         <el-col :span="8">
-          <el-form-item label="HCG 激发前"><el-input v-model="localData.hcg" :disabled="disabled" /></el-form-item>
+          <el-form-item label="HCG 激发前 T" class="exam-with-date">
+            <div class="exam-row">
+              <el-input v-model="localData.hcg" :disabled="disabled" class="exam-val" />
+              <el-date-picker v-model="localData.hcgCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+            </div>
+          </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="HCG 激发后 T"><el-input v-model="localData.hcgt" :disabled="disabled" /></el-form-item>
+          <el-form-item label="HCG 激发后 T" class="exam-with-date">
+            <div class="exam-row">
+              <el-input v-model="localData.hcgt" :disabled="disabled" class="exam-val" />
+              <el-date-picker v-model="localData.hcgtCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+            </div>
+          </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="HCG 激发后 DHT"><el-input v-model="localData.hcgdht" :disabled="disabled" /></el-form-item>
+          <el-form-item label="HCG 激发后 DHT" class="exam-with-date">
+            <div class="exam-row">
+              <el-input v-model="localData.hcgdht" :disabled="disabled" class="exam-val" />
+              <el-date-picker v-model="localData.hcgdhtCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+            </div>
+          </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="HCG 激发后 AD"><el-input v-model="localData.hcgad" :disabled="disabled" /></el-form-item>
+          <el-form-item label="HCG 激发后 AD" class="exam-with-date">
+            <div class="exam-row">
+              <el-input v-model="localData.hcgad" :disabled="disabled" class="exam-val" />
+              <el-date-picker v-model="localData.hcgadCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+            </div>
+          </el-form-item>
         </el-col>
       </template>
       <!-- GnRH 激发 (DSD, CPP) -->
       <el-col :span="8">
-        <el-form-item label="GnRH 激发 LHmax"><el-input v-model="localData.lhMax" :disabled="disabled" /></el-form-item>
+        <el-form-item label="GnRH 激发 LHmax" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.lhMax" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.lhMaxCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="GnRH 激发 FSHmax"><el-input v-model="localData.fshMax" :disabled="disabled" /></el-form-item>
+        <el-form-item label="GnRH 激发 FSHmax" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.fshMax" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.fshMaxCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -106,19 +236,44 @@
     <div class="section-title" v-if="showThyroid">甲状腺功能</div>
     <el-row v-if="showThyroid" :gutter="16">
       <el-col :span="8">
-        <el-form-item label="TSH (uIU/mL)"><el-input v-model="localData.tsh" :disabled="disabled" /></el-form-item>
+        <el-form-item label="TSH (uIU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.tsh" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.tshCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="FT3 (pg/mL)"><el-input v-model="localData.ft3" :disabled="disabled" /></el-form-item>
+        <el-form-item label="FT3 (pg/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.ft3" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.ft3CheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="FT4 (ng/dL)"><el-input v-model="localData.ft4" :disabled="disabled" /></el-form-item>
+        <el-form-item label="FT4 (ng/dL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.ft4" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.ft4CheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="TPOAb (IU/mL)"><el-input v-model="localData.tpoab" :disabled="disabled" /></el-form-item>
+        <el-form-item label="TPOAb (IU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.tpoab" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.tpoabCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="TgAb (IU/mL)"><el-input v-model="localData.tgab" :disabled="disabled" /></el-form-item>
+        <el-form-item label="TgAb (IU/mL)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.tgab" :disabled="disabled" class="exam-val" />
+            <el-date-picker v-model="localData.tgabCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -126,23 +281,135 @@
     <div class="section-title">影像检查</div>
 
     <!-- 性腺B超 -->
-    <el-row v-if="showGonBUlt" :gutter="16">
-      <el-col :span="24">
-        <el-form-item label="性腺B超">
-          <el-radio-group v-model="imagingState.gonBUlt.result" :disabled="disabled" @change="syncImagingToData('gonBUlt')">
-            <el-radio value="0">未查</el-radio>
-            <el-radio value="1">正常</el-radio>
-            <el-radio value="2">异常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-col>
-      <el-col v-if="imagingState.gonBUlt.result === '2'" :span="24">
-        <el-form-item>
-          <el-input v-model="imagingState.gonBUlt.description" type="textarea" :rows="3"
-            :disabled="disabled" placeholder="请输入性腺B超异常描述" @input="syncImagingToData('gonBUlt')" />
-        </el-form-item>
-      </el-col>
-    </el-row>
+    <template v-if="showGonBUlt">
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="性腺B超">
+            <el-radio-group v-model="imagingState.gonBUlt.result" :disabled="disabled" @change="syncImagingToData('gonBUlt')">
+              <el-radio value="0">未查</el-radio>
+              <el-radio value="1">正常</el-radio>
+              <el-radio value="2">异常</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row v-if="imagingState.gonBUlt.result === '2'" :gutter="16">
+        <el-col :span="24">
+          <el-form-item>
+            <el-input v-model="imagingState.gonBUlt.description" type="textarea" :rows="3"
+              :disabled="disabled" placeholder="请输入性腺B超异常描述" @input="syncImagingToData('gonBUlt')" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <!-- B超尺寸详情（DSD/CPP异常时展开） -->
+      <template v-if="showGonBUltDetail">
+        <el-row :gutter="16">
+          <el-col :span="24"><div class="sub-section-title">B超尺寸详情</div></el-col>
+        </el-row>
+        <!-- 女性 -->
+        <template v-if="patientSex === '2'">
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="子宫长(cm)"><el-input v-model="gonBUltDetail.uterusLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="子宫宽(cm)"><el-input v-model="gonBUltDetail.uterusWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="子宫高(cm)"><el-input v-model="gonBUltDetail.uterusHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="宫颈长(cm)"><el-input v-model="gonBUltDetail.cervixLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="内膜厚度(cm)"><el-input v-model="gonBUltDetail.endometriumThickness" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="最大滤泡直径(cm)"><el-input v-model="gonBUltDetail.maxFollicleDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="有无囊肿">
+                <el-radio-group v-model="gonBUltDetail.hasCyst" :disabled="disabled" @change="syncGonBUltDetail">
+                  <el-radio value="0">无</el-radio>
+                  <el-radio value="1">有</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row v-if="gonBUltDetail.hasCyst === '1'" :gutter="16">
+            <el-col :span="6">
+              <el-form-item label="囊肿侧"><el-input v-model="gonBUltDetail.cystSide" :disabled="disabled" placeholder="左/右" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="囊肿长(cm)"><el-input v-model="gonBUltDetail.cystLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="囊肿宽(cm)"><el-input v-model="gonBUltDetail.cystWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="囊肿高(cm)"><el-input v-model="gonBUltDetail.cystHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="左卵巢长(cm)"><el-input v-model="gonBUltDetail.leftOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="左卵巢宽(cm)"><el-input v-model="gonBUltDetail.leftOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="左卵巢高(cm)"><el-input v-model="gonBUltDetail.leftOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="右卵巢长(cm)"><el-input v-model="gonBUltDetail.rightOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="右卵巢宽(cm)"><el-input v-model="gonBUltDetail.rightOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="右卵巢高(cm)"><el-input v-model="gonBUltDetail.rightOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+        <!-- 男性 -->
+        <template v-if="patientSex === '1'">
+          <el-row :gutter="16">
+            <el-col :span="6">
+              <el-form-item label="右侧睾丸长(cm)"><el-input v-model="gonBUltDetail.rightTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="右侧睾丸宽(cm)"><el-input v-model="gonBUltDetail.rightTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="右侧睾丸高(cm)"><el-input v-model="gonBUltDetail.rightTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="右侧长径(cm)"><el-input v-model="gonBUltDetail.rightTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="6">
+              <el-form-item label="左侧睾丸长(cm)"><el-input v-model="gonBUltDetail.leftTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="左侧睾丸宽(cm)"><el-input v-model="gonBUltDetail.leftTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="左侧睾丸高(cm)"><el-input v-model="gonBUltDetail.leftTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="左侧长径(cm)"><el-input v-model="gonBUltDetail.leftTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+      </template>
+    </template>
 
     <!-- 卵巢囊肿 -->
     <el-row v-if="showOvarianCyst" :gutter="16">
@@ -177,23 +444,76 @@
     </el-row>
 
     <!-- 甲状腺B超 -->
-    <el-row v-if="showThyroidUlt" :gutter="16">
-      <el-col :span="24">
-        <el-form-item label="甲状腺B超">
-          <el-radio-group v-model="imagingState.thyroidUlt.result" :disabled="disabled" @change="syncImagingToData('thyroidUlt')">
-            <el-radio value="0">未查</el-radio>
-            <el-radio value="1">正常</el-radio>
-            <el-radio value="2">异常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-col>
-      <el-col v-if="imagingState.thyroidUlt.result === '2'" :span="24">
-        <el-form-item>
-          <el-input v-model="imagingState.thyroidUlt.description" type="textarea" :rows="3"
-            :disabled="disabled" placeholder="请输入甲状腺B超异常描述" @input="syncImagingToData('thyroidUlt')" />
-        </el-form-item>
-      </el-col>
-    </el-row>
+    <template v-if="showThyroidUlt">
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="甲状腺B超">
+            <el-radio-group v-model="imagingState.thyroidUlt.result" :disabled="disabled" @change="syncImagingToData('thyroidUlt')">
+              <el-radio value="0">未查</el-radio>
+              <el-radio value="1">正常</el-radio>
+              <el-radio value="2">异常</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row v-if="imagingState.thyroidUlt.result === '2'" :gutter="16">
+        <el-col :span="24">
+          <el-form-item>
+            <el-input v-model="imagingState.thyroidUlt.description" type="textarea" :rows="3"
+              :disabled="disabled" placeholder="请输入甲状腺B超异常描述" @input="syncImagingToData('thyroidUlt')" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <!-- CPP 甲状腺B超左右侧细节（来自V1） -->
+      <template v-if="isCpp && imagingState.thyroidUlt.result === '2'">
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="左侧甲状腺">
+              <el-radio-group v-model="thyroidUltDetail.leftResult" :disabled="disabled">
+                <el-radio value="1">正常</el-radio>
+                <el-radio value="2">异常</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="thyroidUltDetail.leftResult === '2'" :span="6">
+            <el-form-item label="左侧结节分级">
+              <el-select v-model="thyroidUltDetail.leftNoduleGrade" :disabled="disabled" placeholder="TI-RADS分级">
+                <el-option label="TI-RADS 1" value="1" />
+                <el-option label="TI-RADS 2" value="2" />
+                <el-option label="TI-RADS 3" value="3" />
+                <el-option label="TI-RADS 4a" value="4a" />
+                <el-option label="TI-RADS 4b" value="4b" />
+                <el-option label="TI-RADS 4c" value="4c" />
+                <el-option label="TI-RADS 5" value="5" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="右侧甲状腺">
+              <el-radio-group v-model="thyroidUltDetail.rightResult" :disabled="disabled">
+                <el-radio value="1">正常</el-radio>
+                <el-radio value="2">异常</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="thyroidUltDetail.rightResult === '2'" :span="6">
+            <el-form-item label="右侧结节分级">
+              <el-select v-model="thyroidUltDetail.rightNoduleGrade" :disabled="disabled" placeholder="TI-RADS分级">
+                <el-option label="TI-RADS 1" value="1" />
+                <el-option label="TI-RADS 2" value="2" />
+                <el-option label="TI-RADS 3" value="3" />
+                <el-option label="TI-RADS 4a" value="4a" />
+                <el-option label="TI-RADS 4b" value="4b" />
+                <el-option label="TI-RADS 4c" value="4c" />
+                <el-option label="TI-RADS 5" value="5" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </template>
+    </template>
 
     <!-- 骨密度 -->
     <el-row v-if="showBonMinDen" :gutter="16">
@@ -210,6 +530,83 @@
         <el-form-item>
           <el-input v-model="imagingState.bonMinDen.description" type="textarea" :rows="3"
             :disabled="disabled" placeholder="请输入骨密度异常描述" @input="syncImagingToData('bonMinDen')" />
+        </el-form-item>
+      </el-col>
+    </el-row>
+
+    <!-- 常规实验室检查 -->
+    <div class="section-title">常规实验室检查</div>
+    <el-row :gutter="16">
+      <el-col :span="12">
+        <el-form-item label="血常规">
+          <el-radio-group v-model="bloodState.result" :disabled="disabled" @change="syncRoutineState">
+            <el-radio value="0">未查</el-radio>
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item label="尿常规">
+          <el-radio-group v-model="urineState.result" :disabled="disabled" @change="syncRoutineState">
+            <el-radio value="0">未查</el-radio>
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-if="bloodState.result === '2'" :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="血常规异常">
+          <el-input v-model="bloodState.description" type="textarea" :rows="2" :disabled="disabled" placeholder="请输入血常规异常描述" @input="syncRoutineState" />
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-if="urineState.result === '2'" :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="尿常规异常">
+          <el-input v-model="urineState.description" type="textarea" :rows="2" :disabled="disabled" placeholder="请输入尿常规异常描述" @input="syncRoutineState" />
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row :gutter="16">
+      <el-col :span="12">
+        <el-form-item label="乙肝三系">
+          <el-select v-model="localData.hepatitisB" :disabled="disabled" placeholder="请选择">
+            <el-option label="阴性" value="阴性" />
+            <el-option label="HBSAb阳性" value="HBSAb阳性" />
+            <el-option label="小三阳" value="小三阳" />
+            <el-option label="大三阳" value="大三阳" />
+          </el-select>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="肝肾糖电解质">
+          <el-input v-model="localData.liverKidneyElectrolyte" type="textarea" :rows="3" :disabled="disabled" placeholder="请输入肝肾糖电解质结果（支持OCR识别文本粘贴）" />
+        </el-form-item>
+      </el-col>
+    </el-row>
+
+    <!-- 甲状腺功能评估 -->
+    <div class="section-sub-title">甲状腺功能评估</div>
+    <el-row :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="甲状腺功能">
+          <el-radio-group v-model="thyroidFunctionState.result" :disabled="disabled" @change="syncThyroidFunction">
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-if="thyroidFunctionState.result === '2'" :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="异常描述">
+          <el-input v-model="thyroidFunctionState.description" type="textarea" :rows="3"
+            :disabled="disabled" placeholder="请输入甲状腺功能异常具体情况" @input="syncThyroidFunction" />
         </el-form-item>
       </el-col>
     </el-row>
@@ -346,7 +743,8 @@ const props = defineProps({
   diseaseData: { type: Object, default: () => ({}) },
   disabled: { type: Boolean, default: false },
   diseaseType: { type: String, default: '' },
-  patientId: { type: String, default: '' }
+  patientId: { type: String, default: '' },
+  patientSex: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:modelValue', 'update:diseaseData'])
@@ -366,9 +764,9 @@ const showDsdHormones = computed(() => isDsd.value)
 const showAdrenal = computed(() => ['dsd', 'fss', 'sga', 'sss', 'eltm'].includes(props.diseaseType))
 const showProvocation = computed(() => ['dsd', 'cpp'].includes(props.diseaseType))
 const showThyroid = computed(() => ['mas', 'eltm'].includes(props.diseaseType))
-const showGonBUlt = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss'].includes(props.diseaseType))
-const showPituitaryMri = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss'].includes(props.diseaseType))
-const showThyroidUlt = computed(() => ['cpp', 'fss', 'sga', 'sss'].includes(props.diseaseType))
+const showGonBUlt = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
+const showPituitaryMri = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
+const showThyroidUlt = computed(() => ['cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
 const showBonMinDen = computed(() => ['fss', 'sga', 'sss'].includes(props.diseaseType))
 const showOvarianCyst = computed(() => ['cpp', 'fss', 'sga', 'sss'].includes(props.diseaseType))
 
@@ -407,6 +805,76 @@ function makeImagingState() {
   }
 }
 const imagingState = reactive(makeImagingState())
+
+// B超尺寸详情（DSD/CPP 性腺B超异常时展开）
+const showGonBUltDetail = computed(() => ['dsd', 'cpp'].includes(props.diseaseType) && imagingState.gonBUlt.result === '2')
+
+const gonBUltDetail = reactive({
+  // 子宫（女性）
+  uterusLength: '', uterusWidth: '', uterusHeight: '',
+  cervixLength: '', endometriumThickness: '',
+  // 卵巢（女性）
+  leftOvaryLength: '', leftOvaryWidth: '', leftOvaryHeight: '',
+  rightOvaryLength: '', rightOvaryWidth: '', rightOvaryHeight: '',
+  maxFollicleDiameter: '',
+  hasCyst: '0', cystSide: '', cystLength: '', cystWidth: '', cystHeight: '',
+  // 睾丸（男性）
+  rightTestisLength: '', rightTestisWidth: '', rightTestisHeight: '', rightTestisLongDiameter: '',
+  leftTestisLength: '', leftTestisWidth: '', leftTestisHeight: '', leftTestisLongDiameter: ''
+})
+
+// 血常规/尿常规状态
+const bloodState = reactive({ result: '0', description: '' })
+const urineState = reactive({ result: '0', description: '' })
+
+// 甲状腺功能评估状态
+const thyroidFunctionState = reactive({ result: '1', description: '' })
+
+function syncRoutineState() {
+  localData.bloodRoutine = encodeField(bloodState.result, bloodState.description)
+  localData.urineRoutine = encodeField(urineState.result, urineState.description)
+}
+
+function loadRoutineState() {
+  const b = parseField(localData.bloodRoutine)
+  bloodState.result = b.result
+  bloodState.description = b.description
+  const u = parseField(localData.urineRoutine)
+  urineState.result = u.result
+  urineState.description = u.description
+}
+
+function syncThyroidFunction() {
+  localData.thyroidFunction = encodeField(thyroidFunctionState.result, thyroidFunctionState.description)
+}
+
+function loadThyroidFunctionState() {
+  const t = parseField(localData.thyroidFunction)
+  thyroidFunctionState.result = t.result || '1'
+  thyroidFunctionState.description = t.description
+}
+
+// 甲状腺B超左右侧细节（CPP）
+const thyroidUltDetail = reactive({
+  leftResult: '1',
+  leftNoduleGrade: '',
+  rightResult: '1',
+  rightNoduleGrade: ''
+})
+
+function syncGonBUltDetail() {
+  localData.gonBUltDetail = JSON.stringify({ ...gonBUltDetail })
+}
+
+function parseGonBUltDetail(json) {
+  if (!json) return
+  try {
+    const obj = JSON.parse(json)
+    Object.keys(gonBUltDetail).forEach(k => {
+      if (obj[k] !== undefined) gonBUltDetail[k] = obj[k]
+    })
+  } catch { /* ignore parse errors */ }
+}
 
 // 从 localData（4个主表字段）加载到 imagingState
 function loadImagingFromLocalData() {
@@ -450,12 +918,41 @@ function syncImagingToData(field) {
 }
 
 const localData = reactive({
-  lh: '', fsh: '', e2: '', t: '', prl: '', dht: '', ft: '', shbg: '', amh: '', inhb: '',
-  igf1: '', igfbp3: '', fasBloodGlu: '', fasInsulin: '', glyHem: '',
-  acth: '', cortisol: '', ohp: '', dheas: '', androstenedione: '',
-  hcg: '', hcgt: '', hcgdht: '', hcgad: '', lhMax: '', fshMax: '',
-  tsh: '', ft3: '', ft4: '', tpoab: '', tgab: '',
-  gonBUlt: '', pituitaryMri: '', thyroidUlt: '', bonMinDen: ''
+  lh: '', lhCheckDate: '',
+  fsh: '', fshCheckDate: '',
+  e2: '', e2CheckDate: '',
+  t: '', tCheckDate: '',
+  prl: '', prlCheckDate: '',
+  dht: '', dhtCheckDate: '',
+  ft: '', ftCheckDate: '',
+  shbg: '', shbgCheckDate: '',
+  amh: '', amhCheckDate: '',
+  inhb: '', inhbCheckDate: '',
+  igf1: '', igf1CheckDate: '',
+  igfbp3: '', igfbp3CheckDate: '',
+  fasBloodGlu: '', fasBloodGluCheckDate: '',
+  fasInsulin: '', fasInsulinCheckDate: '',
+  glyHem: '', glyHemCheckDate: '',
+  acth: '', acthCheckDate: '',
+  cortisol: '', cortisolCheckDate: '',
+  ohp: '', ohpCheckDate: '',
+  dheas: '', dheasCheckDate: '',
+  androstenedione: '', androstenedioneCheckDate: '',
+  hcg: '', hcgCheckDate: '',
+  hcgt: '', hcgtCheckDate: '',
+  hcgdht: '', hcgdhtCheckDate: '',
+  hcgad: '', hcgadCheckDate: '',
+  lhMax: '', lhMaxCheckDate: '',
+  fshMax: '', fshMaxCheckDate: '',
+  tsh: '', tshCheckDate: '',
+  ft3: '', ft3CheckDate: '',
+  ft4: '', ft4CheckDate: '',
+  tpoab: '', tpoabCheckDate: '',
+  tgab: '', tgabCheckDate: '',
+  gonBUlt: '', pituitaryMri: '', thyroidUlt: '', bonMinDen: '',
+  gonBUltDetail: '',
+  thyroidFunction: '',
+  bloodRoutine: '0|', urineRoutine: '0|', hepatitisB: '', liverKidneyElectrolyte: ''
 })
 
 watch(() => props.modelValue, (val) => {
@@ -466,6 +963,9 @@ watch(() => props.modelValue, (val) => {
       }
     })
     loadImagingFromLocalData()
+    loadRoutineState()
+    loadThyroidFunctionState()
+    parseGonBUltDetail(val.gonBUltDetail)
   }
 }, { immediate: true, deep: true })
 
@@ -493,5 +993,30 @@ watch(localData, () => {
   margin: 16px 0 12px 0;
   padding-left: 10px;
   border-left: 3px solid #409eff;
+}
+
+.sub-section-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #606266;
+  margin: 12px 0 8px 0;
+  padding-left: 10px;
+  border-left: 2px solid #67c23a;
+}
+
+.exam-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.exam-val {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-dt {
+  flex-shrink: 0;
+  width: 140px;
 }
 </style>

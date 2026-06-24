@@ -32,6 +32,12 @@ const allMenus = [
     ]
   },
   {
+    path: '/audit',
+    title: '审核发放',
+    icon: 'Checked',
+    roles: ['super_admin', 'hospital_admin']
+  },
+  {
     path: '/school',
     title: '健康筛查',
     icon: 'School',
@@ -171,6 +177,13 @@ const asyncRoutes = [
     name: 'SystemLog',
     component: () => import('@/views/system/SystemLog.vue'),
     meta: { title: '操作日志', requiresAuth: true, roles: ['super_admin'] }
+  },
+  // 审核发放管理
+  {
+    path: '/audit',
+    name: 'AuditManagement',
+    component: () => import('@/views/audit/AuditManagement.vue'),
+    meta: { title: '审核发放', requiresAuth: true, roles: ['super_admin', 'hospital_admin'] }
   }
 ]
 

@@ -76,6 +76,19 @@ export function deleteFile(path) {
 }
 
 /**
+ * 更新文件备注
+ * @param {string} path - 文件路径
+ * @param {string} note - 备注内容
+ */
+export function updateFileNote(path, note) {
+  return request({
+    url: '/api/files/note',
+    method: 'put',
+    params: { path, note }
+  })
+}
+
+/**
  * 批量打包下载
  * @param {Array<string>} patientIds - 患者ID列表
  */

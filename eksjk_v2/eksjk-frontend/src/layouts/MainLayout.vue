@@ -11,9 +11,7 @@
       <!-- 主内容区 -->
       <div class="main-layout__content">
         <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" />
-          </transition>
+          <component :is="Component" />
         </router-view>
       </div>
     </div>

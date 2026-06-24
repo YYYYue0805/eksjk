@@ -38,6 +38,10 @@ public class Patient implements Serializable {
     /** 病历号（医院病历号） */
     private String medrecNum;
 
+    /** 家庭分组ID（同一家庭的患者共享） */
+    @TableField("family_id")
+    private String familyId;
+
     /** 患者编号 */
     private String userNum;
 
@@ -125,6 +129,10 @@ public class Patient implements Serializable {
     /** 家族史 */
     private String familyHis;
 
+    /** 家族成员信息（JSON数组） */
+    @TableField("family_members")
+    private String familyMembers;
+
     // ==================== 出生信息 ====================
 
     /** 胎龄周 */
@@ -176,8 +184,17 @@ public class Patient implements Serializable {
     /** 是否有一般检查（1=有, 0=无） */
     private String hasGeneralExam;
 
+    /** 一般检查描述 */
+    private String generalExamDesc;
+
     /** 初次遗精 */
     private String firstEjaculation;
+
+    /** 是否有初次遗精/月经初潮（1=有, 0=无） */
+    private String hasFirstEjaculation;
+
+    /** 初次遗精/月经初潮时间（年月） */
+    private String firstEjaculationDate;
 
     /** 是否有第二性征（1=有, 0=无） */
     private String hasSecondarySexual;
@@ -210,6 +227,33 @@ public class Patient implements Serializable {
 
     /** 下部量(cm) */
     private String lowerMeasure;
+
+    /** 臂长(cm) */
+    private String armLength;
+
+    /** 特殊面容（1=无, 2=有） */
+    private String specialFace;
+
+    /** 特殊面容描述 */
+    private String specialFaceDesc;
+
+    /** 脊柱侧弯（1=无, 2=有） */
+    private String scoliosis;
+
+    /** 脊柱侧弯描述 */
+    private String scoliosisDesc;
+
+    /** 皮疹（1=无, 2=有） */
+    private String rash;
+
+    /** 皮疹描述 */
+    private String rashDesc;
+
+    /** 左侧乳腺发育 B1-B5 */
+    private String breastDevLeft;
+
+    /** 右侧乳腺发育 B1-B5 */
+    private String breastDevRight;
 
     // ==================== 性激素 ====================
 
@@ -317,10 +361,152 @@ public class Patient implements Serializable {
     /** TgAb (IU/mL) */
     private String tgab;
 
+    /** 甲状腺功能（1=正常, 2|描述=异常） */
+    private String thyroidFunction;
+
+    // ==================== 检查日期（每个检验项独立日期） ====================
+
+    /** LH检查日期 */
+    private String lhCheckDate;
+
+    /** FSH检查日期 */
+    private String fshCheckDate;
+
+    /** E2检查日期 */
+    private String e2CheckDate;
+
+    /** T检查日期 */
+    private String tCheckDate;
+
+    /** PRL检查日期 */
+    private String prlCheckDate;
+
+    /** DHT检查日期 */
+    private String dhtCheckDate;
+
+    /** FT检查日期 */
+    private String ftCheckDate;
+
+    /** SHBG检查日期 */
+    private String shbgCheckDate;
+
+    /** AMH检查日期 */
+    private String amhCheckDate;
+
+    /** INHB检查日期 */
+    private String inhbCheckDate;
+
+    /** IGF-1检查日期 */
+    private String igf1CheckDate;
+
+    /** IGFBP-3检查日期 */
+    private String igfbp3CheckDate;
+
+    /** 空腹血糖检查日期 */
+    private String fasBloodGluCheckDate;
+
+    /** 空腹胰岛素检查日期 */
+    private String fasInsulinCheckDate;
+
+    /** 糖化血红蛋白检查日期 */
+    private String glyHemCheckDate;
+
+    /** ACTH检查日期 */
+    private String acthCheckDate;
+
+    /** 皮质醇检查日期 */
+    private String cortisolCheckDate;
+
+    /** 17-OHP检查日期 */
+    private String ohpCheckDate;
+
+    /** DHEA-S检查日期 */
+    private String dheasCheckDate;
+
+    /** 雄烯二酮检查日期 */
+    private String androstenedioneCheckDate;
+
+    /** HCG激发前T检查日期 */
+    private String hcgCheckDate;
+
+    /** HCG激发后T检查日期 */
+    private String hcgtCheckDate;
+
+    /** HCG激发后DHT检查日期 */
+    private String hcgdhtCheckDate;
+
+    /** HCG激发后AD检查日期 */
+    private String hcgadCheckDate;
+
+    /** GnRH激发LHmax检查日期 */
+    private String lhMaxCheckDate;
+
+    /** GnRH激发FSHmax检查日期 */
+    private String fshMaxCheckDate;
+
+    /** TSH检查日期 */
+    private String tshCheckDate;
+
+    /** FT3检查日期 */
+    private String ft3CheckDate;
+
+    /** FT4检查日期 */
+    private String ft4CheckDate;
+
+    /** TPOAb检查日期 */
+    private String tpoabCheckDate;
+
+    /** TgAb检查日期 */
+    private String tgabCheckDate;
+
+    // ==================== 旧分类级检查日期（保留兼容，不再使用，数据库中不存在） ====================
+
+    /** @deprecated 使用各检验项独立日期 */
+    @Deprecated
+    @TableField(exist = false)
+    private String hormoneCheckDate;
+
+    /** @deprecated 使用各检验项独立日期 */
+    @Deprecated
+    @TableField(exist = false)
+    private String thyroidCheckDate;
+
+    /** @deprecated 使用各检验项独立日期 */
+    @Deprecated
+    @TableField(exist = false)
+    private String adrenalCheckDate;
+
+    /** @deprecated 使用各检验项独立日期 */
+    @Deprecated
+    @TableField(exist = false)
+    private String growthFactorCheckDate;
+
+    /** @deprecated 使用各检验项独立日期 */
+    @Deprecated
+    @TableField(exist = false)
+    private String provocationCheckDate;
+
+    // ==================== 常规实验室检查 ====================
+
+    /** 血常规（编码格式: status|description） */
+    private String bloodRoutine;
+
+    /** 尿常规（编码格式: status|description） */
+    private String urineRoutine;
+
+    /** 乙肝三系（阴性/HBSAb阳性/小三阳/大三阳） */
+    private String hepatitisB;
+
+    /** 肝肾糖电解质（支持OCR识别文本） */
+    private String liverKidneyElectrolyte;
+
     // ==================== 影像描述 ====================
 
     /** 性腺B超描述 */
     private String gonBUlt;
+
+    /** 性腺B超尺寸详情（JSON格式，含子宫/卵巢/睾丸三维尺寸等） */
+    private String gonBUltDetail;
 
     /** 垂体MRI描述 */
     private String pituitaryMri;
@@ -347,6 +533,21 @@ public class Patient implements Serializable {
 
     /** 基因突变检测数据(JSON数组) */
     private String genData;
+
+    /** 手术情况 */
+    private String surgeryNote;
+
+    /** 病理结果 */
+    private String pathologyResult;
+
+    /** 处理意见 */
+    private String treatmentOpinion;
+
+    /** 遗传学其他 */
+    private String geneticsOther;
+
+    /** 生物样本库详情(JSON数组) */
+    private String biologBankData;
 
     // ==================== 小程序关联 ====================
 
@@ -459,4 +660,27 @@ public class Patient implements Serializable {
 
     /** 同步时间 */
     private LocalDateTime syncTime;
+
+    /** ELTM诊断状态 */
+    private String diagnosisStatus;
+
+    // ==================== 审核发放字段 ====================
+
+    /** 审核状态: pending_review/pending_release/released/rejected */
+    private String auditStatus;
+
+    /** 审核人(用户名) */
+    private String auditBy;
+
+    /** 审核时间 */
+    private LocalDateTime auditTime;
+
+    /** 发放人(用户名) */
+    private String releaseBy;
+
+    /** 发放时间 */
+    private LocalDateTime releaseTime;
+
+    /** 审核意见 */
+    private String auditRemark;
 }

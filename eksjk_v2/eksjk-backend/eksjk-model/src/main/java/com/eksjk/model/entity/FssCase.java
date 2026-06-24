@@ -77,6 +77,10 @@ public class FssCase implements Serializable {
     /** 其他既往史 */
     private String pastOther;
 
+    /** 诊疗方案（JSON） */
+    @TableField("dia_trea_plan")
+    private String diaTreaPlan;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

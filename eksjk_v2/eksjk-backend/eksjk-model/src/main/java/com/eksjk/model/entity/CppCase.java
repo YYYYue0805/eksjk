@@ -50,6 +50,10 @@ public class CppCase implements Serializable {
     /** 既往疾病及治疗情况 */
     private String oldHis;
 
+    /** 诊疗方案（JSON） */
+    @TableField("dia_trea_plan")
+    private String diaTreaPlan;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

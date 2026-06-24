@@ -2,6 +2,7 @@ package com.eksjk.service.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
+import com.eksjk.common.constant.PermissionConstants;
 import com.eksjk.common.constant.RoleConstants;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,13 @@ public class StpInterfaceImpl implements StpInterface {
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        return new ArrayList<>();
+        List<String> permissions = new ArrayList<>();
+        String roleCode = (String) StpUtil.getSessionByLoginId(loginId).get("roleCode");
+        if (RoleConstants.SUPER_ADMIN.equals(roleCode) || RoleConstants.HOSPITAL_ADMIN.equals(roleCode)) {
+            permissions.add(PermissionConstants.CASE_AUDIT);
+            permissions.add(PermissionConstants.CASE_RELEASE);
+        }
+        return permissions;
     }
 
     /**

@@ -33,6 +33,9 @@ public class PatientQueryDTO {
     /** 上传时间范围 - 结束 */
     private LocalDateTime endTime;
 
+    /** 审核状态过滤 */
+    private String auditStatus;
+
     /** 当前页码 */
     private Integer pageNum = 1;
 

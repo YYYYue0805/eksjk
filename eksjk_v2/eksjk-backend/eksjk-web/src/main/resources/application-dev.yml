@@ -15,19 +15,18 @@ spring:
 # 文件上传配置
 eksjk:
   upload:
-    # 使用S3对象存储
-    storage-type: s3
-    # 对象存储配置（MinIO）
-    s3:
-      endpoint: http://localhost:9000  # MinIO默认端口
-      region: us-east-1
-      bucket: eksjk-files
-      access-key: minioadmin  # MinIO默认用户名
-      secret-key: minioadmin  # MinIO默认密码
+    # 使用本地文件存储（无需 MinIO）
+    storage-type: local
+    # 上传文件存储路径（开发环境使用用户目录）
+    path: ${user.home}/eksjk-uploads
+
+  # ELTM 外部系统同步地址
+  eltm:
+    sync-url: http://36.26.56.94:8026/datamain/getpatient
 
 # 日志配置
 logging:
   level:
     root: INFO
     com.eksjk: DEBUG
-    software.amazon.awssdk: DEBUG  # 开启S3 SDK调试日志
+    com.baomidou.mybatisplus: DEBUG

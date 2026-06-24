@@ -112,3 +112,73 @@ export function getDisClassName(code) {
   const entry = Object.values(diseaseTypes).find(d => d.code === code)
   return entry?.name || '未知'
 }
+
+/**
+ * 根据疾病分类编码获取路由 key
+ */
+export function getDiseaseTypeByCode(code) {
+  const entry = Object.entries(diseaseTypes).find(([key, val]) => val.code === code)
+  return entry ? entry[0] : 'eltm'
+}
+
+// ==================== 家庭关联 API ====================
+
+/**
+ * 按病历号精确搜索患者
+ * @param {string} medrecNum - 病历号
+ */
+export function searchPatientByMedrec(medrecNum) {
+  return request({
+    url: '/api/patients/search-by-medrec',
+    method: 'get',
+    params: { medrecNum }
+  })
+}
+
+/**
+ * 查询同一家庭的所有患者
+ * @param {string} familyId - 家庭分组ID
+ */
+export function getFamilyMembers(familyId) {
+  return request({
+    url: `/api/patients/family/${familyId}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 将患者关联到目标患者的家庭
+ * @param {string} patientId - 当前患者ID
+ * @param {string} targetMedrecNum - 目标患者病历号
+ */
+export function linkFamilyMember(patientId, targetMedrecNum) {
+  return request({
+    url: `/api/patients/${patientId}/link-family`,
+    method: 'put',
+    data: { targetMedrecNum }
+  })
+}
+
+/**
+ * 解除患者与家庭的关联
+ * @param {string} patientId - 当前患者ID
+ */
+export function unlinkFamilyMember(patientId) {
+  return request({
+    url: `/api/patients/${patientId}/unlink-family`,
+    method: 'put'
+  })
+}
+
+/**
+ * 重新分类患者疾病类型（ELTM → 目标病种）
+ * @param {string} patientId - 患者ID
+ * @param {string} targetDisClass - 目标疾病分类编码
+ */
+export function reclassifyPatient(patientId, targetDisClass) {
+  return request({
+    url: `/api/patients/${patientId}/reclassify`,
+    method: 'put',
+    data: { targetDisClass }
+  })
+}

@@ -24,6 +24,10 @@ eksjk:
       access-key: ${EKSJK_UPLOAD_S3_ACCESS_KEY}
       secret-key: ${EKSJK_UPLOAD_S3_SECRET_KEY}
 
+  # ELTM 外部系统同步地址
+  eltm:
+    sync-url: ${EKSJK_ELTM_SYNC_URL:http://36.26.56.94:8026/datamain/getpatient}
+
 # Sa-Token 密钥从环境变量获取
 sa-token:
   jwt-secret-key: ${EKSJK_JWT_SECRET:eksjk-v2-jwt-secret-key-2024}
@@ -34,3 +38,4 @@ logging:
     root: INFO
     com.eksjk: INFO
     software.amazon.awssdk: WARN
+    com.baomidou.mybatisplus: WARN
