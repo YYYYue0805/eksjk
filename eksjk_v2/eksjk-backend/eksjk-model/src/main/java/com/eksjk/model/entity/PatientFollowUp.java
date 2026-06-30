@@ -239,6 +239,11 @@ public class PatientFollowUp implements Serializable {
     /** 删除标志 */
     private String delFlg;
 
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
+
     // ==================== 审核发放字段 ====================
 
     /** 审核状态: pending_review/pending_release/released/rejected */

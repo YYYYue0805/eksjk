@@ -176,6 +176,11 @@ public class FollowUpVO {
     /** MAS专用随访数据 */
     private Map<String, Object> masFollowUpData;
 
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
+
     // ==================== 审核发放字段 ====================
 
     /** 审核状态 */

@@ -235,6 +235,7 @@ public class PatientDTO {
     private String fasBloodGlu;
     private String fasInsulin;
     private String glyHem;
+    private String glyHemA;
 
     // ==================== 肾上腺 ====================
 
@@ -243,6 +244,8 @@ public class PatientDTO {
     private String ohp;
     private String dheas;
     private String androstenedione;
+    private String afp;
+    private String cea;
 
     // ==================== 激发试验 ====================
 
@@ -252,6 +255,7 @@ public class PatientDTO {
     private String hcgad;
     private String lhMax;
     private String fshMax;
+    private String gh;
 
     // ==================== 甲状腺 ====================
 
@@ -282,12 +286,15 @@ public class PatientDTO {
     private String fasBloodGluCheckDate;
     private String fasInsulinCheckDate;
     private String glyHemCheckDate;
+    private String glyHemACheckDate;
 
     private String acthCheckDate;
     private String cortisolCheckDate;
     private String ohpCheckDate;
     private String dheasCheckDate;
     private String androstenedioneCheckDate;
+    private String afpCheckDate;
+    private String ceaCheckDate;
 
     private String hcgCheckDate;
     private String hcgtCheckDate;
@@ -295,6 +302,7 @@ public class PatientDTO {
     private String hcgadCheckDate;
     private String lhMaxCheckDate;
     private String fshMaxCheckDate;
+    private String ghCheckDate;
 
     private String tshCheckDate;
     private String ft3CheckDate;
@@ -347,6 +355,11 @@ public class PatientDTO {
 
     /** 生物样本库详情(JSON数组) */
     private String biologBankData;
+
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
 
     // ==================== 疾病专项数据（动态字段） ====================
 

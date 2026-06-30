@@ -306,6 +306,9 @@ public class Patient implements Serializable {
     /** 糖化血红蛋白 (%) */
     private String glyHem;
 
+    /** 糖化血红蛋白 A1c (%) */
+    private String glyHemA;
+
     // ==================== 肾上腺激素 ====================
 
     /** ACTH (pg/mL) */
@@ -323,6 +326,12 @@ public class Patient implements Serializable {
     /** 雄烯二酮 (ng/mL) */
     @TableField("ad")
     private String androstenedione;
+
+    /** 甲胎蛋白 (ng/ml) */
+    private String afp;
+
+    /** 癌胚抗原 (ng/ml) */
+    private String cea;
 
     // ==================== 激发试验 ====================
 
@@ -343,6 +352,9 @@ public class Patient implements Serializable {
 
     /** GnRH 激发 FSHmax */
     private String fshMax;
+
+    /** GH 药物激发试验峰值 (ng/mL) */
+    private String gh;
 
     // ==================== 甲状腺功能 ====================
 
@@ -411,6 +423,9 @@ public class Patient implements Serializable {
     /** 糖化血红蛋白检查日期 */
     private String glyHemCheckDate;
 
+    /** 糖化血红蛋白A1c检查日期 */
+    private String glyHemACheckDate;
+
     /** ACTH检查日期 */
     private String acthCheckDate;
 
@@ -425,6 +440,12 @@ public class Patient implements Serializable {
 
     /** 雄烯二酮检查日期 */
     private String androstenedioneCheckDate;
+
+    /** 甲胎蛋白检查日期 */
+    private String afpCheckDate;
+
+    /** 癌胚抗原检查日期 */
+    private String ceaCheckDate;
 
     /** HCG激发前T检查日期 */
     private String hcgCheckDate;
@@ -443,6 +464,9 @@ public class Patient implements Serializable {
 
     /** GnRH激发FSHmax检查日期 */
     private String fshMaxCheckDate;
+
+    /** GH激发试验检查日期 */
+    private String ghCheckDate;
 
     /** TSH检查日期 */
     private String tshCheckDate;
@@ -663,6 +687,11 @@ public class Patient implements Serializable {
 
     /** ELTM诊断状态 */
     private String diagnosisStatus;
+
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
 
     // ==================== 审核发放字段 ====================
 

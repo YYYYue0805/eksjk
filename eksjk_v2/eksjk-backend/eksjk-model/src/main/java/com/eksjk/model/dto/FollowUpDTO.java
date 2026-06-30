@@ -141,6 +141,11 @@ public class FollowUpDTO {
     /** 是否达终身高 */
     private String isFinalhei;
 
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
+
     // ==================== MAS专用随访数据 ====================
 
     /** MAS专用随访数据（仅MAS疾病类型使用） */

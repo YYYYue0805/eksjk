@@ -204,6 +204,7 @@ public class PatientVO {
     private String fasBloodGlu;
     private String fasInsulin;
     private String glyHem;
+    private String glyHemA;
 
     // ==================== 肾上腺 ====================
 
@@ -212,6 +213,8 @@ public class PatientVO {
     private String ohp;
     private String dheas;
     private String androstenedione;
+    private String afp;
+    private String cea;
 
     // ==================== 激发试验 ====================
 
@@ -221,6 +224,7 @@ public class PatientVO {
     private String hcgad;
     private String lhMax;
     private String fshMax;
+    private String gh;
 
     // ==================== 甲状腺 ====================
 
@@ -251,12 +255,15 @@ public class PatientVO {
     private String fasBloodGluCheckDate;
     private String fasInsulinCheckDate;
     private String glyHemCheckDate;
+    private String glyHemACheckDate;
 
     private String acthCheckDate;
     private String cortisolCheckDate;
     private String ohpCheckDate;
     private String dheasCheckDate;
     private String androstenedioneCheckDate;
+    private String afpCheckDate;
+    private String ceaCheckDate;
 
     private String hcgCheckDate;
     private String hcgtCheckDate;
@@ -264,6 +271,7 @@ public class PatientVO {
     private String hcgadCheckDate;
     private String lhMaxCheckDate;
     private String fshMaxCheckDate;
+    private String ghCheckDate;
 
     private String tshCheckDate;
     private String ft3CheckDate;
@@ -325,6 +333,11 @@ public class PatientVO {
 
     /** ELTM诊断状态: unclassified/suggested/auto_classified/uncertain */
     private String diagnosisStatus;
+
+    // ==================== 眼科检查 ====================
+
+    /** 眼科检查数据(JSON) */
+    private String eyeExam;
 
     // ==================== 审核发放字段 ====================
 

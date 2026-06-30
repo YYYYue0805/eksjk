@@ -158,6 +158,62 @@
           </el-select>
         </el-form-item>
       </el-card>
+
+      <el-card shadow="never" class="form-section">
+        <template #header><span>眼科检查</span></template>
+        <el-form-item label="是否有做眼科检查">
+          <el-radio-group v-model="eyeExam.hasExam" @change="syncEyeExam">
+            <el-radio value="0">无</el-radio>
+            <el-radio value="1">有</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <template v-if="eyeExam.hasExam === '1'">
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="检查时间">
+                <el-date-picker v-model="eyeExam.examDate" type="date"
+                  value-format="YYYY-MM-DD" placeholder="请选择日期" @change="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="裸眼视力 右">
+                <el-input v-model="eyeExam.nakedVisionRight" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="裸眼视力 左">
+                <el-input v-model="eyeExam.nakedVisionLeft" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="矫正视力 右">
+                <el-input v-model="eyeExam.correctedVisionRight" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="矫正视力 左">
+                <el-input v-model="eyeExam.correctedVisionLeft" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="眼轴 右 (cm)">
+                <el-input v-model="eyeExam.axialLengthRight" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="眼轴 左 (cm)">
+                <el-input v-model="eyeExam.axialLengthLeft" @input="syncEyeExam" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+      </el-card>
     </el-form>
 
     <template #footer>
@@ -212,7 +268,20 @@ const formData = reactive({
   bonMinDen: '',
   diaTreaPlan: '',
   other: '',
-  isFinalhei: ''
+  isFinalhei: '',
+  eyeExam: ''
+})
+
+// 眼科检查
+const eyeExam = reactive({
+  hasExam: '0',
+  examDate: '',
+  nakedVisionRight: '',
+  nakedVisionLeft: '',
+  correctedVisionRight: '',
+  correctedVisionLeft: '',
+  axialLengthRight: '',
+  axialLengthLeft: ''
 })
 
 watch(() => props.visible, (val) => {
@@ -224,6 +293,7 @@ watch(() => props.visible, (val) => {
           formData[key] = props.editData[key]
         }
       })
+      parseEyeExam(props.editData.eyeExam)
     }
   }
 })
@@ -240,6 +310,20 @@ function calcBmi() {
       formData.bmi = ''
     }
   }
+}
+
+function syncEyeExam() {
+  formData.eyeExam = JSON.stringify({ ...eyeExam })
+}
+
+function parseEyeExam(json) {
+  if (!json) return
+  try {
+    const obj = JSON.parse(json)
+    Object.keys(eyeExam).forEach(k => {
+      if (obj[k] !== undefined) eyeExam[k] = obj[k]
+    })
+  } catch { /* ignore parse errors */ }
 }
 
 async function handleSave() {
@@ -277,6 +361,15 @@ function handleClose() {
       formData[key] = ''
     }
   })
+  // 重置眼科检查
+  eyeExam.hasExam = '0'
+  eyeExam.examDate = ''
+  eyeExam.nakedVisionRight = ''
+  eyeExam.nakedVisionLeft = ''
+  eyeExam.correctedVisionRight = ''
+  eyeExam.correctedVisionLeft = ''
+  eyeExam.axialLengthRight = ''
+  eyeExam.axialLengthLeft = ''
 }
 </script>
 

@@ -128,13 +128,21 @@
           </div>
         </el-form-item>
       </el-col>
+      <el-col :span="8">
+        <el-form-item label="糖化血红蛋白A1c (%)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.glyHemA" :disabled="disabled" placeholder="糖化血红蛋白A1c" class="exam-val" />
+            <el-date-picker v-model="localData.glyHemACheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
+      </el-col>
     </el-row>
 
     <!-- 肾上腺激素 -->
     <div class="section-title" v-if="showAdrenal">肾上腺激素</div>
     <el-row v-if="showAdrenal" :gutter="16">
       <el-col :span="8">
-        <el-form-item label="ACTH (pg/mL)" class="exam-with-date">
+        <el-form-item label="ACTH (8am) (pg/ml)" class="exam-with-date">
           <div class="exam-row">
             <el-input v-model="localData.acth" :disabled="disabled" placeholder="ACTH" class="exam-val" />
             <el-date-picker v-model="localData.acthCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
@@ -142,15 +150,15 @@
         </el-form-item>
       </el-col>
       <el-col :span="8">
-        <el-form-item label="皮质醇 (ug/dL)" class="exam-with-date">
+        <el-form-item label="皮质醇 (8am) (ug/dl)" class="exam-with-date">
           <div class="exam-row">
             <el-input v-model="localData.cortisol" :disabled="disabled" placeholder="皮质醇" class="exam-val" />
             <el-date-picker v-model="localData.cortisolCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
           </div>
         </el-form-item>
       </el-col>
-      <el-col v-if="isDsd" :span="8">
-        <el-form-item label="17-OHP (ng/mL)" class="exam-with-date">
+      <el-col v-if="isDsd || isEltm" :span="8">
+        <el-form-item label="17-OHP (nmol/l)" class="exam-with-date">
           <div class="exam-row">
             <el-input v-model="localData.ohp" :disabled="disabled" placeholder="17-OHP" class="exam-val" />
             <el-date-picker v-model="localData.ohpCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
@@ -170,6 +178,23 @@
           <div class="exam-row">
             <el-input v-model="localData.androstenedione" :disabled="disabled" placeholder="雄烯二酮" class="exam-val" />
             <el-date-picker v-model="localData.androstenedioneCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
+      </el-col>
+      <!-- 肿瘤标志物 -->
+      <el-col :span="8">
+        <el-form-item label="甲胎蛋白 (ng/ml)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.afp" :disabled="disabled" placeholder="甲胎蛋白" class="exam-val" />
+            <el-date-picker v-model="localData.afpCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+          </div>
+        </el-form-item>
+      </el-col>
+      <el-col :span="8">
+        <el-form-item label="癌胚抗原 (ng/ml)" class="exam-with-date">
+          <div class="exam-row">
+            <el-input v-model="localData.cea" :disabled="disabled" placeholder="癌胚抗原" class="exam-val" />
+            <el-date-picker v-model="localData.ceaCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
           </div>
         </el-form-item>
       </el-col>
@@ -230,6 +255,17 @@
           </div>
         </el-form-item>
       </el-col>
+      <!-- GH 药物激发试验 -->
+      <template v-if="showGhExcitation">
+        <el-col :span="8">
+          <el-form-item label="GH 药物激发试验 - GH 峰值 (ng/ml)" class="exam-with-date">
+            <div class="exam-row">
+              <el-input v-model="localData.gh" :disabled="disabled" class="exam-val" />
+              <el-date-picker v-model="localData.ghCheckDate" :disabled="disabled" type="date" value-format="YYYY-MM-DD" placeholder="日期" class="exam-dt" />
+            </div>
+          </el-form-item>
+        </el-col>
+      </template>
     </el-row>
 
     <!-- 甲状腺功能 -->
@@ -301,114 +337,6 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <!-- B超尺寸详情（DSD/CPP异常时展开） -->
-      <template v-if="showGonBUltDetail">
-        <el-row :gutter="16">
-          <el-col :span="24"><div class="sub-section-title">B超尺寸详情</div></el-col>
-        </el-row>
-        <!-- 女性 -->
-        <template v-if="patientSex === '2'">
-          <el-row :gutter="16">
-            <el-col :span="8">
-              <el-form-item label="子宫长(cm)"><el-input v-model="gonBUltDetail.uterusLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="子宫宽(cm)"><el-input v-model="gonBUltDetail.uterusWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="子宫高(cm)"><el-input v-model="gonBUltDetail.uterusHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
-            <el-col :span="8">
-              <el-form-item label="宫颈长(cm)"><el-input v-model="gonBUltDetail.cervixLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="内膜厚度(cm)"><el-input v-model="gonBUltDetail.endometriumThickness" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="最大滤泡直径(cm)"><el-input v-model="gonBUltDetail.maxFollicleDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
-            <el-col :span="12">
-              <el-form-item label="有无囊肿">
-                <el-radio-group v-model="gonBUltDetail.hasCyst" :disabled="disabled" @change="syncGonBUltDetail">
-                  <el-radio value="0">无</el-radio>
-                  <el-radio value="1">有</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row v-if="gonBUltDetail.hasCyst === '1'" :gutter="16">
-            <el-col :span="6">
-              <el-form-item label="囊肿侧"><el-input v-model="gonBUltDetail.cystSide" :disabled="disabled" placeholder="左/右" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="囊肿长(cm)"><el-input v-model="gonBUltDetail.cystLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="囊肿宽(cm)"><el-input v-model="gonBUltDetail.cystWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="囊肿高(cm)"><el-input v-model="gonBUltDetail.cystHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
-            <el-col :span="8">
-              <el-form-item label="左卵巢长(cm)"><el-input v-model="gonBUltDetail.leftOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="左卵巢宽(cm)"><el-input v-model="gonBUltDetail.leftOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="左卵巢高(cm)"><el-input v-model="gonBUltDetail.leftOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
-            <el-col :span="8">
-              <el-form-item label="右卵巢长(cm)"><el-input v-model="gonBUltDetail.rightOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="右卵巢宽(cm)"><el-input v-model="gonBUltDetail.rightOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="右卵巢高(cm)"><el-input v-model="gonBUltDetail.rightOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-        </template>
-        <!-- 男性 -->
-        <template v-if="patientSex === '1'">
-          <el-row :gutter="16">
-            <el-col :span="6">
-              <el-form-item label="右侧睾丸长(cm)"><el-input v-model="gonBUltDetail.rightTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="右侧睾丸宽(cm)"><el-input v-model="gonBUltDetail.rightTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="右侧睾丸高(cm)"><el-input v-model="gonBUltDetail.rightTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="右侧长径(cm)"><el-input v-model="gonBUltDetail.rightTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
-            <el-col :span="6">
-              <el-form-item label="左侧睾丸长(cm)"><el-input v-model="gonBUltDetail.leftTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="左侧睾丸宽(cm)"><el-input v-model="gonBUltDetail.leftTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="左侧睾丸高(cm)"><el-input v-model="gonBUltDetail.leftTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="左侧长径(cm)"><el-input v-model="gonBUltDetail.leftTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
-            </el-col>
-          </el-row>
-        </template>
-      </template>
     </template>
 
     <!-- 卵巢囊肿 -->
@@ -533,6 +461,191 @@
         </el-form-item>
       </el-col>
     </el-row>
+
+    <!-- 性腺B超 -->
+    <template v-if="showGonBUlt">
+      <div class="section-title">性腺B超</div>
+
+      <!-- 男性 -->
+      <template v-if="patientSex === '1'">
+        <el-row :gutter="16">
+          <el-col :span="24"><div class="sub-section-title">睾丸大小</div></el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="6">
+            <el-form-item label="右侧长(cm)"><el-input v-model="gonBUltDetail.rightTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="右侧宽(cm)"><el-input v-model="gonBUltDetail.rightTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="右侧高(cm)"><el-input v-model="gonBUltDetail.rightTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="右侧长径(cm)"><el-input v-model="gonBUltDetail.rightTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="6">
+            <el-form-item label="左侧长(cm)"><el-input v-model="gonBUltDetail.leftTestisLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="左侧宽(cm)"><el-input v-model="gonBUltDetail.leftTestisWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="左侧高(cm)"><el-input v-model="gonBUltDetail.leftTestisHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="左侧长径(cm)"><el-input v-model="gonBUltDetail.leftTestisLongDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+      </template>
+
+      <!-- 女性 -->
+      <template v-if="patientSex === '2'">
+        <el-row :gutter="16">
+          <el-col :span="24"><div class="sub-section-title">子宫</div></el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="子宫长(cm)"><el-input v-model="gonBUltDetail.uterusLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="子宫宽(cm)"><el-input v-model="gonBUltDetail.uterusWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="子宫高(cm)"><el-input v-model="gonBUltDetail.uterusHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="宫颈长(cm)"><el-input v-model="gonBUltDetail.cervixLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="内膜厚度(cm)"><el-input v-model="gonBUltDetail.endometriumThickness" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="16">
+          <el-col :span="24"><div class="sub-section-title">卵巢</div></el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="左卵巢长(cm)"><el-input v-model="gonBUltDetail.leftOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="左卵巢宽(cm)"><el-input v-model="gonBUltDetail.leftOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="左卵巢高(cm)"><el-input v-model="gonBUltDetail.leftOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="右卵巢长(cm)"><el-input v-model="gonBUltDetail.rightOvaryLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="右卵巢宽(cm)"><el-input v-model="gonBUltDetail.rightOvaryWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="右卵巢高(cm)"><el-input v-model="gonBUltDetail.rightOvaryHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="最大滤泡直径(cm)"><el-input v-model="gonBUltDetail.maxFollicleDiameter" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="16">
+          <el-col :span="24">
+            <el-form-item label="有无囊肿">
+              <el-radio-group v-model="gonBUltDetail.hasCyst" :disabled="disabled" @change="syncGonBUltDetail">
+                <el-radio value="0">无</el-radio>
+                <el-radio value="1">有</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <template v-if="gonBUltDetail.hasCyst === '1'">
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="囊肿侧"><el-input v-model="gonBUltDetail.cystSide" :disabled="disabled" placeholder="左/右" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="囊肿长(cm)"><el-input v-model="gonBUltDetail.cystLength" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="囊肿宽(cm)"><el-input v-model="gonBUltDetail.cystWidth" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="8">
+              <el-form-item label="囊肿高(cm)"><el-input v-model="gonBUltDetail.cystHeight" :disabled="disabled" @input="syncGonBUltDetail" /></el-form-item>
+            </el-col>
+          </el-row>
+        </template>
+      </template>
+    </template>
+
+    <!-- 眼科检查 -->
+    <div class="section-title">眼科检查</div>
+    <el-row :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="是否有做眼科检查">
+          <el-radio-group v-model="eyeExam.hasExam" :disabled="disabled" @change="syncEyeExam">
+            <el-radio value="0">无</el-radio>
+            <el-radio value="1">有</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <template v-if="eyeExam.hasExam === '1'">
+      <el-row :gutter="16">
+        <el-col :span="8">
+          <el-form-item label="检查时间">
+            <el-date-picker v-model="eyeExam.examDate" :disabled="disabled" type="date"
+              value-format="YYYY-MM-DD" placeholder="请选择日期" @change="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="裸眼视力 右">
+            <el-input v-model="eyeExam.nakedVisionRight" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="裸眼视力 左">
+            <el-input v-model="eyeExam.nakedVisionLeft" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="矫正视力 右">
+            <el-input v-model="eyeExam.correctedVisionRight" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="矫正视力 左">
+            <el-input v-model="eyeExam.correctedVisionLeft" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="16">
+        <el-col :span="12">
+          <el-form-item label="眼轴 右 (cm)">
+            <el-input v-model="eyeExam.axialLengthRight" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="眼轴 左 (cm)">
+            <el-input v-model="eyeExam.axialLengthLeft" :disabled="disabled" @input="syncEyeExam" />
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </template>
 
     <!-- 常规实验室检查 -->
     <div class="section-title">常规实验室检查</div>
@@ -762,11 +875,12 @@ const isEltm = computed(() => props.diseaseType === 'eltm')
 const showBasicHormones = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'eltm'].includes(props.diseaseType))
 const showDsdHormones = computed(() => isDsd.value)
 const showAdrenal = computed(() => ['dsd', 'fss', 'sga', 'sss', 'eltm'].includes(props.diseaseType))
-const showProvocation = computed(() => ['dsd', 'cpp'].includes(props.diseaseType))
+const showProvocation = computed(() => ['dsd', 'cpp', 'eltm'].includes(props.diseaseType))
+const showGhExcitation = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'eltm'].includes(props.diseaseType))
 const showThyroid = computed(() => ['mas', 'eltm'].includes(props.diseaseType))
-const showGonBUlt = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
-const showPituitaryMri = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
-const showThyroidUlt = computed(() => ['cpp', 'fss', 'sga', 'sss', 'mas'].includes(props.diseaseType))
+const showGonBUlt = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas', 'eltm'].includes(props.diseaseType))
+const showPituitaryMri = computed(() => ['dsd', 'cpp', 'fss', 'sga', 'sss', 'mas', 'eltm'].includes(props.diseaseType))
+const showThyroidUlt = computed(() => ['cpp', 'fss', 'sga', 'sss', 'mas', 'eltm'].includes(props.diseaseType))
 const showBonMinDen = computed(() => ['fss', 'sga', 'sss'].includes(props.diseaseType))
 const showOvarianCyst = computed(() => ['cpp', 'fss', 'sga', 'sss'].includes(props.diseaseType))
 
@@ -806,9 +920,6 @@ function makeImagingState() {
 }
 const imagingState = reactive(makeImagingState())
 
-// B超尺寸详情（DSD/CPP 性腺B超异常时展开）
-const showGonBUltDetail = computed(() => ['dsd', 'cpp'].includes(props.diseaseType) && imagingState.gonBUlt.result === '2')
-
 const gonBUltDetail = reactive({
   // 子宫（女性）
   uterusLength: '', uterusWidth: '', uterusHeight: '',
@@ -821,6 +932,18 @@ const gonBUltDetail = reactive({
   // 睾丸（男性）
   rightTestisLength: '', rightTestisWidth: '', rightTestisHeight: '', rightTestisLongDiameter: '',
   leftTestisLength: '', leftTestisWidth: '', leftTestisHeight: '', leftTestisLongDiameter: ''
+})
+
+// 眼科检查
+const eyeExam = reactive({
+  hasExam: '0',
+  examDate: '',
+  nakedVisionRight: '',
+  nakedVisionLeft: '',
+  correctedVisionRight: '',
+  correctedVisionLeft: '',
+  axialLengthRight: '',
+  axialLengthLeft: ''
 })
 
 // 血常规/尿常规状态
@@ -872,6 +995,20 @@ function parseGonBUltDetail(json) {
     const obj = JSON.parse(json)
     Object.keys(gonBUltDetail).forEach(k => {
       if (obj[k] !== undefined) gonBUltDetail[k] = obj[k]
+    })
+  } catch { /* ignore parse errors */ }
+}
+
+function syncEyeExam() {
+  localData.eyeExam = JSON.stringify({ ...eyeExam })
+}
+
+function parseEyeExam(json) {
+  if (!json) return
+  try {
+    const obj = JSON.parse(json)
+    Object.keys(eyeExam).forEach(k => {
+      if (obj[k] !== undefined) eyeExam[k] = obj[k]
     })
   } catch { /* ignore parse errors */ }
 }
@@ -932,18 +1069,20 @@ const localData = reactive({
   igfbp3: '', igfbp3CheckDate: '',
   fasBloodGlu: '', fasBloodGluCheckDate: '',
   fasInsulin: '', fasInsulinCheckDate: '',
-  glyHem: '', glyHemCheckDate: '',
+  glyHem: '', glyHemCheckDate: '', glyHemA: '', glyHemACheckDate: '',
   acth: '', acthCheckDate: '',
   cortisol: '', cortisolCheckDate: '',
   ohp: '', ohpCheckDate: '',
   dheas: '', dheasCheckDate: '',
   androstenedione: '', androstenedioneCheckDate: '',
+  afp: '', afpCheckDate: '', cea: '', ceaCheckDate: '',
   hcg: '', hcgCheckDate: '',
   hcgt: '', hcgtCheckDate: '',
   hcgdht: '', hcgdhtCheckDate: '',
   hcgad: '', hcgadCheckDate: '',
   lhMax: '', lhMaxCheckDate: '',
   fshMax: '', fshMaxCheckDate: '',
+  gh: '', ghCheckDate: '',
   tsh: '', tshCheckDate: '',
   ft3: '', ft3CheckDate: '',
   ft4: '', ft4CheckDate: '',
@@ -951,6 +1090,7 @@ const localData = reactive({
   tgab: '', tgabCheckDate: '',
   gonBUlt: '', pituitaryMri: '', thyroidUlt: '', bonMinDen: '',
   gonBUltDetail: '',
+  eyeExam: '',
   thyroidFunction: '',
   bloodRoutine: '0|', urineRoutine: '0|', hepatitisB: '', liverKidneyElectrolyte: ''
 })
@@ -966,6 +1106,7 @@ watch(() => props.modelValue, (val) => {
     loadRoutineState()
     loadThyroidFunctionState()
     parseGonBUltDetail(val.gonBUltDetail)
+    parseEyeExam(val.eyeExam)
   }
 }, { immediate: true, deep: true })
 
