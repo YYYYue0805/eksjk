@@ -239,6 +239,141 @@ public class PatientFollowUp implements Serializable {
     /** 删除标志 */
     private String delFlg;
 
+    // ==================== 性激素扩展 ====================
+
+    /** PRL (ng/mL) */
+    private String prl;
+
+    /** FT (ng/dL) */
+    private String ft;
+
+    /** AMH (ng/mL) */
+    private String amh;
+
+    /** INHB (pg/mL) */
+    private String inhb;
+
+    // ==================== 生长因子补充 ====================
+
+    /** 糖化血红蛋白A1c (%) */
+    private String glyHemA;
+
+    // ==================== 肾上腺激素 ====================
+
+    /** ACTH (8am, pg/mL) */
+    private String acth;
+
+    /** 皮质醇 (8am, ug/dL) */
+    private String cortisol;
+
+    /** 17-OHP (nmol/L) */
+    private String ohp;
+
+    /** DHEA-S (ug/dL) */
+    private String dheas;
+
+    /** 雄烯二酮 (ng/mL) */
+    private String androstenedione;
+
+    /** 甲胎蛋白 (ng/mL) */
+    private String afp;
+
+    /** 癌胚抗原 (ng/mL) */
+    private String cea;
+
+    // ==================== 激发试验 ====================
+
+    /** HCG 激发前 T */
+    private String hcg;
+
+    /** HCG 激发后 T */
+    private String hcgt;
+
+    /** HCG 激发后 DHT */
+    private String hcgdht;
+
+    /** HCG 激发后 AD */
+    private String hcgad;
+
+    /** GnRH 激发 LHmax */
+    private String lhMax;
+
+    /** GnRH 激发 FSHmax */
+    private String fshMax;
+
+    /** GH 药物激发试验 - GH 峰值 (ng/mL) */
+    private String gh;
+
+    // ==================== 常规实验室检查 ====================
+
+    /** 血常规（编码格式） */
+    private String bloodRoutine;
+
+    /** 尿常规（编码格式） */
+    private String urineRoutine;
+
+    /** 乙肝三系 */
+    private String hepatitisB;
+
+    // ==================== 影像检查补充 ====================
+
+    /** 垂体MRI */
+    private String pituitaryMri;
+
+    /** 甲状腺B超 */
+    private String thyroidUlt;
+
+    /** 性腺B超详情(JSON) */
+    private String gonBUltDetail;
+
+    // ==================== 甲状腺补充 ====================
+
+    /** 甲状腺功能评估 */
+    private String thyroidFunction;
+
+    // ==================== 各项检查日期 ====================
+
+    // 性激素日期
+    private String lhCheckDate;
+    private String fshCheckDate;
+    private String e2CheckDate;
+    private String tCheckDate;
+    private String prlCheckDate;
+    private String dhtCheckDate;
+    private String ftCheckDate;
+    private String shbgCheckDate;
+    private String amhCheckDate;
+    private String inhbCheckDate;
+    // 生长因子日期
+    private String igf1CheckDate;
+    private String igfbp3CheckDate;
+    private String fasBloodGluCheckDate;
+    private String fasInsulinCheckDate;
+    private String glyHemCheckDate;
+    private String glyHemACheckDate;
+    // 肾上腺日期
+    private String acthCheckDate;
+    private String cortisolCheckDate;
+    private String ohpCheckDate;
+    private String dheasCheckDate;
+    private String androstenedioneCheckDate;
+    private String afpCheckDate;
+    private String ceaCheckDate;
+    // 激发试验日期
+    private String hcgCheckDate;
+    private String hcgtCheckDate;
+    private String hcgdhtCheckDate;
+    private String hcgadCheckDate;
+    private String lhMaxCheckDate;
+    private String fshMaxCheckDate;
+    private String ghCheckDate;
+    // 甲状腺日期
+    private String tshCheckDate;
+    private String ft3CheckDate;
+    private String ft4CheckDate;
+    private String tpoabCheckDate;
+    private String tgabCheckDate;
+
     // ==================== 眼科检查 ====================
 
     /** 眼科检查数据(JSON) */

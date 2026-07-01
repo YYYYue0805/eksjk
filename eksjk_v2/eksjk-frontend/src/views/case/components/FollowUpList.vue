@@ -50,7 +50,7 @@
     <el-empty v-else description="暂无随访记录" />
 
     <!-- 随访详情弹窗 -->
-    <el-drawer v-model="detailVisible" title="随访详情" size="60%">
+    <el-drawer v-model="detailVisible" title="随访详情" size="70%">
       <div v-if="currentDetail" class="followup-detail">
         <el-descriptions :column="3" border>
           <el-descriptions-item label="随访日期">{{ formatDate(currentDetail.follTime) }}</el-descriptions-item>
@@ -65,15 +65,77 @@
           <el-descriptions-item label="C骨龄">{{ currentDetail.cboneAge }}</el-descriptions-item>
           <el-descriptions-item label="生殖器分期">{{ currentDetail.genStag }}</el-descriptions-item>
           <el-descriptions-item label="阴毛分期">{{ currentDetail.pubStag }}</el-descriptions-item>
-          <el-descriptions-item label="IGF-1">{{ currentDetail.igf1 }}</el-descriptions-item>
-          <el-descriptions-item label="IGFBP-3">{{ currentDetail.igfbp3 }}</el-descriptions-item>
-          <el-descriptions-item label="LH">{{ currentDetail.lh }}</el-descriptions-item>
-          <el-descriptions-item label="FSH">{{ currentDetail.fsh }}</el-descriptions-item>
-          <el-descriptions-item label="E2">{{ currentDetail.e2 }}</el-descriptions-item>
-          <el-descriptions-item label="T">{{ currentDetail.t }}</el-descriptions-item>
-          <el-descriptions-item label="空腹血糖">{{ currentDetail.fasBloodGlu }}</el-descriptions-item>
-          <el-descriptions-item label="空腹胰岛素">{{ currentDetail.fasInsulin }}</el-descriptions-item>
-          <el-descriptions-item label="糖化血红蛋白">{{ currentDetail.glyHem }}</el-descriptions-item>
+        </el-descriptions>
+        <!-- 性激素 -->
+        <h4 style="margin: 16px 0 8px">性激素及相关</h4>
+        <el-descriptions :column="4" border>
+          <el-descriptions-item label="LH(mIU/mL)">{{ currentDetail.lh }}<br><small>{{ currentDetail.lhCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="FSH(mIU/mL)">{{ currentDetail.fsh }}<br><small>{{ currentDetail.fshCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="E2(pg/mL)">{{ currentDetail.e2 }}<br><small>{{ currentDetail.e2CheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="T(ng/dL)">{{ currentDetail.t }}<br><small>{{ currentDetail.tCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="PRL(ng/mL)">{{ currentDetail.prl }}<br><small>{{ currentDetail.prlCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="DHT(ng/dL)">{{ currentDetail.dht }}<br><small>{{ currentDetail.dhtCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="FT(ng/dL)">{{ currentDetail.ft }}<br><small>{{ currentDetail.ftCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="SHBG(nmol/L)">{{ currentDetail.shbg }}<br><small>{{ currentDetail.shbgCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="AMH(ng/mL)">{{ currentDetail.amh }}<br><small>{{ currentDetail.amhCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="INHB(pg/mL)">{{ currentDetail.inhb }}<br><small>{{ currentDetail.inhbCheckDate }}</small></el-descriptions-item>
+        </el-descriptions>
+        <!-- 生长因子与代谢 -->
+        <h4 style="margin: 16px 0 8px">生长因子与代谢</h4>
+        <el-descriptions :column="4" border>
+          <el-descriptions-item label="IGF-1(ng/mL)">{{ currentDetail.igf1 }}<br><small>{{ currentDetail.igf1CheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="IGFBP-3(ug/mL)">{{ currentDetail.igfbp3 }}<br><small>{{ currentDetail.igfbp3CheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="空腹血糖(mmol/L)">{{ currentDetail.fasBloodGlu }}<br><small>{{ currentDetail.fasBloodGluCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="空腹胰岛素(uIU/mL)">{{ currentDetail.fasInsulin }}<br><small>{{ currentDetail.fasInsulinCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="糖化血红蛋白(%)">{{ currentDetail.glyHem }}<br><small>{{ currentDetail.glyHemCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="HbA1c(%)">{{ currentDetail.glyHemA }}<br><small>{{ currentDetail.glyHemACheckDate }}</small></el-descriptions-item>
+        </el-descriptions>
+        <!-- 甲状腺功能 -->
+        <h4 style="margin: 16px 0 8px">甲状腺功能</h4>
+        <el-descriptions :column="4" border>
+          <el-descriptions-item label="TSH(uIU/mL)">{{ currentDetail.tsh }}<br><small>{{ currentDetail.tshCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="FT3(pg/mL)">{{ currentDetail.ft3 }}<br><small>{{ currentDetail.ft3CheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="FT4(ng/dL)">{{ currentDetail.ft4 }}<br><small>{{ currentDetail.ft4CheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="TPOAb(IU/mL)">{{ currentDetail.tpoab }}<br><small>{{ currentDetail.tpoabCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="TgAb(IU/mL)">{{ currentDetail.tgab }}<br><small>{{ currentDetail.tgabCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="甲功评估">{{ currentDetail.thyroidFunction }}</el-descriptions-item>
+        </el-descriptions>
+        <!-- 肾上腺激素 -->
+        <h4 style="margin: 16px 0 8px">肾上腺激素</h4>
+        <el-descriptions :column="4" border>
+          <el-descriptions-item label="ACTH(pg/mL)">{{ currentDetail.acth }}<br><small>{{ currentDetail.acthCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="皮质醇(ug/dL)">{{ currentDetail.cortisol }}<br><small>{{ currentDetail.cortisolCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="17-OHP(nmol/L)">{{ currentDetail.ohp }}<br><small>{{ currentDetail.ohpCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="DHEA-S(ug/dL)">{{ currentDetail.dheas }}<br><small>{{ currentDetail.dheasCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="雄烯二酮(ng/mL)">{{ currentDetail.androstenedione }}<br><small>{{ currentDetail.androstenedioneCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="AFP(ng/mL)">{{ currentDetail.afp }}<br><small>{{ currentDetail.afpCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="CEA(ng/mL)">{{ currentDetail.cea }}<br><small>{{ currentDetail.ceaCheckDate }}</small></el-descriptions-item>
+        </el-descriptions>
+        <!-- 激发试验 -->
+        <h4 style="margin: 16px 0 8px">激发试验</h4>
+        <el-descriptions :column="4" border>
+          <el-descriptions-item label="HCG激发前T">{{ currentDetail.hcg }}<br><small>{{ currentDetail.hcgCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="HCG激发后T">{{ currentDetail.hcgt }}<br><small>{{ currentDetail.hcgtCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="HCG激发后DHT">{{ currentDetail.hcgdht }}<br><small>{{ currentDetail.hcgdhtCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="HCG激发后AD">{{ currentDetail.hcgad }}<br><small>{{ currentDetail.hcgadCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="GnRH激发LHmax">{{ currentDetail.lhMax }}<br><small>{{ currentDetail.lhMaxCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="GnRH激发FSHmax">{{ currentDetail.fshMax }}<br><small>{{ currentDetail.fshMaxCheckDate }}</small></el-descriptions-item>
+          <el-descriptions-item label="GH峰值(ng/mL)">{{ currentDetail.gh }}<br><small>{{ currentDetail.ghCheckDate }}</small></el-descriptions-item>
+        </el-descriptions>
+        <!-- 影像检查 -->
+        <h4 style="margin: 16px 0 8px">影像检查</h4>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="性腺B超">{{ currentDetail.gonBUlt }}</el-descriptions-item>
+          <el-descriptions-item label="垂体MRI">{{ currentDetail.pituitaryMri }}</el-descriptions-item>
+          <el-descriptions-item label="甲状腺B超">{{ currentDetail.thyroidUlt }}</el-descriptions-item>
+          <el-descriptions-item label="骨密度">{{ currentDetail.bonMinDen }}</el-descriptions-item>
+        </el-descriptions>
+        <!-- 常规实验室 -->
+        <h4 style="margin: 16px 0 8px">常规实验室检查</h4>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="血常规">{{ currentDetail.bloodRoutine }}</el-descriptions-item>
+          <el-descriptions-item label="尿常规">{{ currentDetail.urineRoutine }}</el-descriptions-item>
+          <el-descriptions-item label="乙肝三系">{{ currentDetail.hepatitisB }}</el-descriptions-item>
         </el-descriptions>
         <div v-if="currentDetail.diaTreaPlan" style="margin-top: 16px">
           <h4>诊疗方案</h4>

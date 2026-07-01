@@ -334,6 +334,23 @@ public class PatientVO {
     /** ELTM诊断状态: unclassified/suggested/auto_classified/uncertain */
     private String diagnosisStatus;
 
+    // ==================== 随访审核发放字段（ELTM列表用） ====================
+
+    /** 最新随访审核状态 */
+    private String followUpAuditStatus;
+
+    /** 最新随访审核人 */
+    private String followUpAuditBy;
+
+    /** 最新随访审核时间 */
+    private LocalDateTime followUpAuditTime;
+
+    /** 最新随访发放人 */
+    private String followUpReleaseBy;
+
+    /** 最新随访发放时间 */
+    private LocalDateTime followUpReleaseTime;
+
     // ==================== 眼科检查 ====================
 
     /** 眼科检查数据(JSON) */

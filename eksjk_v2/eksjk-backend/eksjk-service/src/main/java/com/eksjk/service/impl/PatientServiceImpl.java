@@ -89,17 +89,23 @@ public class PatientServiceImpl implements PatientService {
         // 只查询有效数据
         wrapper.eq(Patient::getDelFlg, "1");
 
-        // 审核状态过滤：默认只展示已发放的病例，审核模块使用独立的 AuditService 接口
-        if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
-            wrapper.eq(Patient::getAuditStatus, queryDTO.getAuditStatus());
+        // 审核状态与疾病分类过滤
+        // ELTM（10000007）：展示所有审核状态、全部病种
+        if ("10000007".equals(queryDTO.getDisClass())) {
+            if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
+                wrapper.eq(Patient::getAuditStatus, queryDTO.getAuditStatus());
+            }
+            // ELTM不限制disClass，展示全部疾病类型
         } else {
-            wrapper.eq(Patient::getAuditStatus, AuditStatusConstants.RELEASED);
-        }
-
-        // 疾病分类过滤 — ELTM(10000007) 查询全部病例
-        if (StringUtils.isNotBlank(queryDTO.getDisClass())
-                && !"10000007".equals(queryDTO.getDisClass())) {
-            wrapper.eq(Patient::getDisClass, queryDTO.getDisClass());
+            // 非ELTM病种：默认只展示已发放病例
+            if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
+                wrapper.eq(Patient::getAuditStatus, queryDTO.getAuditStatus());
+            } else {
+                wrapper.eq(Patient::getAuditStatus, AuditStatusConstants.RELEASED);
+            }
+            if (StringUtils.isNotBlank(queryDTO.getDisClass())) {
+                wrapper.eq(Patient::getDisClass, queryDTO.getDisClass());
+            }
         }
 
         // 病例编号精确搜索
@@ -138,8 +144,33 @@ public class PatientServiceImpl implements PatientService {
 
         Page<Patient> result = patientMapper.selectPage(page, wrapper);
 
+        // ELTM列表：批量查询各患者的最新随访审核数据
+        final Map<Long, PatientFollowUp> latestFollowUpMap;
+        if ("10000007".equals(queryDTO.getDisClass()) && !result.getRecords().isEmpty()) {
+            List<Long> patientIds = result.getRecords().stream()
+                    .map(Patient::getId)
+                    .toList();
+
+            List<PatientFollowUp> allFollowUps = followUpMapper.selectList(
+                    new LambdaQueryWrapper<PatientFollowUp>()
+                            .in(PatientFollowUp::getPatientId, patientIds)
+                            .eq(PatientFollowUp::getDelFlg, "1")
+                            .orderByAsc(PatientFollowUp::getPatientId)
+                            .orderByDesc(PatientFollowUp::getFollTime)
+            );
+
+            latestFollowUpMap = allFollowUps.stream()
+                    .collect(Collectors.toMap(
+                            PatientFollowUp::getPatientId,
+                            f -> f,
+                            (existing, replacement) -> existing
+                    ));
+        } else {
+            latestFollowUpMap = Collections.emptyMap();
+        }
+
         List<PatientVO> voList = result.getRecords().stream()
-                .map(this::convertToVO)
+                .map(p -> convertToVO(p, latestFollowUpMap))
                 .toList();
 
         return PageResult.of(voList, result.getTotal(), queryDTO.getPageNum(), queryDTO.getPageSize());
@@ -382,13 +413,11 @@ public class PatientServiceImpl implements PatientService {
         return prefix + yearMonth + String.format("%03d", seq);
     }
 
-    /**
-     * Patient -> PatientVO 转换
-     * 注意：Patient.id 为 Long，PatientVO.id 为 String。
-     * BeanUtils.copyProperties 遇到类型不兼容会抛异常（或静默忽略），
-     * 这里显式排除 id 字段，后续由 setId() 重新赋值为 Hashids 编码。
-     */
     private PatientVO convertToVO(Patient patient) {
+        return convertToVO(patient, Collections.emptyMap());
+    }
+
+    private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap) {
         PatientVO vo = new PatientVO();
         BeanUtils.copyProperties(patient, vo, "id");
         vo.setId(HashidsUtil.encode(patient.getId()));
@@ -397,6 +426,18 @@ public class PatientServiceImpl implements PatientService {
         // 非ELTM病种视为"已诊断"
         if (patient.getDisClass() != null && !"10000007".equals(patient.getDisClass())) {
             vo.setDiagnosisStatus("diagnosed");
+        }
+
+        // ELTM：填充最新随访的审核发放信息
+        if (latestFollowUpMap != null && !latestFollowUpMap.isEmpty()) {
+            PatientFollowUp latestFollowUp = latestFollowUpMap.get(patient.getId());
+            if (latestFollowUp != null) {
+                vo.setFollowUpAuditStatus(latestFollowUp.getAuditStatus());
+                vo.setFollowUpAuditBy(latestFollowUp.getAuditBy());
+                vo.setFollowUpAuditTime(latestFollowUp.getAuditTime());
+                vo.setFollowUpReleaseBy(latestFollowUp.getReleaseBy());
+                vo.setFollowUpReleaseTime(latestFollowUp.getReleaseTime());
+            }
         }
 
         // 性别名称

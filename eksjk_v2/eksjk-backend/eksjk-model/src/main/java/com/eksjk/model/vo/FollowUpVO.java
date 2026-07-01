@@ -173,6 +173,91 @@ public class FollowUpVO {
     /** 删除标志 */
     private String delFlg;
 
+    // ==================== 性激素扩展 ====================
+
+    private String prl;
+    private String ft;
+    private String amh;
+    private String inhb;
+
+    // ==================== 生长因子补充 ====================
+
+    private String glyHemA;
+
+    // ==================== 肾上腺激素 ====================
+
+    private String acth;
+    private String cortisol;
+    private String ohp;
+    private String dheas;
+    private String androstenedione;
+    private String afp;
+    private String cea;
+
+    // ==================== 激发试验 ====================
+
+    private String hcg;
+    private String hcgt;
+    private String hcgdht;
+    private String hcgad;
+    private String lhMax;
+    private String fshMax;
+    private String gh;
+
+    // ==================== 常规实验室检查 ====================
+
+    private String bloodRoutine;
+    private String urineRoutine;
+    private String hepatitisB;
+
+    // ==================== 影像检查补充 ====================
+
+    private String pituitaryMri;
+    private String thyroidUlt;
+    private String gonBUltDetail;
+
+    // ==================== 甲状腺补充 ====================
+
+    private String thyroidFunction;
+
+    // ==================== 各项检查日期 ====================
+
+    private String lhCheckDate;
+    private String fshCheckDate;
+    private String e2CheckDate;
+    private String tCheckDate;
+    private String prlCheckDate;
+    private String dhtCheckDate;
+    private String ftCheckDate;
+    private String shbgCheckDate;
+    private String amhCheckDate;
+    private String inhbCheckDate;
+    private String igf1CheckDate;
+    private String igfbp3CheckDate;
+    private String fasBloodGluCheckDate;
+    private String fasInsulinCheckDate;
+    private String glyHemCheckDate;
+    private String glyHemACheckDate;
+    private String acthCheckDate;
+    private String cortisolCheckDate;
+    private String ohpCheckDate;
+    private String dheasCheckDate;
+    private String androstenedioneCheckDate;
+    private String afpCheckDate;
+    private String ceaCheckDate;
+    private String hcgCheckDate;
+    private String hcgtCheckDate;
+    private String hcgdhtCheckDate;
+    private String hcgadCheckDate;
+    private String lhMaxCheckDate;
+    private String fshMaxCheckDate;
+    private String ghCheckDate;
+    private String tshCheckDate;
+    private String ft3CheckDate;
+    private String ft4CheckDate;
+    private String tpoabCheckDate;
+    private String tgabCheckDate;
+
     /** MAS专用随访数据 */
     private Map<String, Object> masFollowUpData;
 

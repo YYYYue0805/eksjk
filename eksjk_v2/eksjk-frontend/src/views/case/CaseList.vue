@@ -77,13 +77,22 @@
           {{ row.icd || '' }}
         </template>
       </el-table-column>
-      <el-table-column v-if="diseaseType === 'eltm'" label="诊断状态" width="100" align="center">
+      <el-table-column v-if="diseaseType === 'eltm'" prop="auditStatus" label="基线审核状态" width="120" align="center">
         <template #default="{ row }">
-          <el-tag v-if="row.diagnosisStatus === 'diagnosed'" type="success" size="small">已诊断</el-tag>
-          <el-tag v-else-if="row.diagnosisStatus === 'auto_classified'" type="success" size="small">已归类</el-tag>
-          <el-tag v-else-if="row.diagnosisStatus === 'suggested'" type="warning" size="small">建议中</el-tag>
-          <el-tag v-else-if="row.diagnosisStatus === 'uncertain'" type="danger" size="small">待审查</el-tag>
-          <span v-else style="color: #909399">未分类</span>
+          <el-tag v-if="row.auditStatus === 'released'" type="success" size="small">已发放</el-tag>
+          <el-tag v-else-if="row.auditStatus === 'pending_review'" type="warning" size="small">待审核</el-tag>
+          <el-tag v-else-if="row.auditStatus === 'pending_release'" type="primary" size="small">待发放</el-tag>
+          <el-tag v-else-if="row.auditStatus === 'rejected'" type="danger" size="small">已驳回</el-tag>
+          <span v-else style="color: #909399">未知</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="diseaseType === 'eltm'" prop="followUpAuditStatus" label="随访审核状态" width="120" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.followUpAuditStatus === 'released'" type="success" size="small">已发放</el-tag>
+          <el-tag v-else-if="row.followUpAuditStatus === 'pending_review'" type="warning" size="small">待审核</el-tag>
+          <el-tag v-else-if="row.followUpAuditStatus === 'pending_release'" type="primary" size="small">待发放</el-tag>
+          <el-tag v-else-if="row.followUpAuditStatus === 'rejected'" type="danger" size="small">已驳回</el-tag>
+          <span v-else style="color: #909399">暂无随访</span>
         </template>
       </el-table-column>
       <el-table-column prop="impPer" label="导入人员" width="100" />
