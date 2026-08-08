@@ -66,7 +66,7 @@
     <!-- 基线信息审核表格 -->
     <DataTable v-if="activeTab === 'patient'" :data="tableData" :loading="loading"
                :total="total" :page-num="queryForm.pageNum" :page-size="queryForm.pageSize"
-               @page-change="handlePageChange">
+               @page-change="handlePageChange" @row-dblclick="handleView">
       <el-table-column prop="caseNum" label="病例编号" width="160" show-overflow-tooltip />
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="sexName" label="性别" width="70" align="center" />
@@ -88,8 +88,9 @@
         <template #default="{ row }">{{ formatDate(row.releaseTime) }}</template>
       </el-table-column>
       <el-table-column prop="auditRemark" label="审核意见" min-width="150" show-overflow-tooltip />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="260" fixed="right">
         <template #default="{ row }">
+          <el-button link type="primary" size="small" @click="handleView(row)">查看</el-button>
           <el-button v-if="row.auditStatus === 'pending_review'" type="success" size="small"
                      @click="handleApprove(row)">审核通过</el-button>
           <el-button v-if="row.auditStatus === 'pending_review'" type="danger" size="small"
@@ -105,7 +106,7 @@
     <!-- 随访信息审核表格 -->
     <DataTable v-if="activeTab === 'followup'" :data="tableData" :loading="loading"
                :total="total" :page-num="queryForm.pageNum" :page-size="queryForm.pageSize"
-               @page-change="handlePageChange">
+               @page-change="handlePageChange" @row-dblclick="handleView">
       <el-table-column prop="patientCaseNum" label="病例编号" width="160" show-overflow-tooltip />
       <el-table-column prop="patientName" label="患者姓名" width="100" />
       <el-table-column prop="patientSex" label="性别" width="70" align="center" />
@@ -137,6 +138,7 @@
       <el-table-column prop="auditRemark" label="审核意见" min-width="150" show-overflow-tooltip />
       <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
+          <el-button link type="primary" size="small" @click="handleView(row)">查看</el-button>
           <template v-if="canOperateFollowUp(row)">
             <el-button v-if="row.auditStatus === 'pending_review'" type="success" size="small"
                        @click="handleApprove(row)">审核通过</el-button>
@@ -183,6 +185,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -193,6 +196,9 @@ import {
   getFollowUpAuditList, approveFollowUp, rejectFollowUp, releaseFollowUp,
   getAuditStats
 } from '@/api/audit'
+import { getDiseaseTypeByCode } from '@/api/patient'
+
+const router = useRouter()
 
 const activeTab = ref('patient')
 const statusFilter = ref('')
@@ -285,6 +291,17 @@ function handleTabChange() {
   queryForm.name = ''
   statusFilter.value = ''
   loadData()
+}
+
+// 查看病例详情
+function handleView(row) {
+  const disClass = row.disClass || row.patientDisClass
+  const type = getDiseaseTypeByCode(disClass)
+  const pid = row.patientId || row.id
+  if (type && pid) {
+    const route = router.resolve({ path: `/case/${type}/${pid}` })
+    window.open(route.href, '_blank')
+  }
 }
 
 // 审批操作

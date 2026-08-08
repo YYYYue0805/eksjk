@@ -326,6 +326,9 @@ public class PatientFollowUp implements Serializable {
     /** 性腺B超详情(JSON) */
     private String gonBUltDetail;
 
+    /** 卵巢囊肿 0|/1|/2|描述 */
+    private String ovarianCyst;
+
     // ==================== 甲状腺补充 ====================
 
     /** 甲状腺功能评估 */

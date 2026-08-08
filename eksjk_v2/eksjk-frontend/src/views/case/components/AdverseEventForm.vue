@@ -1,6 +1,6 @@
 <template>
   <el-drawer :model-value="visible" :title="isEdit ? '编辑GH不良事件' : '新增GH不良事件'" size="55%"
-             @close="handleClose" @update:model-value="val => emit('update:visible', val)">
+             @close="handleClose" @closed="emit('closed')" @update:model-value="val => emit('update:visible', val)">
     <el-form ref="formRef" :model="formData" label-width="130px">
       <!-- 卡片1：患者端信息 -->
       <el-card shadow="never" class="form-section">
@@ -181,7 +181,7 @@ const props = defineProps({
   editData: { type: Object, default: null }
 })
 
-const emit = defineEmits(['update:visible', 'saved'])
+const emit = defineEmits(['update:visible', 'saved', 'closed'])
 const isEdit = computed(() => !!props.editData?.id)
 const formRef = ref(null)
 const saving = ref(false)

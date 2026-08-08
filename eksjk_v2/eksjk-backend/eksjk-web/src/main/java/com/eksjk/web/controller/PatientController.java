@@ -53,8 +53,9 @@ public class PatientController {
      */
     @PostMapping
     public R<Map<String, String>> create(@RequestBody PatientDTO patientDTO) {
-        String caseNum = patientService.create(patientDTO);
-        return R.ok(Map.of("caseNum", caseNum));
+        String result = patientService.create(patientDTO);
+        String[] parts = result.split(":", 2);
+        return R.ok(Map.of("patientId", parts[0], "caseNum", parts[1]));
     }
 
     /**

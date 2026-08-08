@@ -1,18 +1,6 @@
 <template>
   <div class="diagnosis-form">
     <el-row :gutter="16">
-      <el-col :span="12">
-        <el-form-item label="是否已治疗">
-          <el-select v-model="localData.isTreated" :disabled="disabled" placeholder="请选择" clearable>
-            <el-option label="已治疗" value="1" />
-            <el-option label="未治疗" value="0" />
-          </el-select>
-        </el-form-item>
-      </el-col>
-      <el-col :span="12" /> <!-- 占位保持布局 -->
-    </el-row>
-
-    <el-row :gutter="16">
       <el-col :span="24">
         <el-form-item label="诊断结论">
           <el-input v-model="localData.diagnosis" type="textarea" :rows="4" :disabled="disabled" placeholder="请输入诊断结论" />
@@ -51,7 +39,6 @@ const emit = defineEmits(['update:modelValue'])
 const localData = reactive({
   diagnosis: '',
   secondaryDiagnosis: '',
-  isTreated: '',
   tags: []
 })
 

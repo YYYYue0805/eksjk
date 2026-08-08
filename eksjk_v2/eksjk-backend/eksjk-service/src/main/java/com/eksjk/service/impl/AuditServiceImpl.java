@@ -192,7 +192,7 @@ public class AuditServiceImpl implements AuditService {
         if (!patientIds.isEmpty()) {
             LambdaQueryWrapper<Patient> patientWrapper = new LambdaQueryWrapper<>();
             patientWrapper.select(Patient::getId, Patient::getCaseNum, Patient::getName, Patient::getSex,
-                            Patient::getAuditStatus, Patient::getHospitalName, Patient::getImpPer)
+                            Patient::getAuditStatus, Patient::getHospitalName, Patient::getImpPer, Patient::getDisClass)
                     .in(Patient::getId, patientIds);
             List<Patient> patients = patientMapper.selectList(patientWrapper);
             patientMap = patients.stream().collect(Collectors.toMap(Patient::getId, p -> p));
@@ -413,6 +413,7 @@ public class AuditServiceImpl implements AuditService {
             vo.setPatientAuditStatus(patient.getAuditStatus());
             vo.setPatientHospitalName(patient.getHospitalName());
             vo.setPatientImpPer(patient.getImpPer());
+            vo.setPatientDisClass(patient.getDisClass());
         }
         return vo;
     }

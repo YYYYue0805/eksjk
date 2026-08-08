@@ -316,160 +316,113 @@
     <!-- 影像检查 -->
     <div class="section-title">影像检查</div>
 
-    <!-- 性腺B超 -->
+    <!-- 甲状腺B超（左右侧详细评估） -->
     <template v-if="showGonBUlt">
+      <div class="sub-section-title">甲状腺B超</div>
+
+      <!-- 左侧甲状腺B超 -->
+      <el-row :gutter="16">
+        <el-col :span="24"><div class="sub-item-title">左侧甲状腺B超</div></el-col>
+      </el-row>
       <el-row :gutter="16">
         <el-col :span="24">
-          <el-form-item label="性腺B超">
-            <el-radio-group v-model="imagingState.gonBUlt.result" :disabled="disabled" @change="syncImagingToData('gonBUlt')">
-              <el-radio value="0">未查</el-radio>
-              <el-radio value="1">正常</el-radio>
+          <el-form-item label="左侧甲状腺">
+            <el-radio-group v-model="thyroidUltDetail.leftResult" :disabled="disabled" @change="syncThyroidUltDetail">
+              <el-radio value="1">正常没有变化</el-radio>
               <el-radio value="2">异常</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
       </el-row>
-      <el-row v-if="imagingState.gonBUlt.result === '2'" :gutter="16">
-        <el-col :span="24">
-          <el-form-item>
-            <el-input v-model="imagingState.gonBUlt.description" type="textarea" :rows="3"
-              :disabled="disabled" placeholder="请输入性腺B超异常描述" @input="syncImagingToData('gonBUlt')" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </template>
-
-    <!-- 卵巢囊肿 -->
-    <el-row v-if="showOvarianCyst" :gutter="16">
-      <el-col :span="24">
-        <el-form-item label="卵巢囊肿">
-          <el-radio-group v-model="imagingState.ovarianCyst.result" :disabled="disabled" @change="syncImagingToData('ovarianCyst')">
-            <el-radio value="0">未查</el-radio>
-            <el-radio value="1">正常</el-radio>
-            <el-radio value="2">异常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-col>
-    </el-row>
-
-    <!-- 垂体MRI -->
-    <el-row v-if="showPituitaryMri" :gutter="16">
-      <el-col :span="24">
-        <el-form-item label="垂体MRI">
-          <el-radio-group v-model="imagingState.pituitaryMri.result" :disabled="disabled" @change="syncImagingToData('pituitaryMri')">
-            <el-radio value="0">未查</el-radio>
-            <el-radio value="1">正常</el-radio>
-            <el-radio value="2">异常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-col>
-      <el-col v-if="imagingState.pituitaryMri.result === '2'" :span="24">
-        <el-form-item>
-          <el-input v-model="imagingState.pituitaryMri.description" type="textarea" :rows="3"
-            :disabled="disabled" placeholder="请输入垂体MRI异常描述" @input="syncImagingToData('pituitaryMri')" />
-        </el-form-item>
-      </el-col>
-    </el-row>
-
-    <!-- 甲状腺B超 -->
-    <template v-if="showThyroidUlt">
-      <el-row :gutter="16">
-        <el-col :span="24">
-          <el-form-item label="甲状腺B超">
-            <el-radio-group v-model="imagingState.thyroidUlt.result" :disabled="disabled" @change="syncImagingToData('thyroidUlt')">
-              <el-radio value="0">未查</el-radio>
-              <el-radio value="1">正常</el-radio>
-              <el-radio value="2">异常</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row v-if="imagingState.thyroidUlt.result === '2'" :gutter="16">
-        <el-col :span="24">
-          <el-form-item>
-            <el-input v-model="imagingState.thyroidUlt.description" type="textarea" :rows="3"
-              :disabled="disabled" placeholder="请输入甲状腺B超异常描述" @input="syncImagingToData('thyroidUlt')" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <!-- CPP 甲状腺B超左右侧细节（来自V1） -->
-      <template v-if="isCpp && imagingState.thyroidUlt.result === '2'">
+      <template v-if="thyroidUltDetail.leftResult === '2'">
         <el-row :gutter="16">
-          <el-col :span="12">
-            <el-form-item label="左侧甲状腺">
-              <el-radio-group v-model="thyroidUltDetail.leftResult" :disabled="disabled">
-                <el-radio value="1">正常</el-radio>
-                <el-radio value="2">异常</el-radio>
-              </el-radio-group>
+          <el-col :span="8">
+            <el-form-item label="甲状腺结节">
+              <el-select v-model="thyroidUltDetail.leftNoduleGrade" :disabled="disabled" placeholder="请选择分级" @change="syncThyroidUltDetail">
+                <el-option label="一级" value="1" />
+                <el-option label="二级" value="2" />
+                <el-option label="三级" value="3" />
+                <el-option label="四级" value="4" />
+                <el-option label="五级" value="5" />
+              </el-select>
             </el-form-item>
           </el-col>
-          <el-col v-if="thyroidUltDetail.leftResult === '2'" :span="6">
-            <el-form-item label="左侧结节分级">
-              <el-select v-model="thyroidUltDetail.leftNoduleGrade" :disabled="disabled" placeholder="TI-RADS分级">
-                <el-option label="TI-RADS 1" value="1" />
-                <el-option label="TI-RADS 2" value="2" />
-                <el-option label="TI-RADS 3" value="3" />
-                <el-option label="TI-RADS 4a" value="4a" />
-                <el-option label="TI-RADS 4b" value="4b" />
-                <el-option label="TI-RADS 4c" value="4c" />
-                <el-option label="TI-RADS 5" value="5" />
-              </el-select>
+          <el-col :span="8">
+            <el-form-item label="大小">
+              <el-input v-model="thyroidUltDetail.leftSize" :disabled="disabled" placeholder="请输入大小" @input="syncThyroidUltDetail" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="12">
-            <el-form-item label="右侧甲状腺">
-              <el-radio-group v-model="thyroidUltDetail.rightResult" :disabled="disabled">
-                <el-radio value="1">正常</el-radio>
-                <el-radio value="2">异常</el-radio>
-              </el-radio-group>
+            <el-form-item label="弥漫性病变">
+              <el-input v-model="thyroidUltDetail.leftDiffuseLesion" :disabled="disabled" placeholder="请输入弥漫性病变" @input="syncThyroidUltDetail" />
             </el-form-item>
           </el-col>
-          <el-col v-if="thyroidUltDetail.rightResult === '2'" :span="6">
-            <el-form-item label="右侧结节分级">
-              <el-select v-model="thyroidUltDetail.rightNoduleGrade" :disabled="disabled" placeholder="TI-RADS分级">
-                <el-option label="TI-RADS 1" value="1" />
-                <el-option label="TI-RADS 2" value="2" />
-                <el-option label="TI-RADS 3" value="3" />
-                <el-option label="TI-RADS 4a" value="4a" />
-                <el-option label="TI-RADS 4b" value="4b" />
-                <el-option label="TI-RADS 4c" value="4c" />
-                <el-option label="TI-RADS 5" value="5" />
+          <el-col :span="12">
+            <el-form-item label="其他">
+              <el-input v-model="thyroidUltDetail.leftOther" :disabled="disabled" placeholder="请输入其他" @input="syncThyroidUltDetail" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </template>
+
+      <!-- 右侧甲状腺B超 -->
+      <el-row :gutter="16">
+        <el-col :span="24"><div class="sub-item-title">右侧甲状腺B超</div></el-col>
+      </el-row>
+      <el-row :gutter="16">
+        <el-col :span="24">
+          <el-form-item label="右侧甲状腺">
+            <el-radio-group v-model="thyroidUltDetail.rightResult" :disabled="disabled" @change="syncThyroidUltDetail">
+              <el-radio value="1">正常没有变化</el-radio>
+              <el-radio value="2">异常</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <template v-if="thyroidUltDetail.rightResult === '2'">
+        <el-row :gutter="16">
+          <el-col :span="8">
+            <el-form-item label="甲状腺结节">
+              <el-select v-model="thyroidUltDetail.rightNoduleGrade" :disabled="disabled" placeholder="请选择分级" @change="syncThyroidUltDetail">
+                <el-option label="一级" value="1" />
+                <el-option label="二级" value="2" />
+                <el-option label="三级" value="3" />
+                <el-option label="四级" value="4" />
+                <el-option label="五级" value="5" />
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="大小">
+              <el-input v-model="thyroidUltDetail.rightSize" :disabled="disabled" placeholder="请输入大小" @input="syncThyroidUltDetail" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="弥漫性病变">
+              <el-input v-model="thyroidUltDetail.rightDiffuseLesion" :disabled="disabled" placeholder="请输入弥漫性病变" @input="syncThyroidUltDetail" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="其他">
+              <el-input v-model="thyroidUltDetail.rightOther" :disabled="disabled" placeholder="请输入其他" @input="syncThyroidUltDetail" />
             </el-form-item>
           </el-col>
         </el-row>
       </template>
     </template>
 
-    <!-- 骨密度 -->
-    <el-row v-if="showBonMinDen" :gutter="16">
-      <el-col :span="24">
-        <el-form-item label="骨密度">
-          <el-radio-group v-model="imagingState.bonMinDen.result" :disabled="disabled" @change="syncImagingToData('bonMinDen')">
-            <el-radio value="0">未查</el-radio>
-            <el-radio value="1">正常</el-radio>
-            <el-radio value="2">异常</el-radio>
-          </el-radio-group>
-        </el-form-item>
-      </el-col>
-      <el-col v-if="imagingState.bonMinDen.result === '2'" :span="24">
-        <el-form-item>
-          <el-input v-model="imagingState.bonMinDen.description" type="textarea" :rows="3"
-            :disabled="disabled" placeholder="请输入骨密度异常描述" @input="syncImagingToData('bonMinDen')" />
-        </el-form-item>
-      </el-col>
-    </el-row>
-
-    <!-- 性腺B超 -->
+    <!-- 性腺B超尺寸 -->
     <template v-if="showGonBUlt">
-      <div class="section-title">性腺B超</div>
+      <div class="sub-section-title">性腺B超</div>
 
       <!-- 男性 -->
       <template v-if="patientSex === '1'">
         <el-row :gutter="16">
-          <el-col :span="24"><div class="sub-section-title">睾丸大小</div></el-col>
+          <el-col :span="24"><div class="sub-item-title">睾丸大小</div></el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="6">
@@ -504,7 +457,7 @@
       <!-- 女性 -->
       <template v-if="patientSex === '2'">
         <el-row :gutter="16">
-          <el-col :span="24"><div class="sub-section-title">子宫</div></el-col>
+          <el-col :span="24"><div class="sub-item-title">子宫</div></el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="8">
@@ -527,7 +480,7 @@
         </el-row>
 
         <el-row :gutter="16">
-          <el-col :span="24"><div class="sub-section-title">卵巢</div></el-col>
+          <el-col :span="24"><div class="sub-item-title">卵巢</div></el-col>
         </el-row>
         <el-row :gutter="16">
           <el-col :span="8">
@@ -588,64 +541,59 @@
       </template>
     </template>
 
-    <!-- 眼科检查 -->
-    <div class="section-title">眼科检查</div>
-    <el-row :gutter="16">
+    <!-- 卵巢囊肿 -->
+    <el-row v-if="showOvarianCyst" :gutter="16">
       <el-col :span="24">
-        <el-form-item label="是否有做眼科检查">
-          <el-radio-group v-model="eyeExam.hasExam" :disabled="disabled" @change="syncEyeExam">
-            <el-radio value="0">无</el-radio>
-            <el-radio value="1">有</el-radio>
+        <el-form-item label="卵巢囊肿">
+          <el-radio-group v-model="imagingState.ovarianCyst.result" :disabled="disabled" @change="syncImagingToData('ovarianCyst')">
+            <el-radio value="0">未查</el-radio>
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-col>
     </el-row>
-    <template v-if="eyeExam.hasExam === '1'">
+
+    <!-- 垂体MRI -->
+    <template v-if="showPituitaryMri">
+      <div class="sub-section-title">垂体MRI</div>
       <el-row :gutter="16">
-        <el-col :span="8">
-          <el-form-item label="检查时间">
-            <el-date-picker v-model="eyeExam.examDate" :disabled="disabled" type="date"
-              value-format="YYYY-MM-DD" placeholder="请选择日期" @change="syncEyeExam" />
+        <el-col :span="24">
+          <el-form-item label="垂体MRI">
+            <el-radio-group v-model="imagingState.pituitaryMri.result" :disabled="disabled" @change="syncImagingToData('pituitaryMri')">
+              <el-radio value="0">未查</el-radio>
+              <el-radio value="1">正常</el-radio>
+              <el-radio value="2">异常</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="裸眼视力 右">
-            <el-input v-model="eyeExam.nakedVisionRight" :disabled="disabled" @input="syncEyeExam" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="裸眼视力 左">
-            <el-input v-model="eyeExam.nakedVisionLeft" :disabled="disabled" @input="syncEyeExam" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="矫正视力 右">
-            <el-input v-model="eyeExam.correctedVisionRight" :disabled="disabled" @input="syncEyeExam" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="矫正视力 左">
-            <el-input v-model="eyeExam.correctedVisionLeft" :disabled="disabled" @input="syncEyeExam" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="眼轴 右 (cm)">
-            <el-input v-model="eyeExam.axialLengthRight" :disabled="disabled" @input="syncEyeExam" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="眼轴 左 (cm)">
-            <el-input v-model="eyeExam.axialLengthLeft" :disabled="disabled" @input="syncEyeExam" />
+        <el-col v-if="imagingState.pituitaryMri.result === '2'" :span="24">
+          <el-form-item>
+            <el-input v-model="imagingState.pituitaryMri.description" type="textarea" :rows="3"
+              :disabled="disabled" placeholder="请输入垂体MRI异常描述" @input="syncImagingToData('pituitaryMri')" />
           </el-form-item>
         </el-col>
       </el-row>
     </template>
+
+    <!-- 骨密度 -->
+    <el-row v-if="showBonMinDen" :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="骨密度">
+          <el-radio-group v-model="imagingState.bonMinDen.result" :disabled="disabled" @change="syncImagingToData('bonMinDen')">
+            <el-radio value="0">未查</el-radio>
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+      <el-col v-if="imagingState.bonMinDen.result === '2'" :span="24">
+        <el-form-item>
+          <el-input v-model="imagingState.bonMinDen.description" type="textarea" :rows="3"
+            :disabled="disabled" placeholder="请输入骨密度异常描述" @input="syncImagingToData('bonMinDen')" />
+        </el-form-item>
+      </el-col>
+    </el-row>
 
     <!-- 常规实验室检查 -->
     <div class="section-title">常规实验室检查</div>
@@ -934,18 +882,6 @@ const gonBUltDetail = reactive({
   leftTestisLength: '', leftTestisWidth: '', leftTestisHeight: '', leftTestisLongDiameter: ''
 })
 
-// 眼科检查
-const eyeExam = reactive({
-  hasExam: '0',
-  examDate: '',
-  nakedVisionRight: '',
-  nakedVisionLeft: '',
-  correctedVisionRight: '',
-  correctedVisionLeft: '',
-  axialLengthRight: '',
-  axialLengthLeft: ''
-})
-
 // 血常规/尿常规状态
 const bloodState = reactive({ result: '0', description: '' })
 const urineState = reactive({ result: '0', description: '' })
@@ -981,8 +917,14 @@ function loadThyroidFunctionState() {
 const thyroidUltDetail = reactive({
   leftResult: '1',
   leftNoduleGrade: '',
+  leftSize: '',
+  leftDiffuseLesion: '',
+  leftOther: '',
   rightResult: '1',
-  rightNoduleGrade: ''
+  rightNoduleGrade: '',
+  rightSize: '',
+  rightDiffuseLesion: '',
+  rightOther: ''
 })
 
 function syncGonBUltDetail() {
@@ -999,16 +941,16 @@ function parseGonBUltDetail(json) {
   } catch { /* ignore parse errors */ }
 }
 
-function syncEyeExam() {
-  localData.eyeExam = JSON.stringify({ ...eyeExam })
+function syncThyroidUltDetail() {
+  localData.thyroidUltDetail = JSON.stringify({ ...thyroidUltDetail })
 }
 
-function parseEyeExam(json) {
+function parseThyroidUltDetail(json) {
   if (!json) return
   try {
     const obj = JSON.parse(json)
-    Object.keys(eyeExam).forEach(k => {
-      if (obj[k] !== undefined) eyeExam[k] = obj[k]
+    Object.keys(thyroidUltDetail).forEach(k => {
+      if (obj[k] !== undefined) thyroidUltDetail[k] = obj[k]
     })
   } catch { /* ignore parse errors */ }
 }
@@ -1090,7 +1032,7 @@ const localData = reactive({
   tgab: '', tgabCheckDate: '',
   gonBUlt: '', pituitaryMri: '', thyroidUlt: '', bonMinDen: '',
   gonBUltDetail: '',
-  eyeExam: '',
+  thyroidUltDetail: '',
   thyroidFunction: '',
   bloodRoutine: '0|', urineRoutine: '0|', hepatitisB: '', liverKidneyElectrolyte: ''
 })
@@ -1106,7 +1048,7 @@ watch(() => props.modelValue, (val) => {
     loadRoutineState()
     loadThyroidFunctionState()
     parseGonBUltDetail(val.gonBUltDetail)
-    parseEyeExam(val.eyeExam)
+    parseThyroidUltDetail(val.thyroidUltDetail)
   }
 }, { immediate: true, deep: true })
 
@@ -1143,6 +1085,14 @@ watch(localData, () => {
   margin: 12px 0 8px 0;
   padding-left: 10px;
   border-left: 2px solid #67c23a;
+}
+
+.sub-item-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #909399;
+  margin: 8px 0 4px 0;
+  padding-left: 6px;
 }
 
 .exam-row {

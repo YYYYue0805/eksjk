@@ -129,7 +129,7 @@ public class S3FileServiceImpl implements FileService {
 
         try {
             // 构建搜索前缀
-            String searchPrefix = (category != null ? category : "image") + "/";
+            String searchPrefix = category != null ? category + "/" : "";
             
             ListObjectsV2Request listRequest = ListObjectsV2Request.builder()
                     .bucket(bucketName)
@@ -165,6 +165,11 @@ public class S3FileServiceImpl implements FileService {
                     String ext = getFileExtension(key);
                     fileInfo.put("type", ext);
                     fileInfo.put("isDicom", "dcm".equalsIgnoreCase(ext) || "dicom".equalsIgnoreCase(ext));
+                    // 从 S3 key 中提取分类（第一级目录名）
+                    String[] parts = key.split("/");
+                    if (parts.length > 0) {
+                        fileInfo.put("category", parts[0]);
+                    }
                     // 查询文件备注
                     LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
                     noteQuery.eq(FileNote::getFilePath, key);

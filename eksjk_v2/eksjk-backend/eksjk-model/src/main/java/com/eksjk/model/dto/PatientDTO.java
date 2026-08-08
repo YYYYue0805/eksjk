@@ -329,14 +329,28 @@ public class PatientDTO {
     private String gonBUltDetail;
     private String pituitaryMri;
     private String thyroidUlt;
+    private String thyroidUltDetail;
     private String bonMinDen;
 
     // ==================== 遗传学 ====================
 
     private String karyotype;
+
+    /** 染色体核型多选(JSON数组) */
+    private String chrom;
+
+    /** 其它异常核型 */
+    private String chromOther;
+
     private String biologBank;
     private String biologBankFa;
     private String biologBankMo;
+
+    /** 基因检测方法 */
+    private String geneTestMethod;
+
+    /** 基因检测结果（阴性/阳性） */
+    private String geneTestResult;
 
     /** 基因突变检测数据(JSON) */
     private String genData;

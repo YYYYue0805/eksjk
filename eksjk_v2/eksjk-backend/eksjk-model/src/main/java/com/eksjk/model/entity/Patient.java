@@ -538,6 +538,9 @@ public class Patient implements Serializable {
     /** 甲状腺B超描述 */
     private String thyroidUlt;
 
+    /** 甲状腺B超详情（JSON格式，含左右侧结节分级、大小、弥漫性病变等） */
+    private String thyroidUltDetail;
+
     /** 骨密度描述 */
     private String bonMinDen;
 
@@ -554,6 +557,12 @@ public class Patient implements Serializable {
 
     /** 母亲生物样本库 */
     private String biologBankMo;
+
+    /** 基因检测方法 */
+    private String geneTestMethod;
+
+    /** 基因检测结果（阴性/阳性） */
+    private String geneTestResult;
 
     /** 基因突变检测数据(JSON数组) */
     private String genData;

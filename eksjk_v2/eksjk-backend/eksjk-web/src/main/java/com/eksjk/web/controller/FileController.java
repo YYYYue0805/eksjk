@@ -5,6 +5,7 @@ import com.eksjk.common.result.R;
 import com.eksjk.common.util.HashidsUtil;
 import com.eksjk.service.FileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.Map;
  *
  * @author eksjk
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
@@ -72,7 +74,9 @@ public class FileController {
             @PathVariable String patientId,
             @RequestParam(value = "category", required = false) String category) {
         long id = HashidsUtil.decode(patientId);
+        log.info("FileController.listByPatient: patientId={}, decodedId={}, category={}", patientId, id, category);
         List<Map<String, Object>> files = fileService.listByPatientId(id, category);
+        log.info("FileController.listByPatient: found {} files", files.size());
         return R.ok(files);
     }
 

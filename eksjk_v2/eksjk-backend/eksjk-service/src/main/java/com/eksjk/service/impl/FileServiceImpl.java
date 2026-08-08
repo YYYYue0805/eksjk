@@ -127,30 +127,36 @@ public class FileServiceImpl implements FileService {
     public List<Map<String, Object>> listByPatientId(Long patientId, String category) {
         List<Map<String, Object>> fileList = new ArrayList<>();
 
-        // 扫描上传目录中该患者的文件
-        String searchCategory = category != null ? category : "image";
-        Path basePath = Paths.get(uploadBasePath, searchCategory);
+        // 未指定分类时扫描所有目录，指定分类时只扫描该分类目录
+        Path searchRoot = category != null
+                ? Paths.get(uploadBasePath, category)
+                : Paths.get(uploadBasePath);
 
-        if (!Files.exists(basePath)) {
+        if (!Files.exists(searchRoot)) {
             return fileList;
         }
 
         try {
             String patientIdStr = "/" + patientId + "/";
-            Files.walk(basePath)
+            Files.walk(searchRoot)
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().replace('\\', '/').contains(patientIdStr))
                     .forEach(p -> {
                         Map<String, Object> fileInfo = new HashMap<>();
                         try {
                             fileInfo.put("name", p.getFileName().toString());
-                            String relativePath = basePath.getParent().relativize(p).toString().replace('\\', '/');
+                            String relativePath = Paths.get(uploadBasePath).relativize(p).toString().replace('\\', '/');
                             fileInfo.put("path", relativePath);
                             fileInfo.put("size", Files.size(p));
                             fileInfo.put("lastModified", Files.getLastModifiedTime(p).toMillis());
                             String ext = getFileExtension(p.getFileName().toString());
                             fileInfo.put("type", ext);
                             fileInfo.put("isDicom", "dcm".equalsIgnoreCase(ext) || "dicom".equalsIgnoreCase(ext));
+                            // 从路径中提取分类（第一级目录名）
+                            String[] parts = relativePath.split("/");
+                            if (parts.length > 0) {
+                                fileInfo.put("category", parts[0]);
+                            }
                             // 查询文件备注
                             LambdaQueryWrapper<FileNote> noteQuery = new LambdaQueryWrapper<>();
                             noteQuery.eq(FileNote::getFilePath, relativePath);

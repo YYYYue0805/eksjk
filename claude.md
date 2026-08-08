@@ -12,6 +12,94 @@ EKSJK（儿科数据管理系统）是一个面向医疗健康领域的全栈 We
 
 ---
 
+## 快速上手：当前部署与运行环境
+
+### Staging 环境
+
+| 项目 | 值 |
+|------|-----|
+| 前端地址 | http://staging.eksjk.zsmm.org.cn |
+| 后端 API | http://staging.eksjk.zsmm.org.cn/api/* |
+| K8s 集群 | 阿里云 ACK（上海） |
+| 控制面 | https://47.116.218.169:6443 |
+| 命名空间 | `eksjk-staging` |
+| 数据库 | RDS MySQL 8.0.36 Serverless（VPC 内网） |
+| 对象存储 | OSS（S3 兼容，eksjk-staging bucket） |
+| 镜像仓库 | ACR Personal（上海）: `crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/` |
+| 当前镜像 | backend: `develop-806e7a2` / frontend: `develop-806e7a2` |
+| 登录账号 | `super_admin` / `Test@1234`（还有 doctor_1～3, hospital_admin_1～2, parent_1，密码均为 `Test@1234`） |
+
+### 常用命令速查
+
+```bash
+# K8s 连接（必须设置此环境变量）
+export KUBECONFIG=C:/Users/Administrator/.kube/eksjk-config
+
+# 查看 Pod 状态
+kubectl get pods -n eksjk-staging
+
+# 查看部署
+kubectl get deployment -n eksjk-staging
+
+# 查看后端日志
+kubectl logs -n eksjk-staging deployment/eksjk-backend --tail=100 -f
+
+# 重启部署
+kubectl rollout restart deployment/eksjk-backend deployment/eksjk-frontend -n eksjk-staging
+
+# 进入后端 Pod 执行命令
+kubectl exec -it -n eksjk-staging deployment/eksjk-backend -- /bin/bash
+```
+
+### 本地开发
+
+```bash
+# 后端
+cd eksjk_v2/eksjk-backend && mvn spring-boot:run -pl eksjk-web -Dspring-boot.run.profiles=dev
+
+# 前端
+cd eksjk_v2/eksjk-frontend && npm run dev
+```
+
+### 构建与部署到 Staging
+
+```bash
+# 1. 构建后端 JAR
+cd eksjk_v2/eksjk-backend && mvn clean package -pl eksjk-web -am -DskipTests -q
+
+# 2. 构建前端
+cd eksjk_v2/eksjk-frontend && npm run build
+
+# 3. 构建并推送 Docker 镜像（使用 --no-cache 确保干净构建）
+cd eksjk_v2/eksjk-backend && docker build --no-cache -t crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:develop-806e7a2 .
+cd eksjk_v2/eksjk-frontend && docker build --no-cache -t crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-frontend:develop-806e7a2 .
+
+# 4. 登录 ACR 并推送
+docker login --username junedo@qq.com crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com
+docker push crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:develop-806e7a2
+docker push crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-frontend:develop-806e7a2
+
+# 5. 重启 K8s（KUBECONFIG 必须已设置）
+export KUBECONFIG=C:/Users/Administrator/.kube/eksjk-config
+kubectl rollout restart deployment/eksjk-backend deployment/eksjk-frontend -n eksjk-staging
+```
+
+> **注意：** 如果代码有未提交的改动，构建时仍用当前 HEAD 的 SHA 作为 tag（如 `develop-806e7a2`），K8s 重启后会拉取最新推送的同名 tag 镜像。
+
+### ELTM 模块特性
+
+- **ELTM 列表**（`/case/eltm`）展示**全部**病例（不限 disClass），是各病种病例的统一视图
+- **诊断状态列**：非 ELTM 病例（disClass != 10000007）显示绿色「已诊断」；ELTM 未分类显示「未分类」
+- ELTM 列表中点击病例会自动跳转到对应病种的详情路由
+- 新建按钮为下拉菜单，可选择任意病种创建
+- 其他病种（DSD/FSS/CPP 等）列表页正常运作，各自只展示本类病例
+
+### 数据库迁移
+
+数据库增量 SQL 在 `eksjk_v2/init-sql/` 目录下。Staging RDS 已执行完 01-15 号迁移脚本（含 gen_data 列手动补充）。如需新增迁移，需通过 K8s Pod 连接 RDS 执行。
+
+---
+
 ## V2 技术栈（严格遵守，不得擅自升级或替换）
 
 > **说明：** 所有技术选型均为开源组件，无任何内部/私有依赖，可在任意环境直接使用。

@@ -56,10 +56,12 @@ export function fetchFileBlobUrl(path) {
  * @param {string} category - 文件分类
  */
 export function getFileList(patientId, category) {
+  const params = {}
+  if (category) params.category = category
   return request({
     url: `/api/files/patient/${patientId}`,
     method: 'get',
-    params: { category }
+    params
   })
 }
 

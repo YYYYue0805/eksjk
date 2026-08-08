@@ -30,6 +30,9 @@ public class FollowUpVO {
     /** 患者性别 */
     private String patientSex;
 
+    /** 患者疾病分类编码 */
+    private String patientDisClass;
+
     /** 患者审核状态 */
     private String patientAuditStatus;
 
@@ -215,6 +218,7 @@ public class FollowUpVO {
     private String pituitaryMri;
     private String thyroidUlt;
     private String gonBUltDetail;
+    private String ovarianCyst;
 
     // ==================== 甲状腺补充 ====================
 

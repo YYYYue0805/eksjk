@@ -50,6 +50,7 @@ public class PatientServiceImpl implements PatientService {
     private final SssCaseMapper sssCaseMapper;
     private final EltmCaseMapper eltmCaseMapper;
     private final PatientFollowUpMapper followUpMapper;
+    private final PatientGeneticsMapper patientGeneticsMapper;
 
     /** 疾病分类编码与名称映射 */
     private static final Map<String, String> DIS_CLASS_MAP = new LinkedHashMap<>();
@@ -182,15 +183,18 @@ public class PatientServiceImpl implements PatientService {
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("病例不存在");
         }
-        // 病例管理中只能查看已发放的病例
-        if (!AuditStatusConstants.RELEASED.equals(patient.getAuditStatus())) {
-            throw new BusinessException("病例尚未发放，无法查看");
-        }
-
         PatientVO vo = convertToVO(patient);
 
         // 加载疾病专项数据
         vo.setDiseaseData(loadDiseaseData(patient.getId(), patient.getDisClass()));
+
+        // 加载遗传学染色体核型（独立表，主表行大小超限无法存储）
+        PatientGenetics genetics = patientGeneticsMapper.selectOne(
+                new LambdaQueryWrapper<PatientGenetics>().eq(PatientGenetics::getPatientId, patient.getId()));
+        if (genetics != null) {
+            vo.setChrom(genetics.getChrom());
+            vo.setChromOther(genetics.getChromOther());
+        }
 
         // 统计随访记录数量
         Long followUpCount = followUpMapper.selectCount(
@@ -241,6 +245,9 @@ public class PatientServiceImpl implements PatientService {
             }
         }
 
+        // 自动计算初诊年龄
+        calcFirVisAge(patient);
+
         patientMapper.insert(patient);
 
         // 创建疾病子表记录
@@ -248,8 +255,13 @@ public class PatientServiceImpl implements PatientService {
             saveDiseaseData(patient.getId(), patientDTO.getDisClass(), patientDTO.getDiseaseData());
         }
 
+        // 保存遗传学染色体核型（独立表）
+        savePatientGenetics(patient.getId(), patientDTO);
+
+        String encodedPatientId = HashidsUtil.encode(patient.getId());
+
         log.info("新建病例成功: caseNum={}, disClass={}, operator={}", caseNum, patientDTO.getDisClass(), SecurityUtil.getCurrentUsername());
-        return caseNum;
+        return encodedPatientId + ":" + caseNum;
     }
 
     @Override
@@ -301,12 +313,18 @@ public class PatientServiceImpl implements PatientService {
             }
         }
 
+        // 自动计算初诊年龄
+        calcFirVisAge(patient);
+
         patientMapper.updateById(patient);
 
         // 更新疾病子表数据
         if (patientDTO.getDiseaseData() != null) {
             saveDiseaseData(id, originalDisClass, patientDTO.getDiseaseData());
         }
+
+        // 保存遗传学染色体核型（独立表）
+        savePatientGenetics(id, patientDTO);
 
         log.info("编辑病例成功: id={}, operator={}", id, SecurityUtil.getCurrentUsername());
     }
@@ -606,6 +624,37 @@ public class PatientServiceImpl implements PatientService {
         }
     }
 
+    /**
+     * 保存遗传学染色体核型（独立表 patient_genetics）
+     * 无染色体核型数据时删除历史记录，保证幂等
+     */
+    private void savePatientGenetics(Long patientId, PatientDTO patientDTO) {
+        log.info("savePatientGenetics called: patientId={}, chrom='{}', chromOther='{}'",
+                patientId, patientDTO.getChrom(), patientDTO.getChromOther());
+        if (patientId == null) {
+            return;
+        }
+        boolean hasData = StringUtils.isNotBlank(patientDTO.getChrom()) || StringUtils.isNotBlank(patientDTO.getChromOther());
+        LambdaQueryWrapper<PatientGenetics> wrapper = new LambdaQueryWrapper<PatientGenetics>()
+                .eq(PatientGenetics::getPatientId, patientId);
+        PatientGenetics existing = patientGeneticsMapper.selectOne(wrapper);
+        if (!hasData) {
+            if (existing != null) {
+                patientGeneticsMapper.deleteById(existing.getId());
+            }
+            return;
+        }
+        PatientGenetics entity = existing != null ? existing : new PatientGenetics();
+        entity.setPatientId(patientId);
+        entity.setChrom(patientDTO.getChrom());
+        entity.setChromOther(patientDTO.getChromOther());
+        if (existing != null) {
+            patientGeneticsMapper.updateById(entity);
+        } else {
+            patientGeneticsMapper.insert(entity);
+        }
+    }
+
     // ==================== 家庭关联 ====================
 
     @Override
@@ -770,6 +819,20 @@ public class PatientServiceImpl implements PatientService {
                 patientId, oldDisClass, targetDisClass, newCaseNum,
                 SecurityUtil.getCurrentUsername() != null ? SecurityUtil.getCurrentUsername() : "unknown");
         return newCaseNum;
+    }
+
+    /**
+     * 根据出生日期和初诊时间自动计算初诊年龄（周岁）
+     */
+    private void calcFirVisAge(Patient patient) {
+        if (patient.getBirthTime() != null && patient.getFirVisTime() != null) {
+            java.time.LocalDate birth = patient.getBirthTime().toLocalDate();
+            java.time.LocalDate visit = patient.getFirVisTime().toLocalDate();
+            int age = java.time.Period.between(birth, visit).getYears();
+            if (age >= 0) {
+                patient.setFirVisAge(String.valueOf(age));
+            }
+        }
     }
 
     /**

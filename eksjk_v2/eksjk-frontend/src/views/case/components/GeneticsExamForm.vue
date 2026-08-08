@@ -1,59 +1,43 @@
 <template>
   <div class="genetics-exam-form">
-    <!-- 1. 染色体核型 -->
-    <div class="section-title" v-if="showKaryotype">染色体核型</div>
-    <el-row v-if="showKaryotype" :gutter="16">
+    <!-- 4. 基因检测方法 -->
+    <div class="section-title">基因检测方法</div>
+    <el-row :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="基因检测方法">
+          <el-checkbox-group v-model="geneTestMethodChecked" :disabled="disabled">
+            <el-checkbox value="先证者WES">先证者WES</el-checkbox>
+            <el-checkbox value="Trio-WES">Trio-WES</el-checkbox>
+            <el-checkbox value="CNV测序">CNV测序</el-checkbox>
+            <el-checkbox value="CMA">CMA</el-checkbox>
+            <el-checkbox value="WGS">WGS</el-checkbox>
+            <el-checkbox value="其他">其他</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-if="geneTestMethodChecked.includes('其他')" :gutter="16">
       <el-col :span="12">
-        <el-form-item label="染色体核型">
-          <el-select v-model="localData.karyotype" :disabled="disabled" placeholder="请选择或输入" clearable filterable allow-create>
-            <el-option label="46,XY" value="46,XY" />
-            <el-option label="46,XX" value="46,XX" />
-          </el-select>
+        <el-form-item label="其他检测方法">
+          <el-input v-model="geneTestMethodOther" :disabled="disabled" placeholder="请输入其他检测方法" />
         </el-form-item>
       </el-col>
     </el-row>
 
-    <!-- 2. 上传染色体报告 -->
-    <div class="section-title" v-if="showChromReport">染色体报告</div>
-    <div v-if="showChromReport" class="report-section">
-      <template v-if="!chromReportFile">
-        <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: '染色体报告' }"
-                   :on-success="onChromReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
-                   :show-file-list="false" :disabled="disabled" accept="image/*,.pdf">
-          <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>上传染色体报告</el-button>
-        </el-upload>
-      </template>
-      <template v-else>
-        <div class="report-info">
-          <el-icon><Document /></el-icon>
-          <span class="report-name" :title="chromReportFile.name">{{ chromReportFile.name }}</span>
-          <el-button link type="primary" size="small" @click="downloadFile(chromReportFile)">下载</el-button>
-          <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('chrom')">删除</el-button>
-        </div>
-      </template>
-    </div>
+    <!-- 5. 基因检测结果 -->
+    <div class="section-title">基因检测结果</div>
+    <el-row :gutter="16">
+      <el-col :span="24">
+        <el-form-item label="基因检测结果">
+          <el-radio-group v-model="localData.geneTestResult" :disabled="disabled">
+            <el-radio value="阴性">阴性</el-radio>
+            <el-radio value="阳性">阳性</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
 
-    <!-- 3. 上传基因检测报告 -->
-    <div class="section-title" v-if="showGeneReport">基因检测报告</div>
-    <div v-if="showGeneReport" class="report-section">
-      <template v-if="!geneReportFile">
-        <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: '基因检测报告' }"
-                   :on-success="onGeneReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
-                   :show-file-list="false" :disabled="disabled" accept="image/*,.pdf">
-          <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>上传基因检测报告</el-button>
-        </el-upload>
-      </template>
-      <template v-else>
-        <div class="report-info">
-          <el-icon><Document /></el-icon>
-          <span class="report-name" :title="geneReportFile.name">{{ geneReportFile.name }}</span>
-          <el-button link type="primary" size="small" @click="downloadFile(geneReportFile)">下载</el-button>
-          <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('gene')">删除</el-button>
-        </div>
-      </template>
-    </div>
-
-    <!-- 4. 基因突变检测表 -->
+    <!-- 6. 基因突变检测表 -->
     <div class="section-title" v-if="showGeneTable">基因突变检测</div>
     <div v-if="showGeneTable">
       <el-table :data="localData.genData" border stripe size="small">
@@ -109,15 +93,31 @@
             </el-select>
           </template>
         </el-table-column>
+        <el-table-column v-for="col in localData.genCustomColumns" :key="col" :label="col" min-width="120">
+          <template #header>
+            <span style="display:flex;align-items:center;gap:4px">
+              <span>{{ col }}</span>
+              <el-icon v-if="!disabled" class="remove-col-icon" @click="removeCustomColumn(col)"><Close /></el-icon>
+            </span>
+          </template>
+          <template #default="{ row }">
+            <el-input v-model="row.customFields[col]" :disabled="disabled" :placeholder="col" size="small" />
+          </template>
+        </el-table-column>
         <el-table-column v-if="!disabled" label="操作" width="70" fixed="right">
           <template #default="{ $index }">
             <el-button type="danger" size="small" text @click="removeGene($index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-button v-if="!disabled" type="primary" size="small" style="margin-top:8px" @click="addGene">
-        <el-icon><Plus /></el-icon>新增基因
-      </el-button>
+      <div v-if="!disabled" style="margin-top:8px;display:flex;gap:8px">
+        <el-button type="primary" size="small" @click="addGene">
+          <el-icon><Plus /></el-icon>新增基因
+        </el-button>
+        <el-button type="primary" size="small" plain @click="addCustomColumn">
+          <el-icon><Plus /></el-icon>新增列
+        </el-button>
+      </div>
     </div>
 
     <!-- 5. MAS 遗传学检查及病理检查 -->
@@ -172,98 +172,48 @@
       </el-row>
     </template>
 
-    <!-- 7. ELTM 遗传学检查 -->
-    <div class="section-title" v-if="showEltmGenetics">基因结果</div>
-    <template v-if="showEltmGenetics">
-      <div class="report-section">
-        <template v-if="!eltmGeneReportFile">
-          <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: 'E路童萌基因检测报告' }"
-                     :on-success="onEltmGeneReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
-                     :show-file-list="false" :disabled="disabled" accept="image/*,.pdf">
-            <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>基因结果上传</el-button>
-          </el-upload>
-        </template>
-        <template v-else>
-          <div class="report-info">
-            <el-icon><Document /></el-icon>
-            <span class="report-name" :title="eltmGeneReportFile.name">{{ eltmGeneReportFile.name }}</span>
-            <el-button link type="primary" size="small" @click="downloadFile(eltmGeneReportFile)">下载</el-button>
-            <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('eltmGene')">删除</el-button>
-          </div>
-        </template>
+    <!-- 7. 基因结果 / 染色体结果 / 染色体核型（所有病种统一显示，对齐 ELTM 设计） -->
+    <div class="section-title">基因结果</div>
+    <div class="report-section">
+      <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: 'E路童萌基因检测报告' }"
+                 :on-success="onEltmGeneReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
+                 :show-file-list="false" :disabled="disabled" accept="image/*,.pdf" multiple>
+        <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>基因结果上传</el-button>
+      </el-upload>
+      <div v-for="(file, idx) in geneResultFiles" :key="file.path" class="report-info">
+        <el-icon><Document /></el-icon>
+        <span class="report-name" :title="file.name">{{ file.name }}</span>
+        <el-button link type="primary" size="small" @click="downloadFile(file)">下载</el-button>
+        <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('gene', idx)">删除</el-button>
       </div>
-      <el-row :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="基因检测方法">
-            <el-input v-model="localData.geneMethod" :disabled="disabled" placeholder="基因检测方法" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="基因结果">
-            <el-radio-group v-model="localData.geneRes" :disabled="disabled">
-              <el-radio label="阴性">阴性</el-radio>
-              <el-radio label="阳性">阳性</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row v-if="localData.geneRes === '阳性'" :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="基因名称">
-            <el-input v-model="localData.geneName" :disabled="disabled" placeholder="基因名称" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="突变位点">
-            <el-input v-model="localData.genePoint" :disabled="disabled" placeholder="突变位点" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row v-if="localData.geneRes === '阳性'" :gutter="16">
-        <el-col :span="12">
-          <el-form-item label="突变类型">
-            <el-input v-model="localData.geneType" :disabled="disabled" placeholder="突变类型" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="遗传模式">
-            <el-input v-model="localData.geneMode" :disabled="disabled" placeholder="遗传模式" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <div class="section-title" style="margin-top:16px">染色体结果</div>
-      <div class="report-section">
-        <template v-if="!eltmChromReportFile">
-          <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: 'E路童萌染色体检查报告' }"
-                     :on-success="onEltmChromReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
-                     :show-file-list="false" :disabled="disabled" accept="image/*,.pdf">
-            <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>染色体检查报告</el-button>
-          </el-upload>
-        </template>
-        <template v-else>
-          <div class="report-info">
-            <el-icon><Document /></el-icon>
-            <span class="report-name" :title="eltmChromReportFile.name">{{ eltmChromReportFile.name }}</span>
-            <el-button link type="primary" size="small" @click="downloadFile(eltmChromReportFile)">下载</el-button>
-            <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('eltmChrom')">删除</el-button>
-          </div>
-        </template>
+    </div>
+    <div class="section-title" style="margin-top:16px">染色体结果</div>
+    <div class="report-section">
+      <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: 'E路童萌染色体检查报告' }"
+                 :on-success="onEltmChromReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
+                 :show-file-list="false" :disabled="disabled" accept="image/*,.pdf" multiple>
+        <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>染色体检查报告</el-button>
+      </el-upload>
+      <div v-for="(file, idx) in chromResultFiles" :key="file.path" class="report-info">
+        <el-icon><Document /></el-icon>
+        <span class="report-name" :title="file.name">{{ file.name }}</span>
+        <el-button link type="primary" size="small" @click="downloadFile(file)">下载</el-button>
+        <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('chrom', idx)">删除</el-button>
       </div>
-      <el-form-item label="染色体核型">
-        <el-checkbox-group v-model="chromChecked" :disabled="disabled">
-          <el-checkbox label="正常核型">正常核型</el-checkbox>
-          <el-checkbox label="21三体综合征">21三体综合征</el-checkbox>
-          <el-checkbox label="特纳综合征">特纳综合征</el-checkbox>
-          <el-checkbox label="克氏综合征">克氏综合征</el-checkbox>
-          <el-checkbox label="染色体平衡易位">染色体平衡易位</el-checkbox>
-          <el-checkbox label="染色体嵌合体">染色体嵌合体</el-checkbox>
-          <el-checkbox label="其他异常核型">其他异常核型</el-checkbox>
-        </el-checkbox-group>
-        <el-input v-if="chromChecked.includes('其他异常核型')" v-model="localData.chromOther"
-                  :disabled="disabled" placeholder="请输入其他异常核型" style="width:300px;margin-top:8px" />
-      </el-form-item>
-    </template>
+    </div>
+    <el-form-item label="染色体核型">
+      <el-checkbox-group v-model="chromChecked" :disabled="disabled">
+        <el-checkbox label="正常核型">正常核型</el-checkbox>
+        <el-checkbox label="21三体综合征">21三体综合征</el-checkbox>
+        <el-checkbox label="特纳综合征">特纳综合征</el-checkbox>
+        <el-checkbox label="克氏综合征">克氏综合征</el-checkbox>
+        <el-checkbox label="染色体平衡易位">染色体平衡易位</el-checkbox>
+        <el-checkbox label="染色体嵌合体">染色体嵌合体</el-checkbox>
+        <el-checkbox label="其他异常核型">其他异常核型</el-checkbox>
+      </el-checkbox-group>
+      <el-input v-if="chromChecked.includes('其他异常核型')" v-model="localData.chromOther"
+                :disabled="disabled" placeholder="请输入其他异常核型" style="width:300px;margin-top:8px" />
+    </el-form-item>
 
     <!-- 8. 手术情况 -->
     <div class="section-title" v-if="showSurgeryPathology">手术情况</div>
@@ -287,21 +237,17 @@
 
     <!-- 10. 上传病理报告 -->
     <div v-if="showSurgeryPathology" class="report-section">
-      <template v-if="!pathologyReportFile">
-        <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: '病理报告' }"
-                   :on-success="onPathologyReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
-                   :show-file-list="false" :disabled="disabled" accept="image/*,.pdf">
-          <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>上传病理报告</el-button>
-        </el-upload>
-      </template>
-      <template v-else>
-        <div class="report-info">
-          <el-icon><Document /></el-icon>
-          <span class="report-name" :title="pathologyReportFile.name">{{ pathologyReportFile.name }}</span>
-          <el-button link type="primary" size="small" @click="downloadFile(pathologyReportFile)">下载</el-button>
-          <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('pathology')">删除</el-button>
-        </div>
-      </template>
+      <el-upload :action="uploadUrl" :headers="uploadHeaders" :data="{ patientId, category: '病理报告' }"
+                 :on-success="onPathologyReportSuccess" :on-error="onUploadError" :before-upload="beforeUpload"
+                 :show-file-list="false" :disabled="disabled" accept="image/*,.pdf" multiple>
+        <el-button :disabled="disabled" size="small"><el-icon><Plus /></el-icon>上传病理报告</el-button>
+      </el-upload>
+      <div v-for="(file, idx) in pathologyReportFiles" :key="file.path" class="report-info">
+        <el-icon><Document /></el-icon>
+        <span class="report-name" :title="file.name">{{ file.name }}</span>
+        <el-button link type="primary" size="small" @click="downloadFile(file)">下载</el-button>
+        <el-button v-if="!disabled" link type="danger" size="small" @click="deleteReport('pathology', idx)">删除</el-button>
+      </div>
     </div>
 
   </div>
@@ -309,8 +255,8 @@
 
 <script setup>
 import { reactive, computed, watch, ref, nextTick } from 'vue'
-import { Plus, Document } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { Plus, Document, Close } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { getFileList, deleteFile, getFileDownloadUrl } from '@/api/file'
 import { useUserStore } from '@/stores/user'
 
@@ -328,21 +274,25 @@ const uploadUrl = '/api/files/upload'
 const uploadHeaders = computed(() => userStore.token ? { 'satoken': userStore.token } : {})
 
 // 各疾病类型显示的区块
-const showKaryotype = computed(() => ['dsd', 'mas', 'sss', 'fss', 'sga', 'cpp'].includes(props.diseaseType))
-const showChromReport = computed(() => ['dsd', 'fss', 'sss', 'sga', 'cpp'].includes(props.diseaseType))
-const showGeneReport = computed(() => ['dsd', 'fss', 'sss', 'sga', 'cpp'].includes(props.diseaseType))
-const showGeneTable = computed(() => ['dsd', 'fss', 'sss', 'sga', 'cpp'].includes(props.diseaseType))
+// 统一设计：所有病种遗传学检查对齐 ELTM 风格（基因结果/染色体结果上传 + 染色体核型多选）
+const showGeneTable = computed(() => {
+  if (localData.geneTestResult === '阳性') return true
+  if (localData.genData && localData.genData.length > 0) return true
+  return false
+})
 const showSurgeryPathology = computed(() => props.diseaseType === 'dsd')
 const showMasGenetics = computed(() => props.diseaseType === 'mas')
-const showEltmGenetics = computed(() => props.diseaseType === 'eltm')
 
 const localData = reactive({
   karyotype: '',
   genData: [],
+  genCustomColumns: [],
   biologBank: '',
   biologBankFa: '',
   biologBankMo: '',
   biologBankData: [],
+  geneTestMethod: '',
+  geneTestResult: '',
   surgeryNote: '',
   pathologyResult: '',
   gnas: '',
@@ -366,12 +316,51 @@ const chromChecked = computed({
   set: (val) => { localData.chrom = val }
 })
 
-// 报告文件状态
-const chromReportFile = ref(null)
-const geneReportFile = ref(null)
-const pathologyReportFile = ref(null)
-const eltmGeneReportFile = ref(null)
-const eltmChromReportFile = ref(null)
+// 基因检测方法多选（逗号分隔存储）
+const geneTestMethodChecked = computed({
+  get: () => {
+    const val = localData.geneTestMethod
+    if (!val) return []
+    const parts = val.split(',').filter(Boolean)
+    return parts.map(p => p.startsWith('其他:') ? '其他' : p)
+  },
+  set: (vals) => {
+    const result = vals.map(v => {
+      if (v === '其他') {
+        return geneTestMethodOther.value ? '其他:' + geneTestMethodOther.value : '其他:'
+      }
+      return v
+    })
+    localData.geneTestMethod = result.join(',')
+    syncToParent()
+  }
+})
+
+const geneTestMethodOther = computed({
+  get: () => {
+    const val = localData.geneTestMethod
+    if (!val) return ''
+    const customPart = val.split(',').find(p => p.startsWith('其他:'))
+    return customPart ? customPart.substring(3) : ''
+  },
+  set: (val) => {
+    const newVal = val ? '其他:' + val : '其他:'
+    const parts = localData.geneTestMethod.split(',').filter(Boolean)
+    const idx = parts.findIndex(p => p.startsWith('其他:'))
+    if (idx >= 0) {
+      parts[idx] = newVal
+    } else {
+      parts.push(newVal)
+    }
+    localData.geneTestMethod = parts.join(',')
+    syncToParent()
+  }
+})
+
+// 报告文件列表（支持多文件）
+const geneResultFiles = ref([])
+const chromResultFiles = ref([])
+const pathologyReportFiles = ref([])
 
 function beforeUpload(file) {
   const maxSize = 50 * 1024 * 1024
@@ -390,11 +379,10 @@ async function loadReportFiles() {
   try {
     const res = await getFileList(props.patientId)
     const files = res.data || []
-    chromReportFile.value = files.find(f => f.category === '染色体报告') || null
-    geneReportFile.value = files.find(f => f.category === '基因检测报告') || null
-    pathologyReportFile.value = files.find(f => f.category === '病理报告') || null
-    eltmGeneReportFile.value = files.find(f => f.category === 'E路童萌基因检测报告') || null
-    eltmChromReportFile.value = files.find(f => f.category === 'E路童萌染色体检查报告') || null
+    // 统一分类读取：兼容历史文件（旧的「基因检测报告」「染色体报告」分类）
+    geneResultFiles.value = files.filter(f => f.category === 'E路童萌基因检测报告' || f.category === '基因检测报告')
+    chromResultFiles.value = files.filter(f => f.category === 'E路童萌染色体检查报告' || f.category === '染色体报告')
+    pathologyReportFiles.value = files.filter(f => f.category === '病理报告')
   } catch { /* ignore */ }
 }
 
@@ -409,31 +397,29 @@ function makeReportSuccessHandler() {
   }
 }
 
-const onChromReportSuccess = makeReportSuccessHandler()
-const onGeneReportSuccess = makeReportSuccessHandler()
 const onPathologyReportSuccess = makeReportSuccessHandler()
 const onEltmGeneReportSuccess = makeReportSuccessHandler()
 const onEltmChromReportSuccess = makeReportSuccessHandler()
 
-async function deleteReport(type) {
+async function deleteReport(type, idx) {
   const map = {
-    chrom: chromReportFile,
-    gene: geneReportFile,
-    pathology: pathologyReportFile,
-    eltmGene: eltmGeneReportFile,
-    eltmChrom: eltmChromReportFile
+    gene: geneResultFiles,
+    chrom: chromResultFiles,
+    pathology: pathologyReportFiles
   }
-  const file = map[type]
-  if (!file?.value?.path) return
+  const files = map[type]
+  if (!files?.value?.[idx]) return
   try {
-    await deleteFile(file.value.path)
-    file.value = null
+    await deleteFile(files.value[idx].path)
+    files.value.splice(idx, 1)
     ElMessage.success('删除成功')
   } catch { ElMessage.error('删除失败') }
 }
 
 function addGene() {
-  localData.genData.push({ geneName: '', rna: '', mutationType: '', other: '', pathogenicity: '', amino: '', father: '', mother: '' })
+  const customFields = {}
+  localData.genCustomColumns.forEach(col => { customFields[col] = '' })
+  localData.genData.push({ geneName: '', rna: '', mutationType: '', other: '', pathogenicity: '', amino: '', father: '', mother: '', customFields })
   syncToParent()
 }
 
@@ -442,11 +428,43 @@ function removeGene(index) {
   syncToParent()
 }
 
+const FIXED_COLUMNS = ['基因名称', '核酸变异', '突变类型', '其他', '致病等级', '氨基酸变异', '父亲', '母亲']
+
+function addCustomColumn() {
+  ElMessageBox.prompt('请输入自定义列名', '新增列', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    inputValidator: (val) => {
+      if (!val || !val.trim()) return '列名不能为空'
+      if (FIXED_COLUMNS.includes(val.trim())) return '列名与已有列重复'
+      if (localData.genCustomColumns.includes(val.trim())) return '列名已存在'
+      return true
+    }
+  }).then(({ value }) => {
+    const colName = value.trim()
+    localData.genCustomColumns.push(colName)
+    localData.genData.forEach(row => {
+      if (!row.customFields) row.customFields = {}
+      row.customFields[colName] = ''
+    })
+    syncToParent()
+  }).catch(() => { /* 取消 */ })
+}
+
+function removeCustomColumn(colName) {
+  localData.genCustomColumns = localData.genCustomColumns.filter(c => c !== colName)
+  localData.genData.forEach(row => {
+    if (row.customFields) delete row.customFields[colName]
+  })
+  syncToParent()
+}
+
 function normalizeGenData(data) {
   if (!data || !Array.isArray(data) || data.length === 0) return data
   const first = data[0]
+  let result
   if (first.geneName !== undefined && first.sequencingMethod !== undefined && first.rna === undefined) {
-    return data.map(row => ({
+    result = data.map(row => ({
       geneName: row.geneName || '',
       rna: row.mutationSite || '',
       mutationType: '',
@@ -456,8 +474,14 @@ function normalizeGenData(data) {
       father: '',
       mother: ''
     }))
+  } else {
+    result = data
   }
-  return data
+  // 确保每行都有 customFields
+  result.forEach(row => {
+    if (!row.customFields) row.customFields = {}
+  })
+  return result
 }
 
 // 防止父→子同步时触发子→父回写，避免级联更新导致页面卡顿
@@ -471,6 +495,7 @@ watch(() => props.modelValue, (val) => {
     if (val.biologBankFa !== undefined) localData.biologBankFa = val.biologBankFa
     if (val.biologBankMo !== undefined) localData.biologBankMo = val.biologBankMo
     if (val.genData && Array.isArray(val.genData)) localData.genData = normalizeGenData([...val.genData])
+    if (val.genCustomColumns && Array.isArray(val.genCustomColumns)) localData.genCustomColumns = [...val.genCustomColumns]
     if (val.surgeryNote !== undefined) localData.surgeryNote = val.surgeryNote
     if (val.pathologyResult !== undefined) localData.pathologyResult = val.pathologyResult
     if (val.gnas !== undefined) localData.gnas = val.gnas
@@ -479,6 +504,8 @@ watch(() => props.modelValue, (val) => {
     if (val.detRes !== undefined) localData.detRes = val.detRes
     if (val.detVer !== undefined) localData.detVer = val.detVer
     if (val.mutSit !== undefined) localData.mutSit = val.mutSit
+    if (val.geneTestMethod !== undefined) localData.geneTestMethod = val.geneTestMethod
+    if (val.geneTestResult !== undefined) localData.geneTestResult = val.geneTestResult
     if (val.geneMethod !== undefined) localData.geneMethod = val.geneMethod
     if (val.geneRes !== undefined) localData.geneRes = val.geneRes
     if (val.geneName !== undefined) localData.geneName = val.geneName
@@ -505,7 +532,10 @@ function syncToParent() {
     biologBank: localData.biologBank,
     biologBankFa: localData.biologBankFa,
     biologBankMo: localData.biologBankMo,
+    geneTestMethod: localData.geneTestMethod,
+    geneTestResult: localData.geneTestResult,
     genData: [...localData.genData],
+    genCustomColumns: [...localData.genCustomColumns],
     surgeryNote: localData.surgeryNote,
     pathologyResult: localData.pathologyResult,
     gnas: localData.gnas,
@@ -562,5 +592,14 @@ watch(() => props.patientId, (val) => { if (val) loadReportFiles() }, { immediat
   white-space: nowrap;
   font-size: 13px;
   color: #606266;
+}
+
+.remove-col-icon {
+  cursor: pointer;
+  font-size: 13px;
+  color: #909399;
+}
+.remove-col-icon:hover {
+  color: #f56c6c;
 }
 </style>

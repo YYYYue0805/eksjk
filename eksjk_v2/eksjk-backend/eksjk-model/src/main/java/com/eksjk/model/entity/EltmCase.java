@@ -57,6 +57,48 @@ public class EltmCase implements Serializable {
     /** 诊断说明（匹配的指标和得分详情） */
     private String diagnosisNote;
 
+    // ==================== 结构化既往史 ====================
+
+    /** 运动发育落后 1=无 2=有 */
+    private String motDevBack;
+
+    /** 运动发育落后描述 */
+    private String sport;
+
+    /** 语言发育落后 1=无 2=有 */
+    private String lanDevBack;
+
+    /** 语言发育落后描述 */
+    private String language;
+
+    /** 智力发育落后 1=无 2=有 */
+    private String intDevBack;
+
+    /** 智力发育落后描述 */
+    private String intelligence;
+
+    /** 听力异常 1=无 2=有 */
+    private String abnHear;
+
+    /** 听力异常描述 */
+    private String hear;
+
+    /** 反复感染史 1=无 2=有 */
+    private String recInfHis;
+
+    /** 反复感染史描述 */
+    private String infection;
+
+    /** 抽搐史 1=无 2=有 */
+    private String conHis;
+
+    /** 其他既往史 */
+    private String pastOther;
+
+    /** 诊疗方案（JSON） */
+    @TableField("dia_trea_plan")
+    private String diaTreaPlan;
+
     // ==================== 遗传学检查 ====================
 
     /** 基因检测方法 */

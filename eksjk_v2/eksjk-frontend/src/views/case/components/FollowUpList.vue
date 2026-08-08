@@ -24,12 +24,6 @@
               <span class="metric" v-if="item.bmi">
                 <label>BMI</label> {{ item.bmi }}
               </span>
-              <span class="metric" v-if="item.rboneAge && item.rboneAge !== '无'">
-                <label>R骨龄</label> {{ item.rboneAge }}
-              </span>
-              <span class="metric" v-if="item.cboneAge && item.cboneAge !== '无'">
-                <label>C骨龄</label> {{ item.cboneAge }}
-              </span>
             </div>
             <div class="actions">
               <el-button link type="primary" size="small" @click="handleView(item)">查看</el-button>
@@ -41,8 +35,8 @@
               </el-popconfirm>
             </div>
           </div>
-          <div class="followup-extra" v-if="item.diaTreaPlan && item.diaTreaPlan !== '无'">
-            <label>诊疗方案：</label>{{ item.diaTreaPlan }}
+          <div class="followup-extra" v-if="formatTreatment(item.diaTreaPlan)">
+            <label>诊疗方案：</label>{{ formatTreatment(item.diaTreaPlan) }}
           </div>
         </el-card>
       </el-timeline-item>
@@ -61,8 +55,6 @@
           <el-descriptions-item label="体脂率(%)">{{ currentDetail.bodyFat }}</el-descriptions-item>
           <el-descriptions-item label="腰围(cm)">{{ currentDetail.waistline }}</el-descriptions-item>
           <el-descriptions-item label="臀围(cm)">{{ currentDetail.hips }}</el-descriptions-item>
-          <el-descriptions-item label="R骨龄">{{ currentDetail.rboneAge }}</el-descriptions-item>
-          <el-descriptions-item label="C骨龄">{{ currentDetail.cboneAge }}</el-descriptions-item>
           <el-descriptions-item label="生殖器分期">{{ currentDetail.genStag }}</el-descriptions-item>
           <el-descriptions-item label="阴毛分期">{{ currentDetail.pubStag }}</el-descriptions-item>
         </el-descriptions>
@@ -125,21 +117,21 @@
         <!-- 影像检查 -->
         <h4 style="margin: 16px 0 8px">影像检查</h4>
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="性腺B超">{{ currentDetail.gonBUlt }}</el-descriptions-item>
-          <el-descriptions-item label="垂体MRI">{{ currentDetail.pituitaryMri }}</el-descriptions-item>
-          <el-descriptions-item label="甲状腺B超">{{ currentDetail.thyroidUlt }}</el-descriptions-item>
-          <el-descriptions-item label="骨密度">{{ currentDetail.bonMinDen }}</el-descriptions-item>
+          <el-descriptions-item label="性腺B超">{{ decodeDisplay(currentDetail.gonBUlt) }}</el-descriptions-item>
+          <el-descriptions-item label="垂体MRI">{{ decodeDisplay(currentDetail.pituitaryMri) }}</el-descriptions-item>
+          <el-descriptions-item label="甲状腺B超">{{ decodeDisplay(currentDetail.thyroidUlt) }}</el-descriptions-item>
+          <el-descriptions-item label="骨密度">{{ decodeDisplay(currentDetail.bonMinDen) }}</el-descriptions-item>
         </el-descriptions>
         <!-- 常规实验室 -->
         <h4 style="margin: 16px 0 8px">常规实验室检查</h4>
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="血常规">{{ currentDetail.bloodRoutine }}</el-descriptions-item>
-          <el-descriptions-item label="尿常规">{{ currentDetail.urineRoutine }}</el-descriptions-item>
+          <el-descriptions-item label="血常规">{{ decodeDisplay(currentDetail.bloodRoutine) }}</el-descriptions-item>
+          <el-descriptions-item label="尿常规">{{ decodeDisplay(currentDetail.urineRoutine) }}</el-descriptions-item>
           <el-descriptions-item label="乙肝三系">{{ currentDetail.hepatitisB }}</el-descriptions-item>
         </el-descriptions>
-        <div v-if="currentDetail.diaTreaPlan" style="margin-top: 16px">
+        <div v-if="formatTreatment(currentDetail.diaTreaPlan)" style="margin-top: 16px">
           <h4>诊疗方案</h4>
-          <p>{{ currentDetail.diaTreaPlan }}</p>
+          <p>{{ formatTreatment(currentDetail.diaTreaPlan) }}</p>
         </div>
       </div>
     </el-drawer>
@@ -153,7 +145,8 @@ import { getFollowUpList, getFollowUpDetail, deleteFollowUp } from '@/api/follow
 import * as echarts from 'echarts'
 
 const props = defineProps({
-  patientId: { type: String, required: true }
+  patientId: { type: String, required: true },
+  birthTime: { type: String, default: '' }
 })
 
 const emit = defineEmits(['edit'])
@@ -298,6 +291,62 @@ async function handleDelete(item) {
   } catch (error) {
     console.error('删除失败', error)
   }
+}
+
+const planLabels = {
+  '1': '未治疗', '2': 'rhGH治疗', '3': 'GnRHa联合生长激素治疗',
+  '4': '停止GnRHa治疗', '5': '停止GnRHa联合生长激素治疗',
+  '6': '停止生长激素治疗', '7': 'GnRHa治疗', '8': '芳香化酶抑制剂',
+  '9': '中医药治疗', '10': '芳香化酶联合生长激素治疗',
+  '11': '停止芳香化酶抑制剂', '12': '停止芳香化酶联合生长激素治疗'
+}
+
+const laghDrugLabels = {
+  '11': '金赛增', '12': '益佩生', '13': '维臻高', '14': '诺泽优'
+}
+
+const rhghDrugLabels = {
+  '21': '赛增粉剂', '22': '赛增水剂', '23': '诺泽粉剂', '24': '诺泽水剂',
+  '25': '安苏萌粉剂', '26': '安苏萌水剂', '27': '海之元粉剂', '28': '海之元水剂', '29': '珍怡粉剂'
+}
+
+const rhGHTypeLabels = { '1': 'LAGH', '2': 'rhGH' }
+
+function formatTreatment(diaTreaPlan) {
+  if (!diaTreaPlan || diaTreaPlan === '无') return ''
+  try {
+    const plan = JSON.parse(diaTreaPlan)
+    if (!plan || typeof plan !== 'object') return diaTreaPlan
+    const parts = [planLabels[plan.diaPlan] || '未知方案']
+    if (plan.diaPlan === '2') {
+      if (plan.rhGHType) parts.push(rhGHTypeLabels[plan.rhGHType] || '')
+      if (plan.rhGH && plan.rhGHType === '1') {
+        parts.push(laghDrugLabels[plan.rhGH] || '')
+        if (plan.PEGrhGHdose) parts.push(plan.PEGrhGHdose + ' mg/w')
+      } else if (plan.rhGH && plan.rhGHType === '2') {
+        parts.push(rhghDrugLabels[plan.rhGH] || '')
+        if (plan.rhGHdose) parts.push(plan.rhGHdose + ' IU/d')
+      }
+    }
+    if (plan.otherMedicine) parts.push('其他用药: ' + plan.otherMedicine)
+    return parts.join('；')
+  } catch { return diaTreaPlan }
+}
+
+function parseField(raw) {
+  if (!raw) return { result: '0', description: '' }
+  const idx = raw.indexOf('|')
+  if (idx === -1) return { result: '0', description: raw }
+  return { result: raw.substring(0, idx) || '0', description: raw.substring(idx + 1) }
+}
+
+function decodeDisplay(raw) {
+  if (!raw) return ''
+  const parsed = parseField(raw)
+  const labels = { '0': '未查', '1': '正常', '2': '异常' }
+  const base = labels[parsed.result]
+  if (base === undefined) return raw
+  return parsed.result === '2' && parsed.description ? base + '：' + parsed.description : base
 }
 
 function formatDate(dateStr) {

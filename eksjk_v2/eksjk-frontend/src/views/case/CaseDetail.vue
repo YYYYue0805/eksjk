@@ -174,17 +174,114 @@
 
         <!-- Tab 2：基线-临床信息 -->
         <el-tab-pane label="基线-临床信息" name="baselineClinical">
+          <!-- 病史 -->
+          <el-divider />
+          <div class="tab-section-title">病史</div>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item prop="firVisTime" :rules="[{ required: true, message: '请选择初诊时间', trigger: 'change' }]">
+                <template #label><span class="req-flag">√ </span>初诊时间</template>
+                <el-date-picker v-model="formData.firVisTime" type="date" placeholder="选择日期"
+                  value-format="YYYY-MM-DDTHH:mm:ss" style="width:100%" :disabled="isViewMode" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item prop="firVisAge" :rules="[{ required: true, message: '请选择初诊时间以计算年龄', trigger: 'change' }]">
+                <template #label><span class="req-flag">√ </span>初诊年龄</template>
+                <el-input v-model="formData.firVisAge" placeholder="岁" disabled />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 生长速率（所有疾病类型） -->
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item prop="growRate" :rules="[{ required: true, message: '请选择生长速率', trigger: 'change' }]">
+                <template #label><span class="req-flag">√ </span>生长速率</template>
+                <el-radio-group v-model="formData.growRate" :disabled="isViewMode">
+                  <el-radio value="1">不详</el-radio>
+                  <el-radio value="2">请选择</el-radio>
+                </el-radio-group>
+                <el-select v-if="formData.growRate === '2'" v-model="formData.rate" placeholder="cm/年"
+                  style="width:140px;margin-left:12px" :disabled="isViewMode">
+                  <el-option v-for="v in growthRateOptions" :key="v" :label="v + ' cm/年'" :value="String(v)" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- MAS 身高增长速度 -->
+          <el-row v-if="diseaseType === 'mas'" :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="身高增长速度">
+                <el-input v-model="formData.diseaseData.heightRate" placeholder="cm/年" :disabled="isViewMode">
+                  <template #suffix>cm/年</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 主诉、一般检查、初次遗精 -->
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <el-form-item prop="chiCom" :rules="[{ required: true, message: '请输入主诉', trigger: 'blur' }]">
+                <template #label><span class="req-flag">√ </span>主诉</template>
+                <el-input v-model="formData.chiCom" type="textarea" :rows="3" placeholder="请输入主诉" :disabled="isViewMode" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 是否有第二性征 -->
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="是否有第二性征">
+                <el-radio-group v-model="formData.hasSecondarySexual" :disabled="isViewMode">
+                  <el-radio value="1">有</el-radio>
+                  <el-radio value="0">无</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col v-if="formData.hasSecondarySexual === '1'" :span="8">
+              <el-form-item label="出现日期">
+                <el-date-picker v-model="formData.secondarySexualDate" type="date" placeholder="选择日期"
+                  value-format="YYYY-MM-DDTHH:mm:ss" style="width:100%" :disabled="isViewMode" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <!-- 初次遗精/月经初潮 -->
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="初次遗精/月经初潮">
+                <el-radio-group v-model="formData.hasFirstEjaculation" :disabled="isViewMode">
+                  <el-radio value="1">有</el-radio>
+                  <el-radio value="0">无</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col v-if="formData.hasFirstEjaculation === '1'" :span="8">
+              <el-form-item label="发生时间">
+                <el-date-picker v-model="formData.firstEjaculationDate" type="month" placeholder="选择年月"
+                  value-format="YYYY-MM" style="width:100%" :disabled="isViewMode" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+
           <!-- 体格检查 -->
           <div class="tab-section-title">体格检查</div>
           <el-row :gutter="20">
             <el-col :span="6">
-              <el-form-item label="身高"><el-input v-model="formData.height" placeholder="cm" @blur="calcBmi"><template #suffix>cm</template></el-input></el-form-item>
+              <el-form-item prop="height" :rules="[{ required: true, message: '请输入身高', trigger: 'blur' }]">
+                <template #label><span class="req-flag">√ </span>身高</template>
+                <el-input v-model="formData.height" placeholder="cm" @blur="calcBmi"><template #suffix>cm</template></el-input>
+              </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="体重"><el-input v-model="formData.weight" placeholder="kg" @blur="calcBmi"><template #suffix>kg</template></el-input></el-form-item>
+              <el-form-item prop="weight" :rules="[{ required: true, message: '请输入体重', trigger: 'blur' }]">
+                <template #label><span class="req-flag">√ </span>体重</template>
+                <el-input v-model="formData.weight" placeholder="kg" @blur="calcBmi"><template #suffix>kg</template></el-input>
+              </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="BMI"><el-input v-model="bmiValue" disabled /></el-form-item>
+              <el-form-item prop="bmi" :rules="[{ required: true, message: '请输入身高体重以计算BMI', trigger: 'blur' }]">
+                <template #label><span class="req-flag">√ </span>BMI</template>
+                <el-input v-model="formData.bmi" disabled />
+              </el-form-item>
             </el-col>
             <el-col v-if="['fss','cpp'].includes(diseaseType)" :span="6">
               <el-form-item label="身高SDS"><el-input v-model="formData.heightSds" /></el-form-item>
@@ -292,112 +389,68 @@
             </el-col>
           </el-row>
 
+          <!-- 眼科检查 -->
+          <el-divider />
+          <div class="tab-section-title">眼科检查</div>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="是否有做眼科检查">
+                <el-radio-group v-model="eyeExam.hasExam" :disabled="isViewMode">
+                  <el-radio value="0">无</el-radio>
+                  <el-radio value="1">有</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col v-if="eyeExam.hasExam === '1'" :span="8">
+              <el-form-item label="检查时间">
+                <el-date-picker v-model="eyeExam.examDate" type="date" value-format="YYYY-MM-DD"
+                  placeholder="选择日期" style="width:100%" :disabled="isViewMode" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-table v-if="eyeExam.hasExam === '1'" :data="eyeRows" border stripe size="small" style="width:100%">
+            <el-table-column label="项目" width="140">
+              <template #default="{ row }">{{ row.label }}</template>
+            </el-table-column>
+            <el-table-column label="右眼">
+              <template #default="{ row }">
+                <template v-if="row.type === 'refraction'">
+                  <el-radio-group v-model="eyeExam[row.rightHas]" size="small" :disabled="isViewMode">
+                    <el-radio value="0">无</el-radio>
+                    <el-radio value="1">有</el-radio>
+                  </el-radio-group>
+                  <span v-if="eyeExam[row.rightHas] === '1'" style="margin-left:6px">
+                    <el-input v-model="eyeExam[row.rightValue]" placeholder="度数" size="small" style="width:70px" :disabled="isViewMode" /> D
+                  </span>
+                </template>
+                <el-input v-else v-model="eyeExam[row.rightValue]" size="small" style="width:120px" :disabled="isViewMode" />
+              </template>
+            </el-table-column>
+            <el-table-column label="左眼">
+              <template #default="{ row }">
+                <template v-if="row.type === 'refraction'">
+                  <el-radio-group v-model="eyeExam[row.leftHas]" size="small" :disabled="isViewMode">
+                    <el-radio value="0">无</el-radio>
+                    <el-radio value="1">有</el-radio>
+                  </el-radio-group>
+                  <span v-if="eyeExam[row.leftHas] === '1'" style="margin-left:6px">
+                    <el-input v-model="eyeExam[row.leftValue]" placeholder="度数" size="small" style="width:70px" :disabled="isViewMode" /> D
+                  </span>
+                </template>
+                <el-input v-else v-model="eyeExam[row.leftValue]" size="small" style="width:120px" :disabled="isViewMode" />
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="eyeExam.hasExam === '1'" style="margin-top:8px;color:#909399;font-size:12px">
+            近视/远视/散光：选择「有」后填写度数(D)；眼轴长度单位为 mm
+          </div>
+
           <!-- 疾病特有临床表现（从 DiseaseFormGeneric 移入） -->
           <template v-if="hasDiseaseClinicalFields">
             <el-divider />
             <div class="tab-section-title">{{ diseaseName }} 专项临床信息</div>
             <component :is="DiseaseFormGeneric" v-model="formData.diseaseData" :disabled="isViewMode" :disease-type="diseaseType" />
           </template>
-
-          <!-- 病史 -->
-          <el-divider />
-          <div class="tab-section-title">病史</div>
-          <el-row :gutter="20">
-            <el-col :span="8">
-              <el-form-item label="初诊时间">
-                <el-date-picker v-model="formData.firVisTime" type="date" placeholder="选择日期"
-                  value-format="YYYY-MM-DD HH:mm:ss" style="width:100%" :disabled="isViewMode" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="初诊年龄">
-                <el-input v-model="formData.firVisAge" placeholder="岁" disabled />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- 生长速率（所有疾病类型） -->
-          <el-row :gutter="20">
-            <el-col :span="24">
-              <el-form-item label="生长速率">
-                <el-radio-group v-model="formData.growRate" :disabled="isViewMode">
-                  <el-radio value="1">不详</el-radio>
-                  <el-radio value="2">请选择</el-radio>
-                </el-radio-group>
-                <el-select v-if="formData.growRate === '2'" v-model="formData.rate" placeholder="cm/年"
-                  style="width:140px;margin-left:12px" :disabled="isViewMode">
-                  <el-option v-for="v in growthRateOptions" :key="v" :label="v + ' cm/年'" :value="String(v)" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- MAS 身高增长速度 -->
-          <el-row v-if="diseaseType === 'mas'" :gutter="20">
-            <el-col :span="8">
-              <el-form-item label="身高增长速度">
-                <el-input v-model="formData.diseaseData.heightRate" placeholder="cm/年" :disabled="isViewMode">
-                  <template #suffix>cm/年</template>
-                </el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- 主诉、一般检查、初次遗精 -->
-          <el-row :gutter="20">
-            <el-col :span="24">
-              <el-form-item label="主诉">
-                <el-input v-model="formData.chiCom" type="textarea" :rows="3" placeholder="请输入主诉" :disabled="isViewMode" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- 一般检查 -->
-          <el-row :gutter="20">
-            <el-col :span="8">
-              <el-form-item label="是否有一般检查">
-                <el-radio-group v-model="formData.hasGeneralExam" :disabled="isViewMode">
-                  <el-radio value="1">有</el-radio>
-                  <el-radio value="0">无</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col v-if="formData.hasGeneralExam === '1'" :span="16">
-              <el-form-item label="一般检查描述">
-                <el-input v-model="formData.generalExamDesc" placeholder="请输入一般检查具体情况" :disabled="isViewMode" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- 是否有第二性征 -->
-          <el-row :gutter="20">
-            <el-col :span="8">
-              <el-form-item label="是否有第二性征">
-                <el-radio-group v-model="formData.hasSecondarySexual" :disabled="isViewMode">
-                  <el-radio value="1">有</el-radio>
-                  <el-radio value="0">无</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col v-if="formData.hasSecondarySexual === '1'" :span="8">
-              <el-form-item label="出现日期">
-                <el-date-picker v-model="formData.secondarySexualDate" type="date" placeholder="选择日期"
-                  value-format="YYYY-MM-DD HH:mm:ss" style="width:100%" :disabled="isViewMode" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <!-- 初次遗精/月经初潮 -->
-          <el-row :gutter="20">
-            <el-col :span="8">
-              <el-form-item label="初次遗精/月经初潮">
-                <el-radio-group v-model="formData.hasFirstEjaculation" :disabled="isViewMode">
-                  <el-radio value="1">有</el-radio>
-                  <el-radio value="0">无</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col v-if="formData.hasFirstEjaculation === '1'" :span="8">
-              <el-form-item label="发生时间">
-                <el-date-picker v-model="formData.firstEjaculationDate" type="month" placeholder="选择年月"
-                  value-format="YYYY-MM" style="width:100%" :disabled="isViewMode" />
-              </el-form-item>
-            </el-col>
-          </el-row>
 
           <el-divider />
           <div class="tab-section-header">
@@ -556,7 +609,7 @@
           </template>
 
           <!-- FSS/SGA/SSS 结构化既往史 -->
-          <template v-if="['fss','sga','sss'].includes(diseaseType)">
+          <template v-if="['fss','sga','sss','eltm'].includes(diseaseType)">
             <el-row :gutter="20">
               <el-col :span="8">
                 <el-form-item label="运动发育落后">
@@ -640,6 +693,18 @@
               </el-col>
             </el-row>
 
+            <!-- ELTM 既往用药史 -->
+            <el-row v-if="diseaseType === 'eltm'" :gutter="20">
+              <el-col :span="24">
+                <el-form-item label="既往用药史">
+                  <el-radio-group v-model="formData.diseaseData.hasHistory" :disabled="isViewMode">
+                    <el-radio value="无">无</el-radio>
+                    <el-radio value="有">有</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+              </el-col>
+            </el-row>
+
             <!-- 诊疗方案 -->
             <TreatmentPlanForm v-model="treatmentPlanData" :disease-type="diseaseType" :disabled="isViewMode" :weight="Number(formData.weight) || 0" />
           </template>
@@ -666,20 +731,6 @@
             <!-- 诊疗方案 -->
             <TreatmentPlanForm v-model="treatmentPlanData" :disease-type="diseaseType" :disabled="isViewMode" :weight="Number(formData.weight) || 0" />
           </template>
-
-          <!-- ELTM 既往用药史 -->
-          <template v-if="diseaseType === 'eltm'">
-            <el-row :gutter="20">
-              <el-col :span="24">
-                <el-form-item label="既往用药史">
-                  <el-radio-group v-model="formData.diseaseData.hasHistory" :disabled="isViewMode">
-                    <el-radio value="无">无</el-radio>
-                    <el-radio value="有">有</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </template>
         </el-tab-pane>
 
         <!-- Tab 3：基线-辅助检查 -->
@@ -693,13 +744,13 @@
         </el-tab-pane>
 
         <!-- Tab 5：随访记录 -->
-        <el-tab-pane v-if="!isCreateMode" label="随访记录" name="followup" lazy>
+        <el-tab-pane label="随访记录" name="followup" lazy>
           <div class="tab-pane-header">
             <el-button type="primary" size="small" @click="showFollowUpForm = true">
               <el-icon><Plus /></el-icon>新增随访
             </el-button>
           </div>
-          <FollowUpList :patient-id="patientId" ref="followUpListRef" />
+          <FollowUpList :patient-id="patientId" :birth-time="formData.birthTime" ref="followUpListRef" @edit="handleFollowUpEdit" />
         </el-tab-pane>
 
         <!-- Tab 6：诊断 -->
@@ -708,9 +759,9 @@
         </el-tab-pane>
 
         <!-- Tab 7：GH不良事件 -->
-        <el-tab-pane v-if="!isCreateMode" label="GH不良事件" name="ghAdverseEvent" lazy>
+        <el-tab-pane label="GH不良事件" name="ghAdverseEvent" lazy>
           <div class="tab-pane-header">
-            <el-button type="primary" size="small" @click="showGhAdverseEventForm = true">
+            <el-button type="primary" size="small" @click="openGhAdverseEventAdd">
               <el-icon><Plus /></el-icon>新增不良事件
             </el-button>
           </div>
@@ -721,9 +772,10 @@
     </el-form>
 
     <FollowUpForm v-model:visible="showFollowUpForm" :patient-id="patientId"
-                  :disease-type="diseaseType" @saved="onFollowUpSaved" />
+                  :disease-type="diseaseType" :birth-time="formData.birthTime" :patient-sex="formData.sex"
+                  :edit-data="followUpEditData" @saved="onFollowUpSaved" />
     <GhAdverseEventForm v-model:visible="showGhAdverseEventForm" :patient-id="patientId"
-                        :edit-data="ghAdverseEventEditData" @saved="onGhAdverseEventSaved" />
+                        :edit-data="ghAdverseEventEditData" @saved="onGhAdverseEventSaved" @closed="onGhAdverseEventClosed" />
   </div>
 </template>
 
@@ -878,13 +930,15 @@ const familyCustomColumns = ref([])
 
 // 诊疗方案数据
 const treatmentPlanData = reactive({
-  diaPlan: '1', rhGH: '', rhGHdose: '', rhGHdoseKG: '',
+  diaPlan: '1', rhGHType: '', rhGH: '', rhGHdose: '', rhGHdoseKG: '',
   PEGrhGHdose: '', PEGrhGHdoseKG: '',
   GnRHa: '', GnRHadose: '',
   planData: [], otherMedicine: '',
   rhCustomizationDiaPlan: '', rhCustomizationPrompt: '',
   PEGrhCustomizationPrompt: '', rhCustomizationPromptKG: '',
-  PEGrhCustomizationPromptKG: ''
+  PEGrhCustomizationPromptKG: '',
+  laghOtherMedicine: '', laghOther: '',
+  rhghOtherMedicine: '', rhghOther: ''
 })
 
 function addFamilyMember() {
@@ -991,7 +1045,7 @@ const formData = reactive({
   relation: '', selfTel: '', chiCom: '', ethnic: '',
   card: '', famAdr: '', contactsName: '', categoryDescribe: '',
   icd: '',
-  height: '', weight: '',
+  height: '', weight: '', bmi: '',
   fht: '', mht: '', fhw: '', mhw: '', menAge: '', isBot: '', familyHis: '',
   pastHis: '', pastTime: '', pastHeight: '', pastWeight: '',
   firVisTime: '', firVisAge: '', growRate: '', rate: '',
@@ -1005,6 +1059,7 @@ const formData = reactive({
   scoliosis: '', scoliosisDesc: '',
   rash: '', rashDesc: '',
   breastDevLeft: '', breastDevRight: '',
+  eyeExam: '',
   examData: {},
   geneticsData: {},
   diagnosisData: {},
@@ -1021,9 +1076,9 @@ const formData = reactive({
 })
 
 const saving = ref(false)
-const bmiValue = ref('')
 const showFollowUpForm = ref(false)
 const followUpListRef = ref(null)
+const followUpEditData = ref(null)
 const showGhAdverseEventForm = ref(false)
 const ghAdverseEventListRef = ref(null)
 const ghAdverseEventEditData = ref(null)
@@ -1033,29 +1088,33 @@ onMounted(() => {
   if (patientId.value && !isCreateMode.value) loadDetail()
 })
 
-// 自动计算初诊年龄：year(firVisTime) - birthYearFromIdCard(card)
+// 自动计算初诊年龄：根据出生日期和初诊时间精确计算
 watch(
-  () => [formData.card, formData.firVisTime],
-  ([card, firVisTime]) => {
-    if (!firVisTime) {
+  () => [formData.birthTime, formData.firVisTime],
+  ([birthTime, firVisTime]) => {
+    if (!birthTime || !firVisTime) {
       formData.firVisAge = ''
       return
     }
-    const birthYear = extractBirthYearFromIdCard(card)
-    const visitYear = extractYearFromDateStr(firVisTime)
-    if (birthYear !== null && visitYear !== null) {
-      const age = visitYear - birthYear
-      formData.firVisAge = age >= 0 ? String(age) : ''
-    } else {
+    const birth = new Date(birthTime)
+    const visit = new Date(firVisTime)
+    if (isNaN(birth.getTime()) || isNaN(visit.getTime())) {
       formData.firVisAge = ''
+      return
     }
+    let age = visit.getFullYear() - birth.getFullYear()
+    const monthDiff = visit.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && visit.getDate() < birth.getDate())) {
+      age--
+    }
+    formData.firVisAge = age >= 0 ? String(age) : ''
   }
 )
 
 // 哪些字段属于哪个子对象（后端平铺 → 前端嵌套的映射）
 const EXAM_FIELDS = ['lh','lhCheckDate','fsh','fshCheckDate','e2','e2CheckDate','t','tCheckDate','prl','prlCheckDate','dht','dhtCheckDate','ft','ftCheckDate','shbg','shbgCheckDate','amh','amhCheckDate','inhb','inhbCheckDate','igf1','igf1CheckDate','igfbp3','igfbp3CheckDate','fasBloodGlu','fasBloodGluCheckDate','fasInsulin','fasInsulinCheckDate','glyHem','glyHemCheckDate','acth','acthCheckDate','cortisol','cortisolCheckDate','ohp','ohpCheckDate','dheas','dheasCheckDate','androstenedione','androstenedioneCheckDate','hcg','hcgCheckDate','hcgt','hcgtCheckDate','hcgdht','hcgdhtCheckDate','hcgad','hcgadCheckDate','lhMax','lhMaxCheckDate','fshMax','fshMaxCheckDate','tsh','tshCheckDate','ft3','ft3CheckDate','ft4','ft4CheckDate','tpoab','tpoabCheckDate','tgab','tgabCheckDate','thyroidFunction','gonBUlt','pituitaryMri','thyroidUlt','bonMinDen']
-const GENETICS_FIELDS = ['karyotype','biologBank','biologBankFa','biologBankMo','surgeryNote','pathologyResult']
-const DIAGNOSIS_FIELDS = ['diagnosis','secondaryDiagnosis','treatmentPlan','isTreated']
+const GENETICS_FIELDS = ['karyotype','biologBank','biologBankFa','biologBankMo','geneTestMethod','geneTestResult','surgeryNote','pathologyResult','chrom','chromOther']
+const DIAGNOSIS_FIELDS = ['diagnosis','secondaryDiagnosis','treatmentPlan']
 
 async function loadDetail() {
   try {
@@ -1082,23 +1141,30 @@ async function loadDetail() {
     }
     // 基因检测数组（后端存为JSON字符串，需解析）
     if (data.genData && typeof data.genData === 'string') {
-      try { formData.geneticsData.genData = JSON.parse(data.genData) } catch {}
+      try {
+        const parsed = JSON.parse(data.genData)
+        if (Array.isArray(parsed)) {
+          // 旧格式：纯数组
+          formData.geneticsData.genData = parsed
+          formData.geneticsData.genCustomColumns = []
+        } else {
+          // 新格式：{ rows, customColumns }
+          formData.geneticsData.genData = parsed.rows || []
+          formData.geneticsData.genCustomColumns = parsed.customColumns || []
+        }
+      } catch {}
     } else if (data.genData) {
       formData.geneticsData.genData = data.genData
     }
     // MAS/ELTM diseaseData 字段路由到 geneticsData
+    // （chrom/chromOther 已改由独立表存储，通过 GENETICS_FIELDS 从主接口读取，不再从 diseaseData 回填）
     if (data.diseaseData) {
       const masKeys = ['gnas','gnasSamLoc','genTesMet','detRes','detVer','mutSit']
-      const eltmKeys = ['geneMethod','geneRes','geneName','genePoint','geneType','geneMode','chrom','chromOther']
+      const eltmKeys = ['geneMethod','geneRes','geneName','genePoint','geneType','geneMode']
       masKeys.forEach(k => { if (data.diseaseData[k] !== undefined && data.diseaseData[k] !== null) formData.geneticsData[k] = data.diseaseData[k] })
       eltmKeys.forEach(k => {
         if (data.diseaseData[k] !== undefined && data.diseaseData[k] !== null) {
-          // chrom 可能是 JSON 字符串，需要解析
-          if (k === 'chrom' && typeof data.diseaseData[k] === 'string') {
-            try { formData.geneticsData[k] = JSON.parse(data.diseaseData[k]) } catch { formData.geneticsData[k] = data.diseaseData[k] }
-          } else {
-            formData.geneticsData[k] = data.diseaseData[k]
-          }
+          formData.geneticsData[k] = data.diseaseData[k]
         }
       })
     }
@@ -1143,6 +1209,7 @@ async function loadDetail() {
       familyMembers.splice(0, familyMembers.length)
     }
     calcBmi()
+    parseEyeExam(formData.eyeExam)
   } catch (error) {
     console.error('加载病例详情失败', error)
     ElMessage.error('加载病例详情失败')
@@ -1154,10 +1221,47 @@ function calcBmi() {
     try {
       const h = parseFloat(formData.height) / 100
       const w = parseFloat(formData.weight)
-      if (h > 0 && w > 0) { bmiValue.value = (w / (h * h)).toFixed(1) }
-    } catch (e) { bmiValue.value = '' }
-  } else { bmiValue.value = '' }
+      if (h > 0 && w > 0) { formData.bmi = (w / (h * h)).toFixed(1) }
+    } catch (e) { formData.bmi = '' }
+  } else { formData.bmi = '' }
 }
+
+// 眼科检查（基线-临床信息）
+const eyeExam = reactive({
+  hasExam: '0',
+  examDate: '',
+  myopiaR: '0', myopiaRD: '', myopiaL: '0', myopiaLD: '',
+  hyperopiaR: '0', hyperopiaRD: '', hyperopiaL: '0', hyperopiaLD: '',
+  astigmatismR: '0', astigmatismRD: '', astigmatismL: '0', astigmatismLD: '',
+  nakedVisionR: '', nakedVisionL: '',
+  correctedVisionR: '', correctedVisionL: '',
+  axialLengthR: '', axialLengthL: ''
+})
+
+const eyeRows = computed(() => [
+  { label: '近视', type: 'refraction', rightHas: 'myopiaR', rightValue: 'myopiaRD', leftHas: 'myopiaL', leftValue: 'myopiaLD' },
+  { label: '远视', type: 'refraction', rightHas: 'hyperopiaR', rightValue: 'hyperopiaRD', leftHas: 'hyperopiaL', leftValue: 'hyperopiaLD' },
+  { label: '散光', type: 'refraction', rightHas: 'astigmatismR', rightValue: 'astigmatismRD', leftHas: 'astigmatismL', leftValue: 'astigmatismLD' },
+  { label: '裸眼视力', type: 'plain', rightValue: 'nakedVisionR', leftValue: 'nakedVisionL' },
+  { label: '矫正视力', type: 'plain', rightValue: 'correctedVisionR', leftValue: 'correctedVisionL' },
+  { label: '眼轴长度', type: 'plain', rightValue: 'axialLengthR', leftValue: 'axialLengthL' }
+])
+
+function syncEyeExam() {
+  formData.eyeExam = JSON.stringify({ ...eyeExam })
+}
+
+function parseEyeExam(json) {
+  if (!json) return
+  try {
+    const obj = JSON.parse(json)
+    Object.keys(eyeExam).forEach(k => {
+      if (obj[k] !== undefined) eyeExam[k] = obj[k]
+    })
+  } catch { /* ignore parse errors */ }
+}
+
+watch(eyeExam, () => { syncEyeExam() }, { deep: true })
 
 const growthRateOptions = computed(() => {
   const opts = []
@@ -1213,8 +1317,17 @@ async function handleSave() {
     if (payload.geneticsData) {
       const g = payload.geneticsData
       Object.assign(payload, g)
-      // genData 数组序列化为 JSON 字符串
-      if (g.genData && Array.isArray(g.genData)) payload.genData = JSON.stringify(g.genData)
+      // chrom 数组序列化为 JSON 字符串（独立表存储，后端 String 字段接收）
+      if (Array.isArray(payload.chrom)) {
+        payload.chrom = JSON.stringify(payload.chrom)
+      }
+      // genData 序列化为 JSON 字符串（包含自定义列元信息）
+      if (g.genData && Array.isArray(g.genData)) {
+        payload.genData = JSON.stringify({
+          rows: g.genData,
+          customColumns: g.genCustomColumns || []
+        })
+      }
       // MAS 遗传学字段路由到 diseaseData
       if (diseaseType.value === 'mas') {
         const masFields = ['gnas','gnasSamLoc','genTesMet','detRes','detVer','mutSit']
@@ -1224,14 +1337,13 @@ async function handleSave() {
           payload.diseaseData = { ...(payload.diseaseData || {}), ...masData }
         }
       }
-      // ELTM 遗传学字段路由到 diseaseData
+      // ELTM 遗传学字段路由到 diseaseData（chrom/chromOther 已改由独立表存储，不再路由）
       if (diseaseType.value === 'eltm') {
-        const eltmFields = ['geneMethod','geneRes','geneName','genePoint','geneType','geneMode','chrom','chromOther']
+        const eltmFields = ['geneMethod','geneRes','geneName','genePoint','geneType','geneMode']
         const eltmData = {}
         eltmFields.forEach(k => {
           if (g[k] !== undefined && g[k] !== null) {
-            // chrom 数组序列化
-            eltmData[k] = (k === 'chrom' && Array.isArray(g[k])) ? JSON.stringify(g[k]) : g[k]
+            eltmData[k] = g[k]
           }
         })
         if (Object.keys(eltmData).length > 0) {
@@ -1243,7 +1355,7 @@ async function handleSave() {
     if (payload.diagnosisData) { Object.assign(payload, payload.diagnosisData); delete payload.diagnosisData }
     // diseaseData 保持不变（后端已有 Map<String,Object> diseaseData 接收）
     // 诊疗方案序列化到 diseaseData
-    if (['fss','sga','sss','cpp'].includes(diseaseType.value)) {
+    if (['fss','sga','sss','cpp','eltm'].includes(diseaseType.value)) {
       payload.diseaseData = { ...(payload.diseaseData || {}), diaTreaPlan: JSON.stringify(treatmentPlanData) }
     }
     // 家族成员序列化为 JSON 字符串
@@ -1252,7 +1364,7 @@ async function handleSave() {
     if (isCreateMode.value) {
       const res = await createPatient(payload)
       ElMessage.success('新建成功，病例编号：' + (res.data?.caseNum || ''))
-      router.replace('/case/' + diseaseType.value)
+      router.replace(`/case/${diseaseType.value}/${res.data?.patientId || res.data?.caseNum}`)
     } else {
       await updatePatient(patientId.value, payload)
       ElMessage.success('保存成功')
@@ -1263,8 +1375,19 @@ async function handleSave() {
   } finally { saving.value = false }
 }
 
+function handleFollowUpEdit(item) {
+  followUpEditData.value = item
+  showFollowUpForm.value = true
+}
+
 function onFollowUpSaved() {
+  followUpEditData.value = null
   followUpListRef.value?.refresh()
+}
+
+function openGhAdverseEventAdd() {
+  ghAdverseEventEditData.value = null
+  showGhAdverseEventForm.value = true
 }
 
 function handleGhAdverseEventEdit(item) {
@@ -1275,6 +1398,11 @@ function handleGhAdverseEventEdit(item) {
 function onGhAdverseEventSaved() {
   ghAdverseEventEditData.value = null
   ghAdverseEventListRef.value?.refresh()
+}
+
+function onGhAdverseEventClosed() {
+  // 抽屉关闭时清除编辑数据，避免下次新增时误入编辑模式
+  ghAdverseEventEditData.value = null
 }
 </script>
 
@@ -1287,6 +1415,7 @@ function onGhAdverseEventSaved() {
   font-size: 15px; font-weight: 600; color: #303133;
   margin-bottom: 20px; padding-left: 10px; border-left: 3px solid #409eff;
 }
+.req-flag { color: #f56c6c; font-weight: 600; }
 .tab-section-header {
   display: flex; justify-content: space-between; align-items: center;
 }

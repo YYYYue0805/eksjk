@@ -183,6 +183,7 @@ public class FollowUpDTO {
     private String pituitaryMri;
     private String thyroidUlt;
     private String gonBUltDetail;
+    private String ovarianCyst;
 
     // ==================== 甲状腺补充 ====================
 
