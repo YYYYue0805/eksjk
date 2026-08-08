@@ -12,48 +12,27 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="随访年龄">
+            <el-form-item label="随访年龄" prop="age" :rules="[{ required: true, message: '请填写随访年龄' }]">
               <el-input :model-value="followUpAge" disabled placeholder="自动计算" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="身高">
+            <el-form-item label="身高" prop="ht" :rules="[{ required: true, message: '请填写身高' }]">
               <el-input v-model="formData.ht" placeholder="cm" @blur="calcBmi">
                 <template #suffix>cm</template>
               </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="体重">
+            <el-form-item label="体重" prop="wt" :rules="[{ required: true, message: '请填写体重' }]">
               <el-input v-model="formData.wt" placeholder="kg" @blur="calcBmi">
                 <template #suffix>kg</template>
               </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="BMI">
+            <el-form-item label="BMI" prop="bmi" :rules="[{ required: true, message: '请填写BMI' }]">
               <el-input v-model="formData.bmi" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="体脂率">
-              <el-input v-model="formData.bodyFat" placeholder="%">
-                <template #suffix>%</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="腰围">
-              <el-input v-model="formData.waistline" placeholder="cm">
-                <template #suffix>cm</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="臀围">
-              <el-input v-model="formData.hips" placeholder="cm">
-                <template #suffix>cm</template>
-              </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -305,53 +284,67 @@
             </el-row>
           </template>
           <template v-if="patientSex === '2'">
-            <el-row :gutter="16">
-              <el-col :span="24"><div class="sub-item-title">子宫</div></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="8"><el-form-item label="子宫长(cm)"><el-input v-model="gonBUltDetail.uterusLength" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="子宫宽(cm)"><el-input v-model="gonBUltDetail.uterusWidth" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="子宫高(cm)"><el-input v-model="gonBUltDetail.uterusHeight" @input="syncGonBUltDetail" /></el-form-item></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="12"><el-form-item label="宫颈长(cm)"><el-input v-model="gonBUltDetail.cervixLength" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="12"><el-form-item label="内膜厚度(cm)"><el-input v-model="gonBUltDetail.endometriumThickness" @input="syncGonBUltDetail" /></el-form-item></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="24"><div class="sub-item-title">卵巢</div></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="8"><el-form-item label="左卵巢长(cm)"><el-input v-model="gonBUltDetail.leftOvaryLength" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="左卵巢宽(cm)"><el-input v-model="gonBUltDetail.leftOvaryWidth" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="左卵巢高(cm)"><el-input v-model="gonBUltDetail.leftOvaryHeight" @input="syncGonBUltDetail" /></el-form-item></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="8"><el-form-item label="右卵巢长(cm)"><el-input v-model="gonBUltDetail.rightOvaryLength" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="右卵巢宽(cm)"><el-input v-model="gonBUltDetail.rightOvaryWidth" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              <el-col :span="8"><el-form-item label="右卵巢高(cm)"><el-input v-model="gonBUltDetail.rightOvaryHeight" @input="syncGonBUltDetail" /></el-form-item></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="8"><el-form-item label="最大滤泡直径(cm)"><el-input v-model="gonBUltDetail.maxFollicleDiameter" @input="syncGonBUltDetail" /></el-form-item></el-col>
-            </el-row>
-            <el-row :gutter="16">
-              <el-col :span="24">
-                <el-form-item label="有无囊肿">
-                  <el-radio-group v-model="gonBUltDetail.hasCyst" @change="syncGonBUltDetail">
-                    <el-radio value="0">无</el-radio>
-                    <el-radio value="1">有</el-radio>
-                  </el-radio-group>
-                </el-form-item>
-              </el-col>
-            </el-row>
+            <div class="gonbult-line">
+              <span class="gonbult-label">检查时间：</span>
+              <el-date-picker v-model="gonBUltDetail.checkDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width: 160px" @change="syncGonBUltDetail" />
+            </div>
+            <div class="gonbult-line">
+              <span class="gonbult-label">子宫三径约：</span>
+              <el-input v-model="gonBUltDetail.uterusLength" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.uterusWidth" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.uterusHeight" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+              <span class="gonbult-label">，宫颈长约：</span>
+              <el-input v-model="gonBUltDetail.cervixLength" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+              <span class="gonbult-label">，内膜厚度：</span>
+              <el-input v-model="gonBUltDetail.endometriumThickness" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+            </div>
+            <div class="gonbult-line">
+              <span class="gonbult-label">左侧卵巢大小约：</span>
+              <el-input v-model="gonBUltDetail.leftOvaryLength" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.leftOvaryWidth" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.leftOvaryHeight" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+            </div>
+            <div class="gonbult-line">
+              <span class="gonbult-label">右侧卵巢大小约：</span>
+              <el-input v-model="gonBUltDetail.rightOvaryLength" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.rightOvaryWidth" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-x">×</span>
+              <el-input v-model="gonBUltDetail.rightOvaryHeight" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+            </div>
+            <div class="gonbult-line">
+              <span class="gonbult-label">最大滤泡直径大小：</span>
+              <el-input v-model="gonBUltDetail.maxFollicleDiameter" class="gonbult-num" @input="syncGonBUltDetail" />
+              <span class="gonbult-unit">cm</span>
+            </div>
+            <div class="gonbult-line">
+              <span class="gonbult-label">有无囊肿：</span>
+              <el-select v-model="gonBUltDetail.hasCyst" style="width: 120px" @change="syncGonBUltDetail">
+                <el-option label="无" value="0" />
+                <el-option label="有" value="1" />
+              </el-select>
+            </div>
             <template v-if="gonBUltDetail.hasCyst === '1'">
-              <el-row :gutter="16">
-                <el-col :span="8"><el-form-item label="囊肿侧"><el-input v-model="gonBUltDetail.cystSide" placeholder="左/右" @input="syncGonBUltDetail" /></el-form-item></el-col>
-                <el-col :span="8"><el-form-item label="囊肿长(cm)"><el-input v-model="gonBUltDetail.cystLength" @input="syncGonBUltDetail" /></el-form-item></el-col>
-                <el-col :span="8"><el-form-item label="囊肿宽(cm)"><el-input v-model="gonBUltDetail.cystWidth" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              </el-row>
-              <el-row :gutter="16">
-                <el-col :span="8"><el-form-item label="囊肿高(cm)"><el-input v-model="gonBUltDetail.cystHeight" @input="syncGonBUltDetail" /></el-form-item></el-col>
-              </el-row>
+              <div class="gonbult-line">
+                <span class="gonbult-label">囊肿位置：</span>
+                <el-input v-model="gonBUltDetail.cystSide" class="gonbult-text" placeholder="如：左/右侧" @input="syncGonBUltDetail" />
+                <span class="gonbult-label">，大小约：</span>
+                <el-input v-model="gonBUltDetail.cystLength" class="gonbult-num" @input="syncGonBUltDetail" />
+                <span class="gonbult-x">×</span>
+                <el-input v-model="gonBUltDetail.cystWidth" class="gonbult-num" @input="syncGonBUltDetail" />
+                <span class="gonbult-x">×</span>
+                <el-input v-model="gonBUltDetail.cystHeight" class="gonbult-num" @input="syncGonBUltDetail" />
+                <span class="gonbult-unit">cm</span>
+              </div>
             </template>
           </template>
         </template>
@@ -555,22 +548,6 @@
       </el-card>
 
       <el-card shadow="never" class="form-section">
-        <template #header><span>诊疗方案</span></template>
-        <TreatmentPlanForm v-model="treatmentPlanData" :disease-type="diseaseType"
-                           :weight="Number(formData.wt) || 0" />
-        <el-form-item label="其他" style="margin-top: 12px">
-          <el-input v-model="formData.other" type="textarea" :rows="2" />
-        </el-form-item>
-        <el-form-item label="是否达终身高">
-          <el-select v-model="formData.isFinalhei">
-            <el-option label="是" value="是" />
-            <el-option label="否" value="否" />
-            <el-option label="无" value="无" />
-          </el-select>
-        </el-form-item>
-      </el-card>
-
-      <el-card shadow="never" class="form-section">
         <template #header><span>眼科检查</span></template>
         <el-form-item label="是否有做眼科检查">
           <el-radio-group v-model="eyeExam.hasExam" @change="syncEyeExam">
@@ -622,6 +599,22 @@
           </el-table>
           <div style="margin-top:8px;color:#909399;font-size:12px">近视/远视/散光：选择「有」后填写度数(D)；眼轴长度单位为 mm</div>
         </template>
+      </el-card>
+
+      <el-card shadow="never" class="form-section">
+        <template #header><span>诊疗方案</span></template>
+        <TreatmentPlanForm v-model="treatmentPlanData" :disease-type="diseaseType"
+                           :weight="Number(formData.wt) || 0" />
+        <el-form-item label="其他" style="margin-top: 12px">
+          <el-input v-model="formData.other" type="textarea" :rows="2" />
+        </el-form-item>
+        <el-form-item label="是否达终身高">
+          <el-select v-model="formData.isFinalhei">
+            <el-option label="是" value="是" />
+            <el-option label="否" value="否" />
+            <el-option label="无" value="无" />
+          </el-select>
+        </el-form-item>
       </el-card>
     </el-form>
 
@@ -711,6 +704,7 @@ const imagingState = reactive(makeImagingState())
 
 // 性腺B超详情
 const gonBUltDetail = reactive({
+  checkDate: '',
   uterusLength: '', uterusWidth: '', uterusHeight: '',
   cervixLength: '', endometriumThickness: '',
   leftOvaryLength: '', leftOvaryWidth: '', leftOvaryHeight: '',
@@ -751,6 +745,7 @@ function syncRoutineState() {
 function resetImagingLabState() {
   Object.assign(imagingState, makeImagingState())
   Object.assign(gonBUltDetail, {
+    checkDate: '',
     uterusLength: '', uterusWidth: '', uterusHeight: '',
     cervixLength: '', endometriumThickness: '',
     leftOvaryLength: '', leftOvaryWidth: '', leftOvaryHeight: '',
@@ -775,9 +770,6 @@ const formData = reactive({
   ht: '',
   wt: '',
   bmi: '',
-  bodyFat: '',
-  waistline: '',
-  hips: '',
   rboneAge: '',
   cboneAge: '',
   genStag: '',
@@ -960,6 +952,7 @@ function parseEyeExam(json) {
 
 async function handleSave() {
   try {
+    calcBmi()
     await formRef.value?.validate()
   } catch {
     ElMessage.warning('请完善必填信息')
@@ -1033,6 +1026,39 @@ function handleClose() {
   color: #909399;
   margin: 8px 0 4px 0;
   padding-left: 6px;
+}
+
+.gonbult-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.gonbult-label {
+  color: #606266;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.gonbult-x {
+  color: #909399;
+  margin: 0 2px;
+}
+
+.gonbult-unit {
+  color: #606266;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.gonbult-num {
+  width: 80px;
+}
+
+.gonbult-text {
+  width: 140px;
 }
 
 .section-sub-title {

@@ -52,9 +52,6 @@
           <el-descriptions-item label="身高(cm)">{{ currentDetail.ht }}</el-descriptions-item>
           <el-descriptions-item label="体重(kg)">{{ currentDetail.wt }}</el-descriptions-item>
           <el-descriptions-item label="BMI">{{ currentDetail.bmi }}</el-descriptions-item>
-          <el-descriptions-item label="体脂率(%)">{{ currentDetail.bodyFat }}</el-descriptions-item>
-          <el-descriptions-item label="腰围(cm)">{{ currentDetail.waistline }}</el-descriptions-item>
-          <el-descriptions-item label="臀围(cm)">{{ currentDetail.hips }}</el-descriptions-item>
           <el-descriptions-item label="生殖器分期">{{ currentDetail.genStag }}</el-descriptions-item>
           <el-descriptions-item label="阴毛分期">{{ currentDetail.pubStag }}</el-descriptions-item>
         </el-descriptions>

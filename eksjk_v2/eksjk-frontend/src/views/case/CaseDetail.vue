@@ -471,10 +471,10 @@
             </div>
           </div>
           <el-table v-if="familyViewMode === 'table'" :data="familyMembers" border stripe size="small" style="width:100%;margin-top:12px">
-            <el-table-column prop="relationship" label="与患者关系" width="120">
-              <template #default="{ row }">
-                <el-select v-model="row.relationship" placeholder="请选择" size="small" :disabled="isViewMode">
-                  <el-option v-for="r in familyRelations" :key="r" :label="r" :value="r" />
+            <el-table-column prop="relationship" label="与患者关系" width="130">
+              <template #default="{ row, $index }">
+                <el-select v-model="row.relationship" size="small" :disabled="isViewMode || $index < 2" @change="onFamilyRelationshipChange(row)">
+                  <el-option v-for="r in ($index < 2 ? [row.relationship] : familyRelations)" :key="r" :label="r" :value="r" />
                 </el-select>
               </template>
             </el-table-column>
@@ -545,7 +545,7 @@
             <el-table-column v-if="!isViewMode" label="操作" width="120" fixed="right">
               <template #default="{ row, $index }">
                 <el-button type="primary" size="small" text @click="openLinkPatientDialog($index)">关联</el-button>
-                <el-button type="danger" size="small" text @click="removeFamilyMember($index)">删除</el-button>
+                <el-button v-if="$index > 1" type="danger" size="small" text @click="removeFamilyMember($index)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -923,7 +923,7 @@ function extractYearFromDateStr(dateStr) {
 }
 
 const FAMILY_STANDARD_KEYS = ['relationship', 'sex', 'birthYear', 'height', 'weight', 'isAffected', 'isDeceased', 'generation', 'hasSimilarDisease', 'notes', 'linkedPatientId', 'linkedMedrecNum', 'linkedDiseaseType']
-const familyRelations = ['父亲', '母亲', '兄', '弟', '姐', '妹', '祖父', '祖母', '外祖父', '外祖母', '其他']
+const familyRelations = ['兄弟姐妹', '祖父', '祖母', '外祖父', '外祖母', '其他']
 const familyMembers = reactive([])
 const familyViewMode = ref('table')  // 'table' | 'pedigree'
 const familyCustomColumns = ref([])
@@ -941,10 +941,10 @@ const treatmentPlanData = reactive({
   rhghOtherMedicine: '', rhghOther: ''
 })
 
-function addFamilyMember() {
+function createFamilyMember(relationship, sex) {
   const member = {
-    relationship: '',
-    sex: '1',
+    relationship: relationship || '',
+    sex: sex || '1',
     birthYear: '',
     height: '',
     weight: '',
@@ -958,7 +958,35 @@ function addFamilyMember() {
     linkedDiseaseType: ''
   }
   familyCustomColumns.value.forEach(col => { member[col] = '' })
-  familyMembers.push(member)
+  return member
+}
+
+// 前两行固定为父亲、母亲：新建/加载后调用，确保 index0=父亲、index1=母亲
+function ensureFamilyBaseRows() {
+  const dadIdx = familyMembers.findIndex(m => m.relationship === '父亲')
+  const momIdx = familyMembers.findIndex(m => m.relationship === '母亲')
+  let dadRow = dadIdx >= 0 ? familyMembers.splice(dadIdx, 1)[0] : null
+  const momIdx2 = familyMembers.findIndex(m => m.relationship === '母亲')
+  let momRow = momIdx2 >= 0 ? familyMembers.splice(momIdx2, 1)[0] : null
+  if (!dadRow) dadRow = createFamilyMember('父亲', '1')
+  if (!momRow) momRow = createFamilyMember('母亲', '2')
+  dadRow.sex = dadRow.sex || '1'
+  momRow.sex = momRow.sex || '2'
+  dadRow.generation = -1
+  momRow.generation = -1
+  familyMembers.unshift(momRow)
+  familyMembers.unshift(dadRow)
+}
+
+const familyGenMap = { '父亲': -1, '母亲': -1, '祖父': -2, '祖母': -2, '外祖父': -2, '外祖母': -2, '兄弟姐妹': 0, '其他': 0 }
+
+function onFamilyRelationshipChange(row) {
+  if (!row.relationship) return
+  row.generation = familyGenMap[row.relationship] ?? 0
+}
+
+function addFamilyMember() {
+  familyMembers.push(createFamilyMember('', '1'))
 }
 
 function removeFamilyMember(index) {
@@ -1086,6 +1114,7 @@ const ghAdverseEventEditData = ref(null)
 onMounted(() => {
   formData.disClass = getDisClassByType(diseaseType.value)
   if (patientId.value && !isCreateMode.value) loadDetail()
+  else ensureFamilyBaseRows()
 })
 
 // 自动计算初诊年龄：根据出生日期和初诊时间精确计算
@@ -1208,6 +1237,8 @@ async function loadDetail() {
     } else {
       familyMembers.splice(0, familyMembers.length)
     }
+    // 前两行固定为父亲、母亲
+    ensureFamilyBaseRows()
     calcBmi()
     parseEyeExam(formData.eyeExam)
   } catch (error) {
