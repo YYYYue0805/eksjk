@@ -101,6 +101,13 @@
           {{ formatDate(row.cTime) }}
         </template>
       </el-table-column>
+      <el-table-column label="知情同意书" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.informedConsentStatus === 'signed'" type="success" size="small">已签署</el-tag>
+          <span v-else style="color:#c0c4cc">未签署</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="doctorName" label="医生" width="100" show-overflow-tooltip />
       <el-table-column label="操作" width="160" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleView(row)">
