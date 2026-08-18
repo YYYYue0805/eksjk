@@ -23,7 +23,7 @@ spec:
       containers:
         - name: backend
           # 镜像 tag 由 GitHub Actions CI 自动更新为 develop-{short_sha}
-          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:develop-3d9dc2d
+          image: crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/eksjk-backend:develop-7e42693
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

@@ -516,11 +516,11 @@ kubectl get pods -n eksjk-prod -o wide
 ```bash
 # Staging 环境
 curl -s http://staging.eksjk.zsmm.org.cn/           # 前端页面（应返回 HTML）
-curl -s http://staging.eksjk.zsmm.org.cn/api/actuator/health  # 后端健康检查
+curl -s http://staging.eksjk.zsmm.org.cn/actuator/health  # 后端健康检查
 
 # Production 环境
 curl -s http://prod.eksjk.zsmm.org.cn/
-curl -s http://prod.eksjk.zsmm.org.cn/api/actuator/health
+curl -s http://prod.eksjk.zsmm.org.cn/actuator/health
 ```
 
 ### 7.3 查看 Pod 日志
@@ -542,7 +542,7 @@ kubectl logs -n eksjk-staging deployment/eksjk-frontend --tail=50
 | 用户登录 | 使用系统管理员账号登录 | 登录成功，进入主页 |
 | 文件上传 | 上传影像资料 | 上传成功，文件存储到 OSS |
 | 数据库读写 | 新增/查询数据 | 操作成功 |
-| 健康检查 | 访问 /api/actuator/health | 返回 `{"status":"UP"}` |
+| 健康检查 | 访问 /actuator/health | 返回 `{"status":"UP"}` |
 
 ---
 
@@ -972,5 +972,5 @@ kubectl apply -f k8s/prod/backend/deployment.yaml
 kubectl rollout status deployment/eksjk-backend -n eksjk-prod --timeout=120s
 
 # 4. 验证
-curl -s http://prod.eksjk.zsmm.org.cn/api/actuator/health
+curl -s http://prod.eksjk.zsmm.org.cn/actuator/health
 ```
