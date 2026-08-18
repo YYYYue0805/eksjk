@@ -768,6 +768,11 @@
           <GhAdverseEventList :patient-id="patientId" ref="ghAdverseEventListRef" @edit="handleGhAdverseEventEdit" />
         </el-tab-pane>
 
+        <!-- Tab 8：知情同意书 -->
+        <el-tab-pane label="知情同意书" name="informedConsent" lazy>
+          <InformedConsentList :patient-id="patientId" />
+        </el-tab-pane>
+
       </el-tabs>
     </el-form>
 
@@ -800,6 +805,7 @@ const PedigreeChart = defineAsyncComponent(() => import('@/views/case/components
 const TreatmentPlanForm = defineAsyncComponent(() => import('@/views/case/components/TreatmentPlanForm.vue'))
 const GeneticsExamForm = defineAsyncComponent(() => import('@/views/case/components/GeneticsExamForm.vue'))
 const GhAdverseEventList = defineAsyncComponent(() => import('@/views/case/components/AdverseEventList.vue'))
+const InformedConsentList = defineAsyncComponent(() => import('@/views/case/components/InformedConsentList.vue'))
 const DiseaseFormGeneric = defineAsyncComponent(() => import('@/views/case/components/DiseaseFormGeneric.vue'))
 
 const route = useRoute()
@@ -831,7 +837,8 @@ const tabList = computed(() => [
   { name: 'genetics', label: '遗传学检查' },
   { name: 'followup', label: '随访记录' },
   { name: 'diagnosis', label: '诊断' },
-  { name: 'ghAdverseEvent', label: 'GH不良事件' }
+  { name: 'ghAdverseEvent', label: 'GH不良事件' },
+  { name: 'informedConsent', label: '知情同意书' }
 ])
 
 const activeTab = ref('basic')
