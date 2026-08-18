@@ -51,6 +51,7 @@ public class PatientServiceImpl implements PatientService {
     private final EltmCaseMapper eltmCaseMapper;
     private final PatientFollowUpMapper followUpMapper;
     private final PatientGeneticsMapper patientGeneticsMapper;
+    private final InformedConsentMapper informedConsentMapper;
 
     /** 疾病分类编码与名称映射 */
     private static final Map<String, String> DIS_CLASS_MAP = new LinkedHashMap<>();
@@ -170,8 +171,27 @@ public class PatientServiceImpl implements PatientService {
             latestFollowUpMap = Collections.emptyMap();
         }
 
+        // ELTM列表：批量查询各患者的最新知情同意书（标记签署状态 + 公众号端医生）
+        final Map<Long, InformedConsent> latestConsentMap;
+        if (!result.getRecords().isEmpty()) {
+            List<Long> patientIds = result.getRecords().stream()
+                    .map(Patient::getId)
+                    .toList();
+            List<InformedConsent> consents = informedConsentMapper.selectList(
+                    new LambdaQueryWrapper<InformedConsent>()
+                            .in(InformedConsent::getPatientId, patientIds)
+                            .orderByAsc(InformedConsent::getPatientId)
+                            .orderByDesc(InformedConsent::getSignTime));
+            latestConsentMap = consents.stream().collect(Collectors.toMap(
+                    InformedConsent::getPatientId,
+                    c -> c,
+                    (existing, replacement) -> existing));
+        } else {
+            latestConsentMap = Collections.emptyMap();
+        }
+
         List<PatientVO> voList = result.getRecords().stream()
-                .map(p -> convertToVO(p, latestFollowUpMap))
+                .map(p -> convertToVO(p, latestFollowUpMap, latestConsentMap))
                 .toList();
 
         return PageResult.of(voList, result.getTotal(), queryDTO.getPageNum(), queryDTO.getPageSize());
@@ -432,10 +452,15 @@ public class PatientServiceImpl implements PatientService {
     }
 
     private PatientVO convertToVO(Patient patient) {
-        return convertToVO(patient, Collections.emptyMap());
+        return convertToVO(patient, Collections.emptyMap(), Collections.emptyMap());
     }
 
     private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap) {
+        return convertToVO(patient, latestFollowUpMap, Collections.emptyMap());
+    }
+
+    private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap,
+                                  Map<Long, InformedConsent> latestConsentMap) {
         PatientVO vo = new PatientVO();
         BeanUtils.copyProperties(patient, vo, "id");
         vo.setId(HashidsUtil.encode(patient.getId()));
@@ -455,6 +480,16 @@ public class PatientServiceImpl implements PatientService {
                 vo.setFollowUpAuditTime(latestFollowUp.getAuditTime());
                 vo.setFollowUpReleaseBy(latestFollowUp.getReleaseBy());
                 vo.setFollowUpReleaseTime(latestFollowUp.getReleaseTime());
+            }
+        }
+
+        // 知情同意书：有记录标记 signed，doctorName 取最近一条的公众号端医生
+        vo.setInformedConsentStatus("not_signed");
+        if (latestConsentMap != null && !latestConsentMap.isEmpty()) {
+            InformedConsent consent = latestConsentMap.get(patient.getId());
+            if (consent != null) {
+                vo.setInformedConsentStatus("signed");
+                vo.setDoctorName(consent.getDoctorName());
             }
         }
 

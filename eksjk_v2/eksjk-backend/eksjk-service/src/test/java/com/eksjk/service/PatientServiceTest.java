@@ -1,6 +1,9 @@
 package com.eksjk.service;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.eksjk.common.exception.BusinessException;
 import com.eksjk.common.result.PageResult;
@@ -8,9 +11,11 @@ import com.eksjk.common.util.SecurityUtil;
 import com.eksjk.mapper.*;
 import com.eksjk.model.dto.PatientDTO;
 import com.eksjk.model.dto.PatientQueryDTO;
+import com.eksjk.model.entity.InformedConsent;
 import com.eksjk.model.entity.Patient;
 import com.eksjk.model.vo.PatientVO;
 import com.eksjk.service.impl.PatientServiceImpl;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +23,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -63,6 +70,37 @@ class PatientServiceTest extends BaseServiceTest {
     @Mock
     private PatientFollowUpMapper followUpMapper;
 
+    @Mock
+    private PatientGeneticsMapper patientGeneticsMapper;
+
+    @Mock
+    private InformedConsentMapper informedConsentMapper;
+
+    // 初始化 MyBatis-Plus 表元数据：单元测试中 LambdaQueryWrapper 的列名解析（select/set 为即时解析）依赖该缓存
+    static {
+        MybatisConfiguration configuration = new MybatisConfiguration();
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(configuration, ""), Patient.class);
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(configuration, ""), InformedConsent.class);
+    }
+
+    /**
+     * 创建测试用知情同意书实体
+     *
+     * @param patientId  患者 ID
+     * @param doctorName 公众号端医生姓名
+     */
+    private InformedConsent createConsent(Long patientId, String doctorName) {
+        InformedConsent consent = new InformedConsent();
+        consent.setId(1L);
+        consent.setPatientId(patientId);
+        consent.setExternalFileId("file_001");
+        consent.setFileName("知情同意书.pdf");
+        consent.setDoctorName(doctorName);
+        consent.setSource("ELTM");
+        consent.setSignTime(LocalDateTime.now());
+        return consent;
+    }
+
     // ==================== 分页查询测试 ====================
 
     @Nested
@@ -85,6 +123,7 @@ class PatientServiceTest extends BaseServiceTest {
                 secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("super_admin");
                 when(patientMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                         .thenReturn(mockPage);
+                when(informedConsentMapper.selectList(any())).thenReturn(Collections.emptyList());
 
                 // When
                 PageResult<PatientVO> result = patientService.queryPage(queryDTO);
@@ -113,6 +152,7 @@ class PatientServiceTest extends BaseServiceTest {
                 secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("super_admin");
                 when(patientMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                         .thenReturn(mockPage);
+                when(informedConsentMapper.selectList(any())).thenReturn(Collections.emptyList());
 
                 // When
                 PageResult<PatientVO> result = patientService.queryPage(queryDTO);
@@ -140,6 +180,7 @@ class PatientServiceTest extends BaseServiceTest {
                 secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("super_admin");
                 when(patientMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                         .thenReturn(mockPage);
+                when(informedConsentMapper.selectList(any())).thenReturn(Collections.emptyList());
 
                 // When
                 PageResult<PatientVO> result = patientService.queryPage(queryDTO);
@@ -147,6 +188,52 @@ class PatientServiceTest extends BaseServiceTest {
                 // Then
                 assertThat(result).isNotNull();
                 assertThat(result.getRecords()).hasSize(1);
+            }
+        }
+
+        @Test
+        @DisplayName("患者有知情同意书记录应标记已签署并带出医生")
+        void shouldMarkSignedWhenConsentExists() {
+            PatientQueryDTO queryDTO = createPatientQueryDTO();
+            Patient p1 = createPatient(1L, DIS_CLASS_DSD, "测试患者");
+            Page<Patient> mockPage = new Page<>(1, 10);
+            mockPage.setRecords(Arrays.asList(p1));
+            mockPage.setTotal(1);
+
+            try (MockedStatic<SecurityUtil> secMock = mockStatic(SecurityUtil.class)) {
+                secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("super_admin");
+                when(patientMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+                        .thenReturn(mockPage);
+                when(informedConsentMapper.selectList(any())).thenReturn(
+                        Arrays.asList(createConsent(1L, "张医生")));
+
+                PageResult<PatientVO> result = patientService.queryPage(queryDTO);
+
+                assertThat(result.getRecords()).hasSize(1);
+                assertThat(result.getRecords().get(0).getInformedConsentStatus()).isEqualTo("signed");
+                assertThat(result.getRecords().get(0).getDoctorName()).isEqualTo("张医生");
+            }
+        }
+
+        @Test
+        @DisplayName("患者无知情同意书应标记未签署")
+        void shouldMarkNotSignedWhenNoConsent() {
+            PatientQueryDTO queryDTO = createPatientQueryDTO();
+            Patient p1 = createPatient(1L, DIS_CLASS_DSD, "测试患者");
+            Page<Patient> mockPage = new Page<>(1, 10);
+            mockPage.setRecords(Arrays.asList(p1));
+            mockPage.setTotal(1);
+
+            try (MockedStatic<SecurityUtil> secMock = mockStatic(SecurityUtil.class)) {
+                secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("super_admin");
+                when(patientMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+                        .thenReturn(mockPage);
+                when(informedConsentMapper.selectList(any())).thenReturn(Collections.emptyList());
+
+                PageResult<PatientVO> result = patientService.queryPage(queryDTO);
+
+                assertThat(result.getRecords()).hasSize(1);
+                assertThat(result.getRecords().get(0).getInformedConsentStatus()).isEqualTo("not_signed");
             }
         }
     }
@@ -215,8 +302,12 @@ class PatientServiceTest extends BaseServiceTest {
                 secMock.when(SecurityUtil::getCurrentHospitalId).thenReturn(HOSPITAL_UNIT_ID);
                 secMock.when(SecurityUtil::getCurrentRoleCode).thenReturn("doctor");
 
-                when(patientMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
-                when(patientMapper.insert(any(Patient.class))).thenReturn(1);
+                // 模拟数据库自增回填主键，否则 create() 中 HashidsUtil.encode(patient.getId()) 会因 null 抛出 NPE
+                doAnswer(invocation -> {
+                    Patient arg = invocation.getArgument(0);
+                    arg.setId(1L);
+                    return 1;
+                }).when(patientMapper).insert(any(Patient.class));
 
                 // When
                 String caseNum = patientService.create(dto);
@@ -240,7 +331,7 @@ class PatientServiceTest extends BaseServiceTest {
             // Given
             Patient patient = createPatient(1L, DIS_CLASS_DSD, "测试患者_DSD_001");
             when(patientMapper.selectById(1L)).thenReturn(patient);
-            when(patientMapper.updateById(any(Patient.class))).thenReturn(1);
+            when(patientMapper.update(any(), any(LambdaUpdateWrapper.class))).thenReturn(1);
 
             try (MockedStatic<SecurityUtil> secMock = mockStatic(SecurityUtil.class)) {
                 secMock.when(SecurityUtil::getCurrentUserId).thenReturn(DOCTOR_ID);
@@ -250,7 +341,7 @@ class PatientServiceTest extends BaseServiceTest {
                 patientService.delete(1L);
 
                 // Then
-                verify(patientMapper, times(1)).updateById(any(Patient.class));
+                verify(patientMapper, times(1)).update(any(), any(LambdaUpdateWrapper.class));
             }
         }
     }

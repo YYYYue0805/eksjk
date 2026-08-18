@@ -64,6 +64,12 @@ public class PatientVO {
     /** 导入人员 */
     private String impPer;
 
+    /** 知情同意书状态: signed/not_signed */
+    private String informedConsentStatus;
+
+    /** 公众号端医生姓名 */
+    private String doctorName;
+
     /** 上传机构 */
     private String upMec;
 
