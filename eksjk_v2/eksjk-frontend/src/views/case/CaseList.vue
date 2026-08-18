@@ -26,6 +26,9 @@
         <el-button v-if="diseaseType === 'eltm'" type="warning" @click="handleDiagnose" :loading="diagnosing">
           <el-icon><Cpu /></el-icon>智能诊断
         </el-button>
+        <el-button v-if="diseaseType === 'eltm'" type="success" plain @click="handleConsentSync" :loading="consentSyncing">
+          <el-icon><Document /></el-icon>同步知情同意书
+        </el-button>
       </template>
     </PageHeader>
 
@@ -131,12 +134,13 @@
 import { shallowRef, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Download, Refresh, Cpu, ArrowDown } from '@element-plus/icons-vue'
+import { Plus, Download, Refresh, Cpu, ArrowDown, Document } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
 import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType, getDiseaseTypeByCode } from '@/api/patient'
 import { syncEltmData, diagnoseBatch } from '@/api/eltm'
+import { syncInformedConsent } from '@/api/informedConsent'
 
 const route = useRoute()
 const router = useRouter()
@@ -166,6 +170,7 @@ const total = ref(0)
 const loading = ref(false)
 const syncing = ref(false)
 const diagnosing = ref(false)
+const consentSyncing = ref(false)
 
 // 监听日期范围变化
 watch(dateRange, (val) => {
@@ -293,6 +298,23 @@ async function handleDiagnose() {
     ElMessage.error('智能诊断失败')
   } finally {
     diagnosing.value = false
+  }
+}
+
+async function handleConsentSync() {
+  try {
+    await ElMessageBox.confirm('将从 E路童萌 同步知情同意书数据，是否继续？', '确认同步', { type: 'info' })
+  } catch { return }
+  consentSyncing.value = true
+  try {
+    const res = await syncInformedConsent()
+    const data = res.data || {}
+    ElMessage.success(`同步完成：新增 ${data.newCount || 0} 条，更新 ${data.updatedCount || 0} 条，失败 ${data.failedCount || 0} 条`)
+    loadData()
+  } catch (error) {
+    ElMessage.error('同步知情同意书失败，请检查外部系统连接')
+  } finally {
+    consentSyncing.value = false
   }
 }
 
