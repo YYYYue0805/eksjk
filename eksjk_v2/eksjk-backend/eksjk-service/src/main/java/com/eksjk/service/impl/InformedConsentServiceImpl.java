@@ -1,6 +1,7 @@
 package com.eksjk.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.eksjk.common.util.HashidsUtil;
 import com.eksjk.mapper.InformedConsentMapper;
 import com.eksjk.model.entity.InformedConsent;
 import com.eksjk.model.vo.InformedConsentVO;
@@ -23,7 +24,7 @@ public class InformedConsentServiceImpl implements InformedConsentService {
     private final InformedConsentMapper informedConsentMapper;
 
     @Override
-    public List<InformedConsentVO> listByPatient(Long patientId) {
+    public List<InformedConsentVO> listByPatientId(Long patientId) {
         List<InformedConsent> consents = informedConsentMapper.selectList(
                 new LambdaQueryWrapper<InformedConsent>()
                         .eq(InformedConsent::getPatientId, patientId)
@@ -32,7 +33,8 @@ public class InformedConsentServiceImpl implements InformedConsentService {
         return consents.stream().map(c -> {
             InformedConsentVO vo = new InformedConsentVO();
             BeanUtils.copyProperties(c, vo);
-            vo.setId(String.valueOf(c.getId()));
+            vo.setId(HashidsUtil.encode(c.getId()));
+            vo.setPatientId(HashidsUtil.encode(c.getPatientId()));
             return vo;
         }).toList();
     }

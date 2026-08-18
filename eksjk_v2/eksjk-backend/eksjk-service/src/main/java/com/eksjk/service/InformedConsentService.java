@@ -12,9 +12,9 @@ import java.util.List;
 public interface InformedConsentService {
 
     /**
-     * 按患者查询知情同意书列表
+     * 按患者ID查询知情同意书列表
      *
      * @param patientId 患者ID（内部自增ID）
      */
-    List<InformedConsentVO> listByPatient(Long patientId);
+    List<InformedConsentVO> listByPatientId(Long patientId);
 }
