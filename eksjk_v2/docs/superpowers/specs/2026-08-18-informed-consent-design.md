@@ -201,13 +201,16 @@ export function syncInformedConsent() {
 
 ## 6. 数据库迁移
 
-新增增量 SQL：`eksjk_v2/init-sql/28-informed-consent.sql`
+新增增量 SQL：`eksjk_v2/init-sql/30-informed-consent.sql`
 
 ```sql
 CREATE TABLE IF NOT EXISTS `informed_consent` (...);
 ```
 
 本地 `eksjk_db` 需执行；staging 通过 K8s Pod 连 RDS 执行（遵循现有迁移流程）。
+
+> 说明：迁移序号为 30（原计划 28 与 `28-followup-imaging-lab.sql` 冲突，已修正）。
+> 对接真实接口后建议追加 `UNIQUE KEY uk_external_file_id (external_file_id)`，在 schema 层保证同步幂等。
 
 ## 7. 测试
 
@@ -222,7 +225,8 @@ CREATE TABLE IF NOT EXISTS `informed_consent` (...);
 
 ## 8. 待真实对接时替换项
 
-- `eksjk.informed-consent.sync-url` 指向真实接口
+- `eksjk.informed-consent.sync-url` 指向真实接口；`eksjk.informed-consent.sync-enabled` 已作为定时同步开关（占位阶段生产默认 `false`，本地 dev 为 `true`）
 - 占位 mock 逻辑替换为真实 HTTP 调用 + OAuth/Token 认证
 - `oss_url` 若为带签名临时 URL，考虑改为后端代理下载接口
 - 医生字段来源若为 ELTM 病例同步（getpatient）而非知情同意书接口，改为从 `patient` 表取 `doctor_name`
+- 追加 `UNIQUE KEY uk_external_file_id` 保证同步幂等
