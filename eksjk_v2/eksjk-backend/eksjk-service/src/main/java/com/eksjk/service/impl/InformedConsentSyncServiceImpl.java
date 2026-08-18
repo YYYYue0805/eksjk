@@ -8,6 +8,7 @@ import com.eksjk.model.entity.Patient;
 import com.eksjk.service.InformedConsentSyncService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,10 @@ public class InformedConsentSyncServiceImpl implements InformedConsentSyncServic
     private final PatientMapper patientMapper;
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /** 定时同步开关：占位阶段生产环境默认关闭，避免 mock 数据写入；真实对接后按需开启 */
+    @Value("${eksjk.informed-consent.sync-enabled:false}")
+    private boolean syncEnabled;
 
     @Override
     public Map<String, Object> syncFromExternal() {
@@ -86,9 +91,13 @@ public class InformedConsentSyncServiceImpl implements InformedConsentSyncServic
         return result;
     }
 
-    /** 每天凌晨 2:00 定时同步 */
+    /** 每天凌晨 2:00 定时同步（受 sync-enabled 开关控制） */
     @Scheduled(cron = "0 0 2 * * ?")
     public void scheduledSync() {
+        if (!syncEnabled) {
+            log.info("知情同意书定时同步未开启（eksjk.informed-consent.sync-enabled=false），跳过");
+            return;
+        }
         log.info("定时任务触发知情同意书同步");
         syncFromExternal();
     }

@@ -91,3 +91,5 @@ eksjk:
   informed-consent:
     sync-url: http://36.26.56.94:8026/datamain/getconsent
     source: ELTM
+    # 定时同步开关：占位阶段默认关闭，避免生产环境写入 mock 数据；对接真实接口后按需开启
+    sync-enabled: false
