@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 知情同意书服务实现
@@ -37,5 +39,19 @@ public class InformedConsentServiceImpl implements InformedConsentService {
             vo.setPatientId(HashidsUtil.encode(c.getPatientId()));
             return vo;
         }).toList();
+    }
+
+    @Override
+    public Map<String, Object> getSyncStatus() {
+        InformedConsent latest = informedConsentMapper.selectOne(
+                new LambdaQueryWrapper<InformedConsent>()
+                        .orderByDesc(InformedConsent::getSyncTime)
+                        .last("LIMIT 1"));
+        Long total = informedConsentMapper.selectCount(null);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("lastSyncTime", latest != null ? latest.getSyncTime() : null);
+        result.put("totalCount", total != null ? total : 0L);
+        return result;
     }
 }
