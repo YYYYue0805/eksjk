@@ -45,6 +45,7 @@ public class InformedConsentServiceImpl implements InformedConsentService {
     public Map<String, Object> getSyncStatus() {
         InformedConsent latest = informedConsentMapper.selectOne(
                 new LambdaQueryWrapper<InformedConsent>()
+                        .isNotNull(InformedConsent::getSyncTime)
                         .orderByDesc(InformedConsent::getSyncTime)
                         .last("LIMIT 1"));
         Long total = informedConsentMapper.selectCount(null);

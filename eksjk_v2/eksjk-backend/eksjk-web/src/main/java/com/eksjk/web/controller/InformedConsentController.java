@@ -2,6 +2,7 @@ package com.eksjk.web.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
 import com.eksjk.common.constant.RoleConstants;
 import com.eksjk.common.result.R;
 import com.eksjk.common.util.HashidsUtil;
@@ -41,7 +42,7 @@ public class InformedConsentController {
      * 手动触发从 E路童萌 同步知情同意书（管理端）
      */
     @PostMapping("/sync")
-    @SaCheckRole({RoleConstants.SUPER_ADMIN, RoleConstants.HOSPITAL_ADMIN})
+    @SaCheckRole(value = {RoleConstants.SUPER_ADMIN, RoleConstants.HOSPITAL_ADMIN}, mode = SaMode.OR)
     public R<Map<String, Object>> sync() {
         return R.ok(informedConsentSyncService.syncFromExternal());
     }
