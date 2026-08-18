@@ -86,3 +86,8 @@ eksjk:
       # access-key: ${ALIYUN_ACCESS_KEY}
       # secret-key: ${ALIYUN_SECRET_KEY}
       # bucket: eksjk-prod-files
+
+  # 知情同意书外部同步（占位地址，对接 E路童萌 后替换）
+  informed-consent:
+    sync-url: http://36.26.56.94:8026/datamain/getconsent
+    source: ELTM

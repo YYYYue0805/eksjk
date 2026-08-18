@@ -24,6 +24,11 @@ eksjk:
   eltm:
     sync-url: http://36.26.56.94:8026/datamain/getpatient
 
+  # 知情同意书外部同步
+  informed-consent:
+    sync-url: http://36.26.56.94:8026/datamain/getconsent
+    source: ELTM
+
 # 日志配置
 logging:
   level:
