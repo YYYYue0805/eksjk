@@ -234,6 +234,8 @@ class PatientServiceTest extends BaseServiceTest {
 
                 assertThat(result.getRecords()).hasSize(1);
                 assertThat(result.getRecords().get(0).getInformedConsentStatus()).isEqualTo("not_signed");
+                // doctorName 不应从 Patient 实体泄露，仅知情同意书来源可填充
+                assertThat(result.getRecords().get(0).getDoctorName()).isNullOrEmpty();
             }
         }
     }

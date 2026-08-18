@@ -171,7 +171,7 @@ public class PatientServiceImpl implements PatientService {
             latestFollowUpMap = Collections.emptyMap();
         }
 
-        // ELTM列表：批量查询各患者的最新知情同意书（标记签署状态 + 公众号端医生）
+        // 批量查询各患者的最新知情同意书（标记签署状态 + 公众号端医生）
         final Map<Long, InformedConsent> latestConsentMap;
         if (!result.getRecords().isEmpty()) {
             List<Long> patientIds = result.getRecords().stream()
@@ -181,7 +181,8 @@ public class PatientServiceImpl implements PatientService {
                     new LambdaQueryWrapper<InformedConsent>()
                             .in(InformedConsent::getPatientId, patientIds)
                             .orderByAsc(InformedConsent::getPatientId)
-                            .orderByDesc(InformedConsent::getSignTime));
+                            .orderByDesc(InformedConsent::getSignTime)
+                            .orderByDesc(InformedConsent::getId));
             latestConsentMap = consents.stream().collect(Collectors.toMap(
                     InformedConsent::getPatientId,
                     c -> c,
@@ -455,14 +456,10 @@ public class PatientServiceImpl implements PatientService {
         return convertToVO(patient, Collections.emptyMap(), Collections.emptyMap());
     }
 
-    private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap) {
-        return convertToVO(patient, latestFollowUpMap, Collections.emptyMap());
-    }
-
     private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap,
                                   Map<Long, InformedConsent> latestConsentMap) {
         PatientVO vo = new PatientVO();
-        BeanUtils.copyProperties(patient, vo, "id");
+        BeanUtils.copyProperties(patient, vo, "id", "doctorName");
         vo.setId(HashidsUtil.encode(patient.getId()));
         vo.setDisClassName(DIS_CLASS_MAP.getOrDefault(patient.getDisClass(), "未知"));
 
