@@ -230,3 +230,8 @@ eksjk_v2/terraform/kubeconfig.yaml
 ### K8s Secrets 环境配置（包含真实密钥，禁止提交）
 eksjk_v2/scripts/k8s-secrets/.env.staging
 eksjk_v2/scripts/k8s-secrets/.env.prod
+
+### 本地工具产物（浏览器快照、Vite 缓存）
+.playwright-mcp/
+login-snapshot.yml
+**/.vite/
