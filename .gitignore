@@ -235,3 +235,6 @@ eksjk_v2/scripts/k8s-secrets/.env.prod
 .playwright-mcp/
 login-snapshot.yml
 **/.vite/
+
+### 本地临时数据（接口抽样、验证输出）
+tmp/

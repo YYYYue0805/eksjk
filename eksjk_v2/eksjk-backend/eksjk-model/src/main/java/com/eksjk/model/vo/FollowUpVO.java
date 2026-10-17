@@ -42,6 +42,9 @@ public class FollowUpVO {
     /** 患者导入人员（数据隔离用） */
     private String patientImpPer;
 
+    /** 数据来源：LOCAL/ELTM_SYNC（外部同步记录只读） */
+    private String dataSource;
+
     /** 随访日期 */
     private LocalDateTime follTime;
 

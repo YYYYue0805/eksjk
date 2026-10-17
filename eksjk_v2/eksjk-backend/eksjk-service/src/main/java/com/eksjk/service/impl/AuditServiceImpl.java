@@ -172,6 +172,9 @@ public class AuditServiceImpl implements AuditService {
     public PageResult<FollowUpVO> listFollowUps(AuditQueryDTO queryDTO) {
         LambdaQueryWrapper<PatientFollowUp> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(PatientFollowUp::getDelFlg, "1");
+        // 外部同步的随访记录只读展示，不进入本地审核发放流程
+        wrapper.and(w -> w.ne(PatientFollowUp::getDataSource, "ELTM_SYNC")
+                .or().isNull(PatientFollowUp::getDataSource));
 
         if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
             wrapper.eq(PatientFollowUp::getAuditStatus, queryDTO.getAuditStatus());

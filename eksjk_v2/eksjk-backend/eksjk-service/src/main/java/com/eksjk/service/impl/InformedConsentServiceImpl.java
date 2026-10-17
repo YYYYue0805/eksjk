@@ -1,6 +1,7 @@
 package com.eksjk.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.eksjk.common.util.HashidsUtil;
 import com.eksjk.mapper.InformedConsentMapper;
 import com.eksjk.model.entity.InformedConsent;
@@ -37,6 +38,11 @@ public class InformedConsentServiceImpl implements InformedConsentService {
             BeanUtils.copyProperties(c, vo);
             vo.setId(HashidsUtil.encode(c.getId()));
             vo.setPatientId(HashidsUtil.encode(c.getPatientId()));
+            // 外部签署记录的文件字段为 pdf_*，兼容旧的 fileName/ossUrl
+            vo.setFileName(StringUtils.isNotBlank(c.getPdfFileName())
+                    ? c.getPdfFileName() : c.getFileName());
+            vo.setOssUrl(StringUtils.isNotBlank(c.getPdfPath())
+                    ? c.getPdfPath() : c.getOssUrl());
             return vo;
         }).toList();
     }

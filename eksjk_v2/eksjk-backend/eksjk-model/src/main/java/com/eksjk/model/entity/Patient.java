@@ -686,6 +686,9 @@ public class Patient implements Serializable {
     /** E路童萌id */
     private String eltmId;
 
+    /** datamain 外部患者主键（cxList 列0） */
+    private Long externalId;
+
     // ==================== V2 新增字段 ====================
 
     /** 数据同步状态 */

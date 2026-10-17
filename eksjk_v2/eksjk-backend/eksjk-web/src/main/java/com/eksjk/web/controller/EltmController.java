@@ -1,14 +1,18 @@
 package com.eksjk.web.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.eksjk.common.result.R;
 import com.eksjk.service.DiagnosisService;
-import com.eksjk.service.EltmSyncService;
 import com.eksjk.service.diagnosis.DiagnosisResult;
+import com.eksjk.service.eltm.EltmProjectionService;
+import com.eksjk.service.sync.DatamainConsentBackfillService;
+import com.eksjk.service.sync.DatamainSyncService;
 import com.eksjk.common.util.HashidsUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,15 +26,18 @@ import java.util.Map;
 @SaCheckLogin
 public class EltmController {
 
-    private final EltmSyncService eltmSyncService;
+    private final DatamainSyncService datamainSyncService;
+    private final DatamainConsentBackfillService consentBackfillService;
     private final DiagnosisService diagnosisService;
+    private final EltmProjectionService projectionService;
 
     /**
      * 手动触发从外部系统同步ELTM数据
      */
     @PostMapping("/sync")
+    @SaCheckRole("super_admin")
     public R<Map<String, Object>> sync() {
-        Map<String, Object> result = eltmSyncService.syncFromExternal();
+        Map<String, Object> result = datamainSyncService.syncFromExternal("MANUAL");
         return R.ok(result);
     }
 
@@ -39,8 +46,53 @@ public class EltmController {
      */
     @GetMapping("/sync-status")
     public R<Map<String, Object>> syncStatus() {
-        Map<String, Object> status = eltmSyncService.getSyncStatus();
+        Map<String, Object> status = datamainSyncService.getSyncStatus();
         return R.ok(status);
+    }
+
+    /**
+     * 最近同步日志
+     */
+    @GetMapping("/sync-logs")
+    public R<List<?>> syncLogs(@RequestParam(defaultValue = "20") int limit) {
+        return R.ok(datamainSyncService.listRecentLogs(limit));
+    }
+
+    /**
+     * 重跑 ELTM 外部数据投影（只填空，不覆盖本地已填内容）
+     */
+    @PostMapping("/projection/run")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> runProjection() {
+        return R.ok(projectionService.projectAll());
+    }
+
+    /**
+     * 重跑单个 ELTM 患者的外部数据投影
+     */
+    @PostMapping("/projection/patient/{id}")
+    @SaCheckRole("super_admin")
+    public R<Integer> runPatientProjection(@PathVariable String id) {
+        long patientId = HashidsUtil.decode(id);
+        return R.ok(projectionService.projectByPatientId(patientId));
+    }
+
+    /**
+     * 按外部患者ID重跑单患者投影
+     */
+    @PostMapping("/projection/external/{externalId}")
+    @SaCheckRole("super_admin")
+    public R<Integer> runExternalProjection(@PathVariable long externalId) {
+        return R.ok(projectionService.projectByExternalId(externalId));
+    }
+
+    /**
+     * 补拉单个患者的知情同意书完整记录（正文/签名/PDF）
+     */
+    @PostMapping("/sync/consent/{externalId}")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> backfillConsent(@PathVariable long externalId) {
+        return R.ok(consentBackfillService.backfill(externalId));
     }
 
     /**

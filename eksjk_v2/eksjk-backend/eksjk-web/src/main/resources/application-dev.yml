@@ -24,6 +24,16 @@ eksjk:
   eltm:
     sync-url: http://36.26.56.94:8026/datamain/getpatient
 
+  # datamain 第三方数据同步
+  datamain:
+    base-url: http://36.26.56.94:8026
+    cx-list-path: /datamain/cxList
+    connect-timeout-seconds: 10
+    read-timeout-seconds: 180
+    max-retry: 3
+    sync-enabled: false
+    sync-cron: "0 10 2 * * ?"
+
   # 知情同意书外部同步
   informed-consent:
     sync-url: http://36.26.56.94:8026/datamain/getconsent

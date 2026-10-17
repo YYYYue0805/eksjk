@@ -86,8 +86,8 @@ public class PatientServiceImpl implements PatientService {
                 Patient::getAge, Patient::getAgeY, Patient::getAgeM, Patient::getMedrecNum,
                 Patient::getHeight, Patient::getWeight, Patient::getBmi, Patient::getChiCom,
                 Patient::getIcd, Patient::getDisClass, Patient::getImpPer, Patient::getCTime,
-                Patient::getHospitalName, Patient::getAuditStatus, Patient::getDiagnosisStatus,
-                Patient::getDelFlg);
+                Patient::getHospitalName, Patient::getDoctorName, Patient::getAuditStatus,
+                Patient::getDiagnosisStatus, Patient::getDelFlg);
         // 只查询有效数据
         wrapper.eq(Patient::getDelFlg, "1");
 
@@ -459,7 +459,7 @@ public class PatientServiceImpl implements PatientService {
     private PatientVO convertToVO(Patient patient, Map<Long, PatientFollowUp> latestFollowUpMap,
                                   Map<Long, InformedConsent> latestConsentMap) {
         PatientVO vo = new PatientVO();
-        BeanUtils.copyProperties(patient, vo, "id", "doctorName");
+        BeanUtils.copyProperties(patient, vo, "id");
         vo.setId(HashidsUtil.encode(patient.getId()));
         vo.setDisClassName(DIS_CLASS_MAP.getOrDefault(patient.getDisClass(), "未知"));
 
@@ -486,7 +486,9 @@ public class PatientServiceImpl implements PatientService {
             InformedConsent consent = latestConsentMap.get(patient.getId());
             if (consent != null) {
                 vo.setInformedConsentStatus("signed");
-                vo.setDoctorName(consent.getDoctorName());
+                if (StringUtils.isNotBlank(consent.getDoctorName())) {
+                    vo.setDoctorName(consent.getDoctorName());
+                }
             }
         }
 

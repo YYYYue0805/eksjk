@@ -239,6 +239,9 @@ public class PatientFollowUp implements Serializable {
     /** 删除标志 */
     private String delFlg;
 
+    /** 数据来源：LOCAL/ELTM_SYNC（外部同步记录只读） */
+    private String dataSource;
+
     // ==================== 性激素扩展 ====================
 
     /** PRL (ng/mL) */

@@ -2,7 +2,7 @@
   <div class="followup-list">
     <!-- 生长曲线图表 -->
     <div v-if="list.length > 0" class="growth-chart-section">
-      <el-radio-group v-model="chartType" size="small" style="margin-bottom: 12px">
+      <el-radio-group v-model="chartType" size="small" :disabled="false" style="margin-bottom: 12px">
         <el-radio-button value="height">身高</el-radio-button>
         <el-radio-button value="weight">体重</el-radio-button>
         <el-radio-button value="bmi">BMI</el-radio-button>
@@ -15,6 +15,9 @@
         <el-card shadow="hover" class="followup-card">
           <div class="followup-summary">
             <div class="metrics">
+              <el-tag v-if="item.dataSource === 'ELTM_SYNC'" size="small" type="info" class="source-tag">
+                外部同步·只读
+              </el-tag>
               <span class="metric" v-if="item.ht">
                 <label>身高</label> {{ item.ht }} cm
               </span>
@@ -26,13 +29,15 @@
               </span>
             </div>
             <div class="actions">
-              <el-button link type="primary" size="small" @click="handleView(item)">查看</el-button>
-              <el-button link type="primary" size="small" @click="handleEdit(item)">编辑</el-button>
-              <el-popconfirm title="确定删除该随访记录吗？" @confirm="handleDelete(item)">
-                <template #reference>
-                  <el-button link type="danger" size="small">删除</el-button>
-                </template>
-              </el-popconfirm>
+              <el-button link type="primary" size="small" :disabled="false" @click="handleView(item)">查看</el-button>
+              <template v-if="item.dataSource !== 'ELTM_SYNC'">
+                <el-button link type="primary" size="small" @click="handleEdit(item)">编辑</el-button>
+                <el-popconfirm title="确定删除该随访记录吗？" @confirm="handleDelete(item)">
+                  <template #reference>
+                    <el-button link type="danger" size="small">删除</el-button>
+                  </template>
+                </el-popconfirm>
+              </template>
             </div>
           </div>
           <div class="followup-extra" v-if="formatTreatment(item.diaTreaPlan)">
@@ -381,6 +386,10 @@ defineExpose({ refresh })
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+  align-items: center;
+}
+.source-tag {
+  margin-right: 4px;
 }
 .metric {
   font-size: 14px;

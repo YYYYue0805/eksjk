@@ -29,4 +29,24 @@ public class InformedConsentVO {
     private String source;
 
     private String ossUrl;
+
+    private String pdfFileName;
+
+    private String pdfPath;
+
+    private String signStatus;
+
+    private String content;
+
+    private String patientSignImage;
+
+    private String guardianSignImage;
+
+    private String doctorSignImage;
+
+    private LocalDateTime patientSignTime;
+
+    private LocalDateTime guardianSignTime;
+
+    private LocalDateTime doctorSignTime;
 }

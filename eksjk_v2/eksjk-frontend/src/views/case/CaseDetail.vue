@@ -773,6 +773,11 @@
           <InformedConsentList :patient-id="patientId" />
         </el-tab-pane>
 
+        <!-- Tab 9：暂未处理数据（仅 ELTM，只读） -->
+        <el-tab-pane v-if="isEltm && !isCreateMode" label="暂未处理数据" name="unprocessed" lazy>
+          <EltmUnprocessedTab :patient-id="patientId" />
+        </el-tab-pane>
+
       </el-tabs>
     </el-form>
 
@@ -807,12 +812,14 @@ const GeneticsExamForm = defineAsyncComponent(() => import('@/views/case/compone
 const GhAdverseEventList = defineAsyncComponent(() => import('@/views/case/components/AdverseEventList.vue'))
 const InformedConsentList = defineAsyncComponent(() => import('@/views/case/components/InformedConsentList.vue'))
 const DiseaseFormGeneric = defineAsyncComponent(() => import('@/views/case/components/DiseaseFormGeneric.vue'))
+const EltmUnprocessedTab = defineAsyncComponent(() => import('@/views/case/components/eltm/EltmUnprocessedTab.vue'))
 
 const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
 
 const diseaseType = computed(() => route.params.type)
+const isEltm = computed(() => diseaseType.value === 'eltm')
 const patientId = computed(() => route.params.id || '')
 const isCreateMode = computed(() => route.name === 'CaseCreate')
 const isEditMode = computed(() => route.name === 'CaseEdit')
@@ -830,16 +837,22 @@ const hasDiseaseClinicalFields = computed(() => {
   return ['dsd','fss','cpp','mas','sss'].includes(d)
 })
 
-const tabList = computed(() => [
-  { name: 'basic', label: '基本信息' },
-  { name: 'baselineClinical', label: '基线-临床信息' },
-  { name: 'baselineExam', label: '基线-辅助检查' },
-  { name: 'genetics', label: '遗传学检查' },
-  { name: 'followup', label: '随访记录' },
-  { name: 'diagnosis', label: '诊断' },
-  { name: 'ghAdverseEvent', label: 'GH不良事件' },
-  { name: 'informedConsent', label: '知情同意书' }
-])
+const tabList = computed(() => {
+  const tabs = [
+    { name: 'basic', label: '基本信息' },
+    { name: 'baselineClinical', label: '基线-临床信息' },
+    { name: 'baselineExam', label: '基线-辅助检查' },
+    { name: 'genetics', label: '遗传学检查' },
+    { name: 'followup', label: '随访记录' },
+    { name: 'diagnosis', label: '诊断' },
+    { name: 'ghAdverseEvent', label: 'GH不良事件' },
+    { name: 'informedConsent', label: '知情同意书' }
+  ]
+  if (isEltm.value && !isCreateMode.value) {
+    tabs.push({ name: 'unprocessed', label: '暂未处理数据' })
+  }
+  return tabs
+})
 
 const activeTab = ref('basic')
 

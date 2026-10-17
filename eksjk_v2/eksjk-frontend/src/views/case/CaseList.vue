@@ -70,11 +70,11 @@
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="sexName" label="性别" width="70" align="center" />
       <el-table-column prop="age" label="年龄" width="80" />
-      <el-table-column prop="medrecNum" label="病历号" width="130" show-overflow-tooltip />
+      <el-table-column v-if="diseaseType !== 'eltm'" prop="medrecNum" label="病历号" width="130" show-overflow-tooltip />
       <el-table-column prop="height" label="身高(cm)" width="90" align="center" />
       <el-table-column prop="weight" label="体重(kg)" width="90" align="center" />
       <el-table-column prop="bmi" label="BMI" width="80" align="center" />
-      <el-table-column prop="chiCom" label="主诉" min-width="150" show-overflow-tooltip />
+      <el-table-column v-if="diseaseType !== 'eltm'" prop="chiCom" label="主诉" min-width="150" show-overflow-tooltip />
       <el-table-column label="ICD" width="200" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.icd || '' }}

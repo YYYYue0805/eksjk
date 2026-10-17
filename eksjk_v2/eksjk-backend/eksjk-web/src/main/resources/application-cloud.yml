@@ -28,6 +28,16 @@ eksjk:
   eltm:
     sync-url: ${EKSJK_ELTM_SYNC_URL:http://36.26.56.94:8026/datamain/getpatient}
 
+  # datamain 第三方数据同步
+  datamain:
+    base-url: ${EKSJK_DATAMAIN_BASE_URL:http://36.26.56.94:8026}
+    cx-list-path: /datamain/cxList
+    connect-timeout-seconds: 10
+    read-timeout-seconds: 180
+    max-retry: 3
+    sync-enabled: ${EKSJK_DATAMAIN_SYNC_ENABLED:false}
+    sync-cron: "${EKSJK_DATAMAIN_SYNC_CRON:0 10 2 * * ?}"
+
 # Sa-Token 密钥从环境变量获取
 sa-token:
   jwt-secret-key: ${EKSJK_JWT_SECRET:eksjk-v2-jwt-secret-key-2024}

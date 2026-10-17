@@ -47,6 +47,68 @@ public class InformedConsent implements Serializable {
     /** 公众号端医生姓名 */
     private String doctorName;
 
+    // ==================== datamain 签署记录字段 ====================
+
+    /** 外部签署记录ID */
+    private String signId;
+
+    /** 外部患者ID */
+    private Long externalPatientId;
+
+    /** 外部归属医生ID */
+    private Long externalDoctorId;
+
+    /** 外部项目ID */
+    private String projectId;
+
+    /** 外部分组ID */
+    private String groupId;
+
+    /** 外部知情同意书模板ID */
+    private String externalConsentId;
+
+    /** HTML 正文 */
+    private String content;
+
+    /** 签署医生ID */
+    private String signDoctorId;
+
+    /** 患者签名图片 */
+    private String patientSignImage;
+
+    private LocalDateTime patientSignTime;
+
+    private String guardianSignImage;
+
+    private LocalDateTime guardianSignTime;
+
+    private String doctorSignImage;
+
+    private LocalDateTime doctorSignTime;
+
+    /** 签署状态 */
+    private String signStatus;
+
+    private String pdfPath;
+
+    private String pdfFileName;
+
+    private String pdfErrorMsg;
+
+    /** PDF 状态：0待生成/1成功/2失败/3跳过 */
+    private String pdfStatus;
+
+    private Integer pdfRetryCount;
+
+    private LocalDateTime pdfGenerateTime;
+
+    /** 外部原始 JSON */
+    private String rawJson;
+
+    private LocalDateTime externalCreateTime;
+
+    private LocalDateTime externalUpdateTime;
+
     /** 来源 */
     private String source;
 
