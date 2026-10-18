@@ -81,6 +81,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { Document } from '@element-plus/icons-vue'
 import { getInformedConsentList } from '@/api/informedConsent'
+import { fetchFileBlobUrl } from '@/api/file'
 
 const props = defineProps({
   patientId: { type: String, default: '' }
@@ -172,9 +173,25 @@ function openDetail(file) {
   detailVisible.value = true
 }
 
-function downloadFile(file) {
+async function downloadFile(file) {
   const url = fileUrl(file)
-  if (url) window.open(url, '_blank')
+  if (!url) return
+  if (/^https?:\/\//i.test(url)) {
+    window.open(url, '_blank')
+    return
+  }
+  try {
+    const blobUrl = await fetchFileBlobUrl(url)
+    const link = document.createElement('a')
+    link.href = blobUrl
+    link.download = displayName(file) || '知情同意书'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+  } catch (e) {
+    window.open(url, '_blank')
+  }
 }
 </script>
 

@@ -91,6 +91,12 @@ public class GhAdverseEvent implements Serializable {
     /** 不良事件结局 */
     private String outcome;
 
+    /** 数据来源：LOCAL/ELTM_SYNC */
+    private String dataSource;
+
+    /** 外部表单 form_data_id（幂等键） */
+    private Long sourceFormDataId;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

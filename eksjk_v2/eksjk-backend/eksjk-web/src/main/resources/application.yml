@@ -93,3 +93,8 @@ eksjk:
     source: ELTM
     # 定时同步开关：占位阶段默认关闭，避免生产环境写入 mock 数据；对接真实接口后按需开启
     sync-enabled: false
+
+  # ELTM 外部附件迁移（仅本地文件存储模式生效）
+  eltm:
+    attachment-sync-enabled: true
+    attachment-max-per-patient: 150

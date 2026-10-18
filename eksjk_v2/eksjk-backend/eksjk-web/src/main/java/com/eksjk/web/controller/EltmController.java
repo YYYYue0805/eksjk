@@ -87,6 +87,25 @@ public class EltmController {
     }
 
     /**
+     * 全量迁移外部附件到本地文件存储（仅本地存储模式）
+     */
+    @PostMapping("/attachments/run")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> runAttachments() {
+        return R.ok(projectionService.projectAllAttachments());
+    }
+
+    /**
+     * 单患者迁移外部附件
+     */
+    @PostMapping("/attachments/patient/{id}")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> runPatientAttachments(@PathVariable String id) {
+        long patientId = HashidsUtil.decode(id);
+        return R.ok(projectionService.projectAttachmentsByPatientId(patientId));
+    }
+
+    /**
      * 补拉单个患者的知情同意书完整记录（正文/签名/PDF）
      */
     @PostMapping("/sync/consent/{externalId}")

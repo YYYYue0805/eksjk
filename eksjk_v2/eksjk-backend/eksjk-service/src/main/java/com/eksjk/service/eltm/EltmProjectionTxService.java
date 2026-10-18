@@ -45,6 +45,7 @@ public class EltmProjectionTxService {
     private final PatientFollowUpMapper followUpMapper;
     private final EltmProjectionLogMapper projectionLogMapper;
     private final ObjectMapper objectMapper;
+    private final EltmModuleMigrationService moduleMigrationService;
 
     /**
      * 对单个患者执行投影
@@ -62,6 +63,7 @@ public class EltmProjectionTxService {
         changed += applyFormMappings(patient);
         changed += projectPhysicalFollowUps(patient);
         changed += fillLatestPhysicalSummary(patient);
+        changed += moduleMigrationService.projectPatient(patient);
         writeLog(patient, "SUCCESS", changed, null);
         return changed;
     }
@@ -122,6 +124,7 @@ public class EltmProjectionTxService {
         boolean patientDirty = false;
         EltmCase eltmCase = null;
         PatientGenetics genetics = null;
+        Map<String, String> familyTargets = new LinkedHashMap<>();
 
         for (Map.Entry<String, String> entry : targets.entrySet()) {
             String[] parts = entry.getKey().split("\\.", 2);
@@ -147,12 +150,17 @@ public class EltmProjectionTxService {
                     }
                     changed += setIfBlank(genetics, field, value) ? 1 : 0;
                 }
+                case "FAMILY" -> familyTargets.put(field, value);
                 default -> {
-                    // FOLLOWUP/ADVERSE 暂不通过映射表投影
+                    // FOLLOWUP/ADVERSE 由 EltmModuleMigrationService 处理
                 }
             }
         }
 
+        if (!familyTargets.isEmpty() && moduleMigrationService.mergeFamily(patient, familyTargets)) {
+            patientDirty = true;
+            changed++;
+        }
         if (patientDirty) {
             patientMapper.updateById(patient);
         }
@@ -266,6 +274,9 @@ public class EltmProjectionTxService {
         if (rule == null || rule.isBlank()) {
             return text;
         }
+        if (rule.startsWith("ENUM:")) {
+            return enumValue(text, rule.substring(5));
+        }
         return switch (rule) {
             case "WEIGHT_G_TO_KG" -> {
                 Double number = firstNumber(text);
@@ -295,6 +306,27 @@ public class EltmProjectionTxService {
             case "TEXT_CLEAN" -> text.replaceFirst("^[:：;；\\s]+", "").trim();
             default -> text;
         };
+    }
+
+    /**
+     * 枚举文案转换，规则格式：ENUM:自然分娩=0;剖宫产=1
+     */
+    private String enumValue(String text, String rule) {
+        if (text == null || rule == null) {
+            return null;
+        }
+        for (String pair : rule.split(";")) {
+            int idx = pair.indexOf('=');
+            if (idx <= 0) {
+                continue;
+            }
+            String label = pair.substring(0, idx).trim();
+            String code = pair.substring(idx + 1).trim();
+            if (label.equals(text)) {
+                return code;
+            }
+        }
+        return null;
     }
 
     private Double firstNumber(String text) {

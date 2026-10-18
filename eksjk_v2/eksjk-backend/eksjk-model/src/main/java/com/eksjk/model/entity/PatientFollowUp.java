@@ -242,6 +242,9 @@ public class PatientFollowUp implements Serializable {
     /** 数据来源：LOCAL/ELTM_SYNC（外部同步记录只读） */
     private String dataSource;
 
+    /** 外部表单 form_data_id（幂等键） */
+    private Long sourceFormDataId;
+
     // ==================== 性激素扩展 ====================
 
     /** PRL (ng/mL) */

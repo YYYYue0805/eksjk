@@ -119,7 +119,7 @@ watch(() => props.patientId, (val) => {
 async function loadFiles() {
   loading.value = true
   try {
-    const res = await getFileList(props.patientId)
+    const res = await getFileList(props.patientId, 'image')
     files.value = res.data || []
     // 清除旧的 blob URL 缓存
     Object.values(blobUrls.value).forEach(url => URL.revokeObjectURL(url))

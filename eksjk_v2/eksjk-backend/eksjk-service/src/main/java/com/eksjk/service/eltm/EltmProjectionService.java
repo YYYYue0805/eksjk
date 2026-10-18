@@ -24,6 +24,7 @@ public class EltmProjectionService {
 
     private final PatientMapper patientMapper;
     private final EltmProjectionTxService txService;
+    private final EltmAttachmentService attachmentService;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /**
@@ -91,5 +92,19 @@ public class EltmProjectionService {
      */
     public int projectByPatientId(Long patientId) {
         return txService.projectPatient(patientId);
+    }
+
+    /**
+     * 全量迁移外部附件到本地文件存储
+     */
+    public Map<String, Object> projectAllAttachments() {
+        return attachmentService.projectAll();
+    }
+
+    /**
+     * 单患者迁移外部附件
+     */
+    public Map<String, Object> projectAttachmentsByPatientId(Long patientId) {
+        return attachmentService.projectByPatientId(patientId);
     }
 }
