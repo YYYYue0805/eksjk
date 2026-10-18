@@ -1,0 +1,609 @@
+- generic [ref=f12e44]:
+  - generic [ref=f12e45]:
+    - generic [ref=f12e46] [cursor=pointer]:
+      - img "Logo" [ref=f12e47]
+      - generic [ref=f12e48]: EKSJK
+    - menubar [ref=f12e52]:
+      - menuitem [ref=f12e53] [cursor=pointer]
+      - menuitem "病例管理" [expanded] [ref=f12e59]:
+        - menu [ref=f12e1103]:
+          - menuitem "性发育异常 (DSD)" [ref=f12e68] [cursor=pointer]
+          - menuitem "遗传性骨病 (FSS)" [ref=f12e69] [cursor=pointer]
+          - menuitem "中枢性性早熟 (CPP)" [ref=f12e70] [cursor=pointer]
+          - menuitem "McCune-Albright (MAS)" [ref=f12e71] [cursor=pointer]
+          - menuitem "小于胎龄儿 (SGA)" [ref=f12e72] [cursor=pointer]
+          - menuitem "家族性矮小 (SSS)" [ref=f12e73] [cursor=pointer]
+          - menuitem "E路童萌 (ELTM)" [ref=f12e74] [cursor=pointer]
+      - menuitem [ref=f12e75] [cursor=pointer]
+      - menuitem [ref=f12e79] [cursor=pointer]
+      - menuitem [ref=f12e85] [cursor=pointer]
+      - menuitem [ref=f12e89] [cursor=pointer]
+      - menuitem [ref=f12e95] [cursor=pointer]
+      - menuitem "系统管理" [ref=f12e99]
+  - generic [ref=f12e108]:
+    - generic [ref=f12e109]:
+      - generic [ref=f12e110]:
+        - generic [ref=f12e111] [cursor=pointer]
+        - navigation "面包屑" [ref=f12e114]:
+          - link "病例管理" [ref=f12e116]
+      - button "超 超级管理员" [ref=f12e119] [cursor=pointer]:
+        - generic [ref=f12e120]: 超
+        - generic [ref=f12e121]: 超级管理员
+    - generic [ref=f12e126]:
+      - generic [ref=f12e127]:
+        - heading "E路童萌 (ELTM)" [level=2] [ref=f12e129]
+        - generic [ref=f12e130]:
+          - button "新建病例" [ref=f12e132] [cursor=pointer]
+          - button "导出Excel" [ref=f12e140] [cursor=pointer]
+          - button "同步数据" [ref=f12e145] [cursor=pointer]
+          - button "智能诊断" [ref=f12e150] [cursor=pointer]
+          - button "同步知情同意书" [ref=f12e156] [cursor=pointer]
+      - generic [ref=f12e162]:
+        - generic [ref=f12e163]:
+          - generic [ref=f12e164]: 病例编号
+          - textbox "病例编号" [ref=f12e168]:
+            - /placeholder: 请输入病例编号
+        - generic [ref=f12e169]:
+          - generic [ref=f12e170]: 姓名
+          - generic [ref=f12e173]:
+            - textbox "姓名" [active] [ref=f12e174]:
+              - /placeholder: 请输入患者姓名
+              - text: 张轩玮
+            - generic [ref=f12e1105] [cursor=pointer]
+        - generic [ref=f12e175]:
+          - generic [ref=f12e176]: 性别
+          - generic [ref=f12e179] [cursor=pointer]:
+            - generic:
+              - combobox "性别" [ref=f12e181]
+              - generic: 全部
+        - generic [ref=f12e187]:
+          - button "搜索" [ref=f12e188] [cursor=pointer]
+          - button "重置" [ref=f12e193] [cursor=pointer]
+      - generic [ref=f12e198]:
+        - generic [ref=f12e200]:
+          - table [ref=f12e202]:
+            - rowgroup [ref=f12e221]:
+              - row [ref=f12e222]:
+                - columnheader [ref=f12e223]:
+                  - generic "选择所有行" [ref=f12e225] [cursor=pointer]:
+                    - generic [ref=f12e226]:
+                      - checkbox "选择所有行"
+                - columnheader "疾病类型" [ref=f12e228]
+                - columnheader "病例编号" [ref=f12e230]
+                - columnheader "姓名" [ref=f12e232]
+                - columnheader "性别" [ref=f12e234]
+                - columnheader "年龄" [ref=f12e236]
+                - columnheader "身高(cm)" [ref=f12e238]
+                - columnheader "体重(kg)" [ref=f12e240]
+                - columnheader "BMI" [ref=f12e242]
+                - columnheader "ICD" [ref=f12e244]
+                - columnheader "基线审核状态" [ref=f12e246]
+                - columnheader "随访审核状态" [ref=f12e248]
+                - columnheader "导入人员" [ref=f12e250]
+                - columnheader "上传时间" [ref=f12e252]
+                - columnheader "知情同意书" [ref=f12e254]
+                - columnheader "医生" [ref=f12e256]
+                - columnheader "操作" [ref=f12e258]
+          - table [ref=f12e264]:
+            - rowgroup [ref=f12e283]:
+              - row [ref=f12e284]:
+                - cell [ref=f12e285]:
+                  - generic "选择当前行" [ref=f12e287] [cursor=pointer]:
+                    - generic [ref=f12e288]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e290]
+                - cell "ELTM2026101000" [ref=f12e292]
+                - cell "张轩玮" [ref=f12e294]
+                - cell "男" [ref=f12e296]
+                - cell "8岁11月" [ref=f12e298]
+                - cell "125.0" [ref=f12e300]
+                - cell "23.4" [ref=f12e302]
+                - cell [ref=f12e304]
+                - cell [ref=f12e305]
+                - cell "待发放" [ref=f12e306]
+                - cell "已发放" [ref=f12e308]
+                - cell "ELTM-SYNC" [ref=f12e310]
+                - cell [ref=f12e312]
+                - cell "未签署" [ref=f12e313]
+                - cell "未归属医生" [ref=f12e315]
+                - cell [ref=f12e317]:
+                  - generic [ref=f12e318]:
+                    - button "查看" [ref=f12e319] [cursor=pointer]
+                    - button "编辑" [ref=f12e321] [cursor=pointer]
+                    - button "删除" [ref=f12e323] [cursor=pointer]
+              - row [ref=f12e325]:
+                - cell [ref=f12e326]:
+                  - generic "选择当前行" [ref=f12e328] [cursor=pointer]:
+                    - generic [ref=f12e329]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e331]
+                - cell "ELTM2026101000" [ref=f12e333]
+                - cell "俞" [ref=f12e335]
+                - cell "男" [ref=f12e337]
+                - cell "28岁1月" [ref=f12e339]
+                - cell [ref=f12e341]
+                - cell [ref=f12e342]
+                - cell [ref=f12e343]
+                - cell [ref=f12e344]
+                - cell "待审核" [ref=f12e345]
+                - cell "暂无随访" [ref=f12e347]
+                - cell "ELTM-SYNC" [ref=f12e349]
+                - cell [ref=f12e351]
+                - cell "未签署" [ref=f12e352]
+                - cell "未归属医生" [ref=f12e354]
+                - cell [ref=f12e356]:
+                  - generic [ref=f12e357]:
+                    - button "查看" [ref=f12e358] [cursor=pointer]
+                    - button "编辑" [ref=f12e360] [cursor=pointer]
+                    - button "删除" [ref=f12e362] [cursor=pointer]
+              - row [ref=f12e364]:
+                - cell [ref=f12e365]:
+                  - generic "选择当前行" [ref=f12e367] [cursor=pointer]:
+                    - generic [ref=f12e368]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e370]
+                - cell "ELTM2026101000" [ref=f12e372]
+                - cell "测白" [ref=f12e374]
+                - cell "女" [ref=f12e376]
+                - cell "3岁8月" [ref=f12e378]
+                - cell "65" [ref=f12e380]
+                - cell "5" [ref=f12e382]
+                - cell [ref=f12e384]
+                - cell [ref=f12e385]
+                - cell "待审核" [ref=f12e386]
+                - cell "已发放" [ref=f12e388]
+                - cell "ELTM-SYNC" [ref=f12e390]
+                - cell [ref=f12e392]
+                - cell "未签署" [ref=f12e393]
+                - cell "未归属医生" [ref=f12e395]
+                - cell [ref=f12e397]:
+                  - generic [ref=f12e398]:
+                    - button "查看" [ref=f12e399] [cursor=pointer]
+                    - button "编辑" [ref=f12e401] [cursor=pointer]
+                    - button "删除" [ref=f12e403] [cursor=pointer]
+              - row [ref=f12e405]:
+                - cell [ref=f12e406]:
+                  - generic "选择当前行" [ref=f12e408] [cursor=pointer]:
+                    - generic [ref=f12e409]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e411]
+                - cell "ELTM2026101000" [ref=f12e413]
+                - cell "1" [ref=f12e415]
+                - cell "男" [ref=f12e417]
+                - cell "28岁1月" [ref=f12e419]
+                - cell [ref=f12e421]
+                - cell [ref=f12e422]
+                - cell [ref=f12e423]
+                - cell [ref=f12e424]
+                - cell "待审核" [ref=f12e425]
+                - cell "暂无随访" [ref=f12e427]
+                - cell "ELTM-SYNC" [ref=f12e429]
+                - cell [ref=f12e431]
+                - cell "未签署" [ref=f12e432]
+                - cell "未归属医生" [ref=f12e434]
+                - cell [ref=f12e436]:
+                  - generic [ref=f12e437]:
+                    - button "查看" [ref=f12e438] [cursor=pointer]
+                    - button "编辑" [ref=f12e440] [cursor=pointer]
+                    - button "删除" [ref=f12e442] [cursor=pointer]
+              - row [ref=f12e444]:
+                - cell [ref=f12e445]:
+                  - generic "选择当前行" [ref=f12e447] [cursor=pointer]:
+                    - generic [ref=f12e448]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e450]
+                - cell "ELTM2026101000" [ref=f12e452]
+                - cell "未填写姓名-9644121538566" [ref=f12e454]
+                - cell "未知" [ref=f12e456]
+                - cell [ref=f12e458]
+                - cell [ref=f12e459]
+                - cell [ref=f12e460]
+                - cell [ref=f12e461]
+                - cell [ref=f12e462]
+                - cell "待审核" [ref=f12e463]
+                - cell "暂无随访" [ref=f12e465]
+                - cell "ELTM-SYNC" [ref=f12e467]
+                - cell [ref=f12e469]
+                - cell "已签署" [ref=f12e470]
+                - cell "未归属医生" [ref=f12e472]
+                - cell [ref=f12e474]:
+                  - generic [ref=f12e475]:
+                    - button "查看" [ref=f12e476] [cursor=pointer]
+                    - button "编辑" [ref=f12e478] [cursor=pointer]
+                    - button "删除" [ref=f12e480] [cursor=pointer]
+              - row [ref=f12e482]:
+                - cell [ref=f12e483]:
+                  - generic "选择当前行" [ref=f12e485] [cursor=pointer]:
+                    - generic [ref=f12e486]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e488]
+                - cell "ELTM2026101000" [ref=f12e490]
+                - cell "未填写姓名-999359860736" [ref=f12e492]
+                - cell "未知" [ref=f12e494]
+                - cell [ref=f12e496]
+                - cell [ref=f12e497]
+                - cell [ref=f12e498]
+                - cell [ref=f12e499]
+                - cell [ref=f12e500]
+                - cell "待审核" [ref=f12e501]
+                - cell "暂无随访" [ref=f12e503]
+                - cell "ELTM-SYNC" [ref=f12e505]
+                - cell [ref=f12e507]
+                - cell "已签署" [ref=f12e508]
+                - cell "朱建芳" [ref=f12e510]
+                - cell [ref=f12e512]:
+                  - generic [ref=f12e513]:
+                    - button "查看" [ref=f12e514] [cursor=pointer]
+                    - button "编辑" [ref=f12e516] [cursor=pointer]
+                    - button "删除" [ref=f12e518] [cursor=pointer]
+              - row [ref=f12e520]:
+                - cell [ref=f12e521]:
+                  - generic "选择当前行" [ref=f12e523] [cursor=pointer]:
+                    - generic [ref=f12e524]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e526]
+                - cell "ELTM2026101000" [ref=f12e528]
+                - cell "1" [ref=f12e530]
+                - cell "未知" [ref=f12e532]
+                - cell [ref=f12e534]
+                - cell [ref=f12e535]
+                - cell [ref=f12e536]
+                - cell [ref=f12e537]
+                - cell [ref=f12e538]
+                - cell "待审核" [ref=f12e539]
+                - cell "暂无随访" [ref=f12e541]
+                - cell "ELTM-SYNC" [ref=f12e543]
+                - cell [ref=f12e545]
+                - cell "未签署" [ref=f12e546]
+                - cell "未归属医生" [ref=f12e548]
+                - cell [ref=f12e550]:
+                  - generic [ref=f12e551]:
+                    - button "查看" [ref=f12e552] [cursor=pointer]
+                    - button "编辑" [ref=f12e554] [cursor=pointer]
+                    - button "删除" [ref=f12e556] [cursor=pointer]
+              - row [ref=f12e558]:
+                - cell [ref=f12e559]:
+                  - generic "选择当前行" [ref=f12e561] [cursor=pointer]:
+                    - generic [ref=f12e562]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e564]
+                - cell "ELTM2026101000" [ref=f12e566]
+                - cell "杨潇然" [ref=f12e568]
+                - cell "男" [ref=f12e570]
+                - cell "14岁4月" [ref=f12e572]
+                - cell [ref=f12e574]
+                - cell [ref=f12e575]
+                - cell [ref=f12e576]
+                - cell [ref=f12e577]
+                - cell "待审核" [ref=f12e578]
+                - cell "暂无随访" [ref=f12e580]
+                - cell "ELTM-SYNC" [ref=f12e582]
+                - cell [ref=f12e584]
+                - cell "未签署" [ref=f12e585]
+                - cell "未归属医生" [ref=f12e587]
+                - cell [ref=f12e589]:
+                  - generic [ref=f12e590]:
+                    - button "查看" [ref=f12e591] [cursor=pointer]
+                    - button "编辑" [ref=f12e593] [cursor=pointer]
+                    - button "删除" [ref=f12e595] [cursor=pointer]
+              - row [ref=f12e597]:
+                - cell [ref=f12e598]:
+                  - generic "选择当前行" [ref=f12e600] [cursor=pointer]:
+                    - generic [ref=f12e601]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e603]
+                - cell "ELTM2026101000" [ref=f12e605]
+                - cell "陈君炀" [ref=f12e607]
+                - cell "男" [ref=f12e609]
+                - cell "14岁" [ref=f12e611]
+                - cell "141.1" [ref=f12e613]
+                - cell "42.2" [ref=f12e615]
+                - cell [ref=f12e617]
+                - cell [ref=f12e618]
+                - cell "待审核" [ref=f12e619]
+                - cell "已发放" [ref=f12e621]
+                - cell "ELTM-SYNC" [ref=f12e623]
+                - cell [ref=f12e625]
+                - cell "未签署" [ref=f12e626]
+                - cell "未归属医生" [ref=f12e628]
+                - cell [ref=f12e630]:
+                  - generic [ref=f12e631]:
+                    - button "查看" [ref=f12e632] [cursor=pointer]
+                    - button "编辑" [ref=f12e634] [cursor=pointer]
+                    - button "删除" [ref=f12e636] [cursor=pointer]
+              - row [ref=f12e638]:
+                - cell [ref=f12e639]:
+                  - generic "选择当前行" [ref=f12e641] [cursor=pointer]:
+                    - generic [ref=f12e642]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e644]
+                - cell "ELTM2026101000" [ref=f12e646]
+                - cell "未填写姓名-991013879808" [ref=f12e648]
+                - cell "未知" [ref=f12e650]
+                - cell [ref=f12e652]
+                - cell [ref=f12e653]
+                - cell [ref=f12e654]
+                - cell [ref=f12e655]
+                - cell [ref=f12e656]
+                - cell "待审核" [ref=f12e657]
+                - cell "暂无随访" [ref=f12e659]
+                - cell "ELTM-SYNC" [ref=f12e661]
+                - cell [ref=f12e663]
+                - cell "已签署" [ref=f12e664]
+                - cell "未归属医生" [ref=f12e666]
+                - cell [ref=f12e668]:
+                  - generic [ref=f12e669]:
+                    - button "查看" [ref=f12e670] [cursor=pointer]
+                    - button "编辑" [ref=f12e672] [cursor=pointer]
+                    - button "删除" [ref=f12e674] [cursor=pointer]
+              - row [ref=f12e676]:
+                - cell [ref=f12e677]:
+                  - generic "选择当前行" [ref=f12e679] [cursor=pointer]:
+                    - generic [ref=f12e680]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e682]
+                - cell "ELTM2026101000" [ref=f12e684]
+                - cell "未填写姓名-988466450432" [ref=f12e686]
+                - cell "未知" [ref=f12e688]
+                - cell [ref=f12e690]
+                - cell [ref=f12e691]
+                - cell [ref=f12e692]
+                - cell [ref=f12e693]
+                - cell [ref=f12e694]
+                - cell "待审核" [ref=f12e695]
+                - cell "暂无随访" [ref=f12e697]
+                - cell "ELTM-SYNC" [ref=f12e699]
+                - cell [ref=f12e701]
+                - cell "已签署" [ref=f12e702]
+                - cell "方燕兰" [ref=f12e704]
+                - cell [ref=f12e706]:
+                  - generic [ref=f12e707]:
+                    - button "查看" [ref=f12e708] [cursor=pointer]
+                    - button "编辑" [ref=f12e710] [cursor=pointer]
+                    - button "删除" [ref=f12e712] [cursor=pointer]
+              - row [ref=f12e714]:
+                - cell [ref=f12e715]:
+                  - generic "选择当前行" [ref=f12e717] [cursor=pointer]:
+                    - generic [ref=f12e718]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e720]
+                - cell "ELTM2026101000" [ref=f12e722]
+                - cell "未填写姓名-987915767808" [ref=f12e724]
+                - cell "未知" [ref=f12e726]
+                - cell [ref=f12e728]
+                - cell "60" [ref=f12e729]
+                - cell "5" [ref=f12e731]
+                - cell [ref=f12e733]
+                - cell [ref=f12e734]
+                - cell "待审核" [ref=f12e735]
+                - cell "已发放" [ref=f12e737]
+                - cell "ELTM-SYNC" [ref=f12e739]
+                - cell [ref=f12e741]
+                - cell "未签署" [ref=f12e742]
+                - cell "李娜娜" [ref=f12e744]
+                - cell [ref=f12e746]:
+                  - generic [ref=f12e747]:
+                    - button "查看" [ref=f12e748] [cursor=pointer]
+                    - button "编辑" [ref=f12e750] [cursor=pointer]
+                    - button "删除" [ref=f12e752] [cursor=pointer]
+              - row [ref=f12e754]:
+                - cell [ref=f12e755]:
+                  - generic "选择当前行" [ref=f12e757] [cursor=pointer]:
+                    - generic [ref=f12e758]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e760]
+                - cell "ELTM2026101000" [ref=f12e762]
+                - cell "陈炫博" [ref=f12e764]
+                - cell "男" [ref=f12e766]
+                - cell "13岁11月" [ref=f12e768]
+                - cell [ref=f12e770]
+                - cell [ref=f12e771]
+                - cell [ref=f12e772]
+                - cell [ref=f12e773]
+                - cell "待审核" [ref=f12e774]
+                - cell "暂无随访" [ref=f12e776]
+                - cell "ELTM-SYNC" [ref=f12e778]
+                - cell [ref=f12e780]
+                - cell "未签署" [ref=f12e781]
+                - cell "陈双忠" [ref=f12e783]
+                - cell [ref=f12e785]:
+                  - generic [ref=f12e786]:
+                    - button "查看" [ref=f12e787] [cursor=pointer]
+                    - button "编辑" [ref=f12e789] [cursor=pointer]
+                    - button "删除" [ref=f12e791] [cursor=pointer]
+              - row [ref=f12e793]:
+                - cell [ref=f12e794]:
+                  - generic "选择当前行" [ref=f12e796] [cursor=pointer]:
+                    - generic [ref=f12e797]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e799]
+                - cell "ELTM2026101000" [ref=f12e801]
+                - cell "未填写姓名-986727178240" [ref=f12e803]
+                - cell "未知" [ref=f12e805]
+                - cell [ref=f12e807]
+                - cell "158.0" [ref=f12e808]
+                - cell "55.0" [ref=f12e810]
+                - cell "22.03" [ref=f12e812]
+                - cell [ref=f12e814]
+                - cell "待审核" [ref=f12e815]
+                - cell "已发放" [ref=f12e817]
+                - cell "ELTM-SYNC" [ref=f12e819]
+                - cell [ref=f12e821]
+                - cell "已签署" [ref=f12e822]
+                - cell "Admin" [ref=f12e824]
+                - cell [ref=f12e826]:
+                  - generic [ref=f12e827]:
+                    - button "查看" [ref=f12e828] [cursor=pointer]
+                    - button "编辑" [ref=f12e830] [cursor=pointer]
+                    - button "删除" [ref=f12e832] [cursor=pointer]
+              - row [ref=f12e834]:
+                - cell [ref=f12e835]:
+                  - generic "选择当前行" [ref=f12e837] [cursor=pointer]:
+                    - generic [ref=f12e838]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e840]
+                - cell "ELTM2026101000" [ref=f12e842]
+                - cell "张家萌" [ref=f12e844]
+                - cell "女" [ref=f12e846]
+                - cell "13岁4月" [ref=f12e848]
+                - cell [ref=f12e850]
+                - cell [ref=f12e851]
+                - cell [ref=f12e852]
+                - cell [ref=f12e853]
+                - cell "待审核" [ref=f12e854]
+                - cell "暂无随访" [ref=f12e856]
+                - cell "ELTM-SYNC" [ref=f12e858]
+                - cell [ref=f12e860]
+                - cell "未签署" [ref=f12e861]
+                - cell "未归属医生" [ref=f12e863]
+                - cell [ref=f12e865]:
+                  - generic [ref=f12e866]:
+                    - button "查看" [ref=f12e867] [cursor=pointer]
+                    - button "编辑" [ref=f12e869] [cursor=pointer]
+                    - button "删除" [ref=f12e871] [cursor=pointer]
+              - row [ref=f12e873]:
+                - cell [ref=f12e874]:
+                  - generic "选择当前行" [ref=f12e876] [cursor=pointer]:
+                    - generic [ref=f12e877]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e879]
+                - cell "ELTM2026101000" [ref=f12e881]
+                - cell "刘安奕" [ref=f12e883]
+                - cell "女" [ref=f12e885]
+                - cell "11岁" [ref=f12e887]
+                - cell [ref=f12e889]
+                - cell [ref=f12e890]
+                - cell [ref=f12e891]
+                - cell [ref=f12e892]
+                - cell "待审核" [ref=f12e893]
+                - cell "暂无随访" [ref=f12e895]
+                - cell "ELTM-SYNC" [ref=f12e897]
+                - cell [ref=f12e899]
+                - cell "未签署" [ref=f12e900]
+                - cell "未归属医生" [ref=f12e902]
+                - cell [ref=f12e904]:
+                  - generic [ref=f12e905]:
+                    - button "查看" [ref=f12e906] [cursor=pointer]
+                    - button "编辑" [ref=f12e908] [cursor=pointer]
+                    - button "删除" [ref=f12e910] [cursor=pointer]
+              - row [ref=f12e912]:
+                - cell [ref=f12e913]:
+                  - generic "选择当前行" [ref=f12e915] [cursor=pointer]:
+                    - generic [ref=f12e916]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e918]
+                - cell "ELTM2026101000" [ref=f12e920]
+                - cell "李琪雯" [ref=f12e922]
+                - cell "女" [ref=f12e924]
+                - cell "11岁3月" [ref=f12e926]
+                - cell [ref=f12e928]
+                - cell [ref=f12e929]
+                - cell [ref=f12e930]
+                - cell [ref=f12e931]
+                - cell "待审核" [ref=f12e932]
+                - cell "暂无随访" [ref=f12e934]
+                - cell "ELTM-SYNC" [ref=f12e936]
+                - cell [ref=f12e938]
+                - cell "未签署" [ref=f12e939]
+                - cell "未归属医生" [ref=f12e941]
+                - cell [ref=f12e943]:
+                  - generic [ref=f12e944]:
+                    - button "查看" [ref=f12e945] [cursor=pointer]
+                    - button "编辑" [ref=f12e947] [cursor=pointer]
+                    - button "删除" [ref=f12e949] [cursor=pointer]
+              - row [ref=f12e951]:
+                - cell [ref=f12e952]:
+                  - generic "选择当前行" [ref=f12e954] [cursor=pointer]:
+                    - generic [ref=f12e955]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e957]
+                - cell "ELTM2026101000" [ref=f12e959]
+                - cell "未填写姓名-974476976128" [ref=f12e961]
+                - cell "未知" [ref=f12e963]
+                - cell [ref=f12e965]
+                - cell [ref=f12e966]
+                - cell [ref=f12e967]
+                - cell [ref=f12e968]
+                - cell [ref=f12e969]
+                - cell "待审核" [ref=f12e970]
+                - cell "暂无随访" [ref=f12e972]
+                - cell "ELTM-SYNC" [ref=f12e974]
+                - cell [ref=f12e976]
+                - cell "已签署" [ref=f12e977]
+                - cell "施红波" [ref=f12e979]
+                - cell [ref=f12e981]:
+                  - generic [ref=f12e982]:
+                    - button "查看" [ref=f12e983] [cursor=pointer]
+                    - button "编辑" [ref=f12e985] [cursor=pointer]
+                    - button "删除" [ref=f12e987] [cursor=pointer]
+              - row [ref=f12e989]:
+                - cell [ref=f12e990]:
+                  - generic "选择当前行" [ref=f12e992] [cursor=pointer]:
+                    - generic [ref=f12e993]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e995]
+                - cell "ELTM2026101000" [ref=f12e997]
+                - cell "唐佩琳" [ref=f12e999]
+                - cell "女" [ref=f12e1001]
+                - cell "10岁1月" [ref=f12e1003]
+                - cell [ref=f12e1005]
+                - cell [ref=f12e1006]
+                - cell [ref=f12e1007]
+                - cell [ref=f12e1008]
+                - cell "待审核" [ref=f12e1009]
+                - cell "暂无随访" [ref=f12e1011]
+                - cell "ELTM-SYNC" [ref=f12e1013]
+                - cell [ref=f12e1015]
+                - cell "未签署" [ref=f12e1016]
+                - cell "陈双忠" [ref=f12e1018]
+                - cell [ref=f12e1020]:
+                  - generic [ref=f12e1021]:
+                    - button "查看" [ref=f12e1022] [cursor=pointer]
+                    - button "编辑" [ref=f12e1024] [cursor=pointer]
+                    - button "删除" [ref=f12e1026] [cursor=pointer]
+              - row [ref=f12e1028]:
+                - cell [ref=f12e1029]:
+                  - generic "选择当前行" [ref=f12e1031] [cursor=pointer]:
+                    - generic [ref=f12e1032]:
+                      - checkbox "选择当前行"
+                - cell "E路童萌 (ELTM)" [ref=f12e1034]
+                - cell "ELTM2026101000" [ref=f12e1036]
+                - cell "金子萱" [ref=f12e1038]
+                - cell "女" [ref=f12e1040]
+                - cell "8岁1月" [ref=f12e1042]
+                - cell [ref=f12e1044]
+                - cell [ref=f12e1045]
+                - cell [ref=f12e1046]
+                - cell [ref=f12e1047]
+                - cell "待审核" [ref=f12e1048]
+                - cell "暂无随访" [ref=f12e1050]
+                - cell "ELTM-SYNC" [ref=f12e1052]
+                - cell [ref=f12e1054]
+                - cell "未签署" [ref=f12e1055]
+                - cell "未归属医生" [ref=f12e1057]
+                - cell [ref=f12e1059]:
+                  - generic [ref=f12e1060]:
+                    - button "查看" [ref=f12e1061] [cursor=pointer]
+                    - button "编辑" [ref=f12e1063] [cursor=pointer]
+                    - button "删除" [ref=f12e1065] [cursor=pointer]
+        - generic [ref=f12e1069]:
+          - generic [ref=f12e1070]: 共 5372 条
+          - generic [ref=f12e1073] [cursor=pointer]:
+            - generic:
+              - combobox [ref=f12e1075]
+              - generic [ref=f12e1076]: 20条/页
+          - button "上一页" [disabled] [ref=f12e1081]
+          - list [ref=f12e1082]:
+            - listitem "第 1 页" [ref=f12e1083]: "1"
+            - listitem "第 2 页" [ref=f12e1084] [cursor=pointer]: "2"
+            - listitem "第 3 页" [ref=f12e1085] [cursor=pointer]: "3"
+            - listitem "第 4 页" [ref=f12e1086] [cursor=pointer]: "4"
+            - listitem "第 5 页" [ref=f12e1087] [cursor=pointer]: "5"
+            - listitem "第 6 页" [ref=f12e1088] [cursor=pointer]: "6"
+            - listitem "向后 5 页" [ref=f12e1089] [cursor=pointer]
+            - listitem "第 269 页" [ref=f12e1090] [cursor=pointer]: "269"
+          - button "下一页" [ref=f12e1091] [cursor=pointer]
+          - generic [ref=f12e1092]:
+            - generic [ref=f12e1093]: 前往
+            - spinbutton "页" [ref=f12e1096]: "1"
+            - generic [ref=f12e1097]: 页
