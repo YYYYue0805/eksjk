@@ -7,6 +7,8 @@ import com.eksjk.common.util.HashidsUtil;
 import com.eksjk.model.entity.EltmAssessmentReport;
 import com.eksjk.model.entity.EltmFormSubmission;
 import com.eksjk.model.entity.EltmPatientPic;
+import com.eksjk.model.entity.EltmPatientRaw;
+import com.eksjk.model.entity.EltmUnprocessedData;
 import com.eksjk.service.eltm.EltmPatientDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -98,5 +100,52 @@ public class EltmPatientDataController {
     @GetMapping("/{id}/exercise-sleep")
     public R<Map<String, Object>> exerciseSleep(@PathVariable String id) {
         return R.ok(eltmPatientDataService.exerciseSleep(HashidsUtil.decode(id)));
+    }
+
+    /**
+     * 未识别数据分页
+     */
+    @GetMapping("/{id}/unprocessed")
+    public R<PageResult<EltmUnprocessedData>> unprocessed(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "") String category,
+            @RequestParam(defaultValue = "") String module,
+            @RequestParam(defaultValue = "1") long pageNum,
+            @RequestParam(defaultValue = "20") long pageSize) {
+        return R.ok(eltmPatientDataService.unprocessed(
+                HashidsUtil.decode(id), category, module, pageNum, pageSize));
+    }
+
+    /**
+     * 未处理数据按目标模块统计
+     */
+    @GetMapping("/{id}/unprocessed-modules")
+    public R<List<Map<String, Object>>> unprocessedModules(@PathVariable String id) {
+        return R.ok(eltmPatientDataService.unprocessedModules(HashidsUtil.decode(id)));
+    }
+
+    /**
+     * 未识别数据详情（含完整 raw_json）
+     */
+    @GetMapping("/{id}/unprocessed/{recordId}")
+    public R<EltmUnprocessedData> unprocessedDetail(@PathVariable String id,
+                                                    @PathVariable Long recordId) {
+        return R.ok(eltmPatientDataService.unprocessedDetail(HashidsUtil.decode(id), recordId));
+    }
+
+    /**
+     * cxList 原始行
+     */
+    @GetMapping("/{id}/raw")
+    public R<EltmPatientRaw> raw(@PathVariable String id) {
+        return R.ok(eltmPatientDataService.rawRow(HashidsUtil.decode(id)));
+    }
+
+    /**
+     * 单患者补拉病历图片（gettpbyid）
+     */
+    @PostMapping("/{id}/pics/sync")
+    public R<Map<String, Object>> syncPics(@PathVariable String id) {
+        return R.ok(eltmPatientDataService.syncPics(HashidsUtil.decode(id)));
     }
 }

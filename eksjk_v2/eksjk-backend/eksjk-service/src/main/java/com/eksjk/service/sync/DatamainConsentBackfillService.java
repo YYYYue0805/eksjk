@@ -3,16 +3,22 @@ package com.eksjk.service.sync;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.mapper.InformedConsentMapper;
 import com.eksjk.mapper.PatientMapper;
+import com.eksjk.model.entity.EltmUnprocessedData;
 import com.eksjk.model.entity.InformedConsent;
 import com.eksjk.model.entity.Patient;
+import com.eksjk.service.eltm.EltmUnprocessedService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 知情同意书完整记录补拉（getzqbyid）
@@ -32,6 +38,8 @@ public class DatamainConsentBackfillService {
     private final DatamainApiClient apiClient;
     private final PatientMapper patientMapper;
     private final InformedConsentMapper informedConsentMapper;
+    private final EltmUnprocessedCollector unprocessedCollector;
+    private final EltmUnprocessedService unprocessedService;
 
     public Map<String, Object> backfill(long externalId) {
         Patient patient = patientMapper.selectOne(new LambdaQueryWrapper<Patient>()
@@ -45,6 +53,8 @@ public class DatamainConsentBackfillService {
         int updated = 0;
         int skipped = 0;
         int skippedImages = 0;
+        List<EltmUnprocessedData> unprocessed = new ArrayList<>();
+        Set<String> skippedImageSeen = new HashSet<>();
 
         for (JsonNode row : rows) {
             String signId = DatamainParseUtil.text(row.get(0));
@@ -52,6 +62,8 @@ public class DatamainConsentBackfillService {
                 skipped++;
                 continue;
             }
+            unprocessed.addAll(unprocessedCollector.collectGetZqById(
+                    patient.getId(), externalId, signId, row));
             InformedConsent consent = informedConsentMapper.selectOne(
                     new LambdaQueryWrapper<InformedConsent>()
                             .eq(InformedConsent::getSignId, signId).last("LIMIT 1"));
@@ -82,6 +94,8 @@ public class DatamainConsentBackfillService {
             String patientImage = DatamainParseUtil.text(row.get(11));
             if (patientImage != null && patientImage.length() > MAX_INLINE_IMAGE_LENGTH) {
                 skippedImages++;
+                unprocessedCollector.recordSkippedConsentImage(unprocessed, skippedImageSeen,
+                        patient.getId(), externalId, signId, "patient_sign_image", patientImage.length());
                 patientImage = null;
             }
             consent.setPatientSignImage(patientImage);
@@ -91,6 +105,8 @@ public class DatamainConsentBackfillService {
             if (guardianImage != null) {
                 if (guardianImage.length() > MAX_INLINE_IMAGE_LENGTH) {
                     skippedImages++;
+                    unprocessedCollector.recordSkippedConsentImage(unprocessed, skippedImageSeen,
+                            patient.getId(), externalId, signId, "guardian_sign_image", guardianImage.length());
                     guardianImage = null;
                 }
             }
@@ -101,6 +117,8 @@ public class DatamainConsentBackfillService {
             if (doctorImage != null) {
                 if (doctorImage.length() > MAX_INLINE_IMAGE_LENGTH) {
                     skippedImages++;
+                    unprocessedCollector.recordSkippedConsentImage(unprocessed, skippedImageSeen,
+                            patient.getId(), externalId, signId, "doctor_sign_image", doctorImage.length());
                     doctorImage = null;
                 }
             }
@@ -140,6 +158,14 @@ public class DatamainConsentBackfillService {
         result.put("updated", updated);
         result.put("skipped", skipped);
         result.put("skippedLargeImages", skippedImages);
+        try {
+            unprocessedService.replacePending(patient.getId(),
+                    EltmUnprocessedCollector.API_GETZQBYID, unprocessed);
+            result.put("unprocessed", unprocessed.size());
+        } catch (Exception e) {
+            log.error("保存知情同意未处理数据失败 externalId={}", externalId, e);
+            result.put("unprocessed", 0);
+        }
         return result;
     }
 }

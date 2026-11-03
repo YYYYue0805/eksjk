@@ -6,6 +6,7 @@ import com.eksjk.common.exception.BusinessException;
 import com.eksjk.common.result.PageResult;
 import com.eksjk.mapper.*;
 import com.eksjk.model.entity.*;
+import com.eksjk.service.sync.DatamainPicBackfillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,8 @@ public class EltmPatientDataService {
     private final EltmSleepRecordMapper sleepRecordMapper;
     private final EltmSleepSummaryMapper sleepSummaryMapper;
     private final InformedConsentMapper consentMapper;
+    private final EltmUnprocessedService unprocessedService;
+    private final DatamainPicBackfillService picBackfillService;
 
     public Map<String, Object> overview(Long patientId) {
         Patient patient = requirePatient(patientId);
@@ -78,6 +81,7 @@ public class EltmPatientDataService {
                 new LambdaQueryWrapper<InformedConsent>()
                         .eq(InformedConsent::getPatientId, patientId)
                         .isNotNull(InformedConsent::getSignId)));
+        counts.put("unprocessed", unprocessedService.countPending(patientId));
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("patient", patientInfo);
@@ -231,6 +235,35 @@ public class EltmPatientDataService {
                         .orderByDesc(EltmSleepSummary::getSummaryDate)
                         .orderByDesc(EltmSleepSummary::getId)));
         return result;
+    }
+
+    public PageResult<EltmUnprocessedData> unprocessed(Long patientId, String category, String module,
+                                                       long pageNum, long pageSize) {
+        requirePatient(patientId);
+        return unprocessedService.page(patientId, category, module, pageNum, pageSize);
+    }
+
+    public List<Map<String, Object>> unprocessedModules(Long patientId) {
+        requirePatient(patientId);
+        return unprocessedService.moduleCounts(patientId);
+    }
+
+    public EltmUnprocessedData unprocessedDetail(Long patientId, Long recordId) {
+        requirePatient(patientId);
+        return unprocessedService.detail(patientId, recordId);
+    }
+
+    public EltmPatientRaw rawRow(Long patientId) {
+        requirePatient(patientId);
+        return unprocessedService.rawRow(patientId);
+    }
+
+    public Map<String, Object> syncPics(Long patientId) {
+        Patient patient = requirePatient(patientId);
+        if (patient.getExternalId() == null) {
+            throw new BusinessException("该病例未关联外部患者");
+        }
+        return picBackfillService.backfillPatient(patient.getExternalId());
     }
 
     private Map<String, Object> latestPhysical(Long patientId) {

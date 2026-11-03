@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eksjk.mapper.EltmUnprocessedDataMapper">
+
+    <insert id="upsertBatch">
+        INSERT INTO eltm_unprocessed_data
+            (patient_id, external_patient_id, api_code, category, source_key, source_name,
+             suggested_module, reason, raw_value, raw_json, content_hash, status, sync_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.patientId}, #{item.externalPatientId}, #{item.apiCode}, #{item.category},
+             #{item.sourceKey}, #{item.sourceName}, #{item.suggestedModule}, #{item.reason},
+             #{item.rawValue}, #{item.rawJson}, #{item.contentHash}, #{item.status}, #{item.syncTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            external_patient_id = VALUES(external_patient_id),
+            source_name = VALUES(source_name),
+            suggested_module = VALUES(suggested_module),
+            reason = VALUES(reason),
+            raw_value = VALUES(raw_value),
+            raw_json = VALUES(raw_json),
+            content_hash = VALUES(content_hash),
+            status = IF(status IN ('MAPPED', 'IGNORED'), status, VALUES(status)),
+            sync_time = VALUES(sync_time),
+            update_time = NOW()
+    </insert>
+</mapper>

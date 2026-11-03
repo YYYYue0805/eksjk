@@ -23,6 +23,9 @@
         <el-button v-if="diseaseType === 'eltm'" type="success" @click="handleSync" :loading="syncing">
           <el-icon><Refresh /></el-icon>同步数据
         </el-button>
+        <el-button v-if="diseaseType === 'eltm'" type="success" plain @click="handlePicSync" :loading="picSyncing">
+          <el-icon><Picture /></el-icon>补拉图片
+        </el-button>
         <el-button v-if="diseaseType === 'eltm'" type="warning" @click="handleDiagnose" :loading="diagnosing">
           <el-icon><Cpu /></el-icon>智能诊断
         </el-button>
@@ -134,12 +137,12 @@
 import { shallowRef, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Download, Refresh, Cpu, ArrowDown, Document } from '@element-plus/icons-vue'
+import { Plus, Download, Refresh, Cpu, ArrowDown, Document, Picture } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
 import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType, getDiseaseTypeByCode } from '@/api/patient'
-import { syncEltmData, diagnoseBatch } from '@/api/eltm'
+import { syncEltmDataAsync, getEltmSyncStatus, diagnoseBatch, syncEltmPicsBatch } from '@/api/eltm'
 import { syncInformedConsent } from '@/api/informedConsent'
 
 const route = useRoute()
@@ -169,6 +172,7 @@ const tableData = shallowRef([])
 const total = ref(0)
 const loading = ref(false)
 const syncing = ref(false)
+const picSyncing = ref(false)
 const diagnosing = ref(false)
 const consentSyncing = ref(false)
 
@@ -268,14 +272,57 @@ async function handleSync() {
   } catch { return }
   syncing.value = true
   try {
-    const res = await syncEltmData()
-    const data = res.data || {}
-    ElMessage.success(`同步完成：新增 ${data.newCount || 0} 条，更新 ${data.updatedCount || 0} 条`)
-    loadData()
+    await syncEltmDataAsync()
+    ElMessage.success('同步任务已启动，正在后台执行，请稍后刷新列表查看')
+    pollSyncStatus()
   } catch (error) {
-    ElMessage.error('同步失败，请检查外部系统连接')
+    ElMessage.error('同步启动失败，请检查外部系统连接')
   } finally {
     syncing.value = false
+  }
+}
+
+async function pollSyncStatus() {
+  let sawRunning = false
+  for (let i = 0; i < 120; i++) {
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    try {
+      const res = await getEltmSyncStatus()
+      const log = res.data?.lastSyncLog
+      if (!log) continue
+      if (log.status === 'RUNNING') {
+        sawRunning = true
+        continue
+      }
+      if (sawRunning) {
+        ElMessage.success(`同步完成：新增 ${log.newCount || 0} 条，更新 ${log.updatedCount || 0} 条，跳过 ${log.skippedCount || 0} 条，失败 ${log.failedCount || 0} 条`)
+        loadData()
+        return
+      }
+      if (i >= 11) {
+        ElMessage.info('同步任务已启动，请稍后刷新列表查看结果')
+        return
+      }
+    } catch (error) {
+      // 忽略轮询错误，继续等待
+    }
+  }
+  ElMessage.warning('同步仍在后台执行，请稍后刷新列表查看')
+}
+
+async function handlePicSync() {
+  try {
+    await ElMessageBox.confirm('将对有图片记录的ELTM患者补拉 gettpbyid 数据，是否继续？', '确认补拉', { type: 'info' })
+  } catch { return }
+  picSyncing.value = true
+  try {
+    const res = await syncEltmPicsBatch()
+    const data = res.data || {}
+    ElMessage.success(`补拉完成：处理 ${data.processed || 0}/${data.total || 0}，成功 ${data.success || 0}，失败 ${data.failed || 0}`)
+  } catch (error) {
+    ElMessage.error('补拉图片失败，请检查外部系统连接')
+  } finally {
+    picSyncing.value = false
   }
 }
 

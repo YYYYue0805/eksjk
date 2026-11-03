@@ -106,6 +106,48 @@ public class S3FileServiceImpl implements FileService {
     }
 
     @Override
+    public String store(String objectKey, byte[] content, String originalFilename) {
+        if (content == null || content.length == 0) {
+            throw new BusinessException("文件内容不能为空");
+        }
+        if (content.length > maxFileSize) {
+            throw new BusinessException("文件大小超过限制（最大50MB）");
+        }
+        String extension = getFileExtension(originalFilename);
+        String encodedOriginalName = URLEncoder.encode(
+                originalFilename != null ? originalFilename : "", StandardCharsets.UTF_8);
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectKey)
+                .contentType(getContentType(extension))
+                .metadata(Map.of("original-name", encodedOriginalName))
+                .build();
+        try {
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
+            return objectKey;
+        } catch (S3Exception e) {
+            log.error("文件保存失败: key={}", objectKey, e);
+            throw new BusinessException("文件保存失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean exists(String filePath) {
+        try {
+            s3Client.headObject(HeadObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(filePath)
+                    .build());
+            return true;
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) {
+                return false;
+            }
+            throw e;
+        }
+    }
+
+    @Override
     public byte[] download(String filePath) {
         try {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()

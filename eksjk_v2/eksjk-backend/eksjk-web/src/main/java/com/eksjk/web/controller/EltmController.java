@@ -7,7 +7,9 @@ import com.eksjk.service.DiagnosisService;
 import com.eksjk.service.diagnosis.DiagnosisResult;
 import com.eksjk.service.eltm.EltmProjectionService;
 import com.eksjk.service.sync.DatamainConsentBackfillService;
+import com.eksjk.service.sync.DatamainPicBackfillService;
 import com.eksjk.service.sync.DatamainSyncService;
+import com.eksjk.service.sync.DatamainUnprocessedRebuildService;
 import com.eksjk.common.util.HashidsUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,8 @@ public class EltmController {
     private final DatamainConsentBackfillService consentBackfillService;
     private final DiagnosisService diagnosisService;
     private final EltmProjectionService projectionService;
+    private final DatamainPicBackfillService picBackfillService;
+    private final DatamainUnprocessedRebuildService unprocessedRebuildService;
 
     /**
      * 手动触发从外部系统同步ELTM数据
@@ -39,6 +43,35 @@ public class EltmController {
     public R<Map<String, Object>> sync() {
         Map<String, Object> result = datamainSyncService.syncFromExternal("MANUAL");
         return R.ok(result);
+    }
+
+    /**
+     * 异步触发全量同步，立即返回
+     */
+    @PostMapping("/sync/async")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> syncAsync(
+            @RequestParam(defaultValue = "false") boolean force,
+            @RequestParam(defaultValue = "0") int limit) {
+        return R.ok(datamainSyncService.startAsync("MANUAL", force, limit));
+    }
+
+    /**
+     * 对 pic_count>0 的患者批量补拉病历图片（gettpbyid）
+     */
+    @PostMapping("/sync/pics")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> syncPics(@RequestParam(defaultValue = "0") int limit) {
+        return R.ok(picBackfillService.backfillAll(limit));
+    }
+
+    /**
+     * 从 eltm_patient_raw 重放未处理数据采集
+     */
+    @PostMapping("/unprocessed/rebuild")
+    @SaCheckRole("super_admin")
+    public R<Map<String, Object>> rebuildUnprocessed() {
+        return R.ok(unprocessedRebuildService.rebuildAll());
     }
 
     /**
@@ -87,12 +120,17 @@ public class EltmController {
     }
 
     /**
-     * 全量迁移外部附件到本地文件存储（仅本地存储模式）
+     * 迁移外部附件到文件存储（本地/S3 均支持）
      */
     @PostMapping("/attachments/run")
     @SaCheckRole("super_admin")
-    public R<Map<String, Object>> runAttachments() {
-        return R.ok(projectionService.projectAllAttachments());
+    public R<Map<String, Object>> runAttachments(
+            @RequestParam(defaultValue = "0") int limit,
+            @RequestParam(defaultValue = "false") boolean async) {
+        if (async) {
+            return R.ok(projectionService.startAttachmentsAsync(limit));
+        }
+        return R.ok(projectionService.projectAllAttachments(limit));
     }
 
     /**

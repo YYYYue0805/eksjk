@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.eksjk.mapper.*;
 import com.eksjk.model.entity.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 单患者同步事务写入
@@ -44,9 +48,14 @@ public class DatamainSyncTxService {
     private final EltmSleepSummaryMapper sleepSummaryMapper;
     private final InformedConsentMapper informedConsentMapper;
     private final DatamainDetailParser detailParser;
+    private final EltmUnprocessedCollector unprocessedCollector;
+
+    /** case_num 月份序号缓存，避免全量同步时逐患者 ORDER BY 查询 */
+    private final Map<String, Integer> caseNumSeq = new HashMap<>();
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public boolean syncPatient(CxListRow row, String rowHash) {
+    public SyncOutcome syncPatient(CxListRow row, String rowHash,
+                                   Map<String, Set<String>> mappedFieldsByFormKey) {
         long externalId = row.id();
         Patient patient = matchExisting(row);
         boolean isNew = patient == null;
@@ -55,6 +64,7 @@ public class DatamainSyncTxService {
             applyNewPatientDefaults(patient);
         }
         applyRowFields(patient, row);
+        applyExtendFallbacks(patient, row);
         if (isNew) {
             patientMapper.insert(patient);
         } else {
@@ -76,7 +86,13 @@ public class DatamainSyncTxService {
         replaceSleeps(patientId, detailParser.parseSleeps(row, patientId));
         replaceSleepSummaries(patientId, detailParser.parseSleepSummaries(row, patientId));
         upsertConsents(patientId, row, patient);
-        return isNew;
+        return new SyncOutcome(isNew, patientId,
+                unprocessedCollector.collectCxList(row, patientId, mappedFieldsByFormKey));
+    }
+
+    /** 单患者同步结果；未处理数据由编排服务在事务提交后落库 */
+    public record SyncOutcome(boolean isNew, Long patientId,
+                              List<EltmUnprocessedData> unprocessed) {
     }
 
     // ==================== 患者主体 ====================
@@ -174,21 +190,56 @@ public class DatamainSyncTxService {
         patient.setModifyPer("ELTM-SYNC");
     }
 
-    private synchronized String generateEltmCaseNum() {
-        String prefix = "ELTM" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        Patient last = patientMapper.selectOne(new LambdaQueryWrapper<Patient>()
-                .likeRight(Patient::getCaseNum, prefix)
-                .orderByDesc(Patient::getCaseNum)
-                .last("LIMIT 1"));
-        int seq = 1;
-        if (last != null && last.getCaseNum() != null) {
-            try {
-                seq = Integer.parseInt(last.getCaseNum().substring(prefix.length())) + 1;
-            } catch (NumberFormatException ignored) {
-                // 保持 1
+    /**
+     * extend_data_json 中的已知键仅作兜底，不覆盖已有值
+     */
+    private void applyExtendFallbacks(Patient patient, CxListRow row) {
+        JsonNode extend = row.json(54);
+        if (extend == null || !extend.isObject()) {
+            return;
+        }
+        if (!notBlank(patient.getName())) {
+            String name = DatamainParseUtil.text(extend.get("name"));
+            if (notBlank(name)) {
+                patient.setName(name);
             }
         }
-        return prefix + String.format("%03d", seq);
+        if (!notBlank(patient.getSex())) {
+            String sexText = DatamainParseUtil.text(extend.get("sex"));
+            String sex = DatamainParseUtil.normalizeSex(sexText, sexText);
+            if (sex != null) {
+                patient.setSex(sex);
+            }
+        }
+        if (patient.getBirthTime() == null) {
+            LocalDateTime birthday = DatamainParseUtil.parseDateTime(extend.get("birthday"));
+            if (birthday != null) {
+                patient.setBirthTime(birthday);
+                patient.setAge(DatamainParseUtil.calcAge(birthday.toLocalDate()));
+            }
+        }
+    }
+
+    private synchronized String generateEltmCaseNum() {
+        String prefix = "ELTM" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        Integer next = caseNumSeq.get(prefix);
+        if (next == null) {
+            Patient last = patientMapper.selectOne(new LambdaQueryWrapper<Patient>()
+                    .likeRight(Patient::getCaseNum, prefix)
+                    .orderByDesc(Patient::getCaseNum)
+                    .last("LIMIT 1"));
+            int lastSeq = 0;
+            if (last != null && last.getCaseNum() != null) {
+                try {
+                    lastSeq = Integer.parseInt(last.getCaseNum().substring(prefix.length()));
+                } catch (NumberFormatException ignored) {
+                    // 保持 0
+                }
+            }
+            next = lastSeq + 1;
+        }
+        caseNumSeq.put(prefix, next + 1);
+        return prefix + String.format("%03d", next);
     }
 
     private void upsertProfile(Long patientId, CxListRow row) {
@@ -203,7 +254,14 @@ public class DatamainSyncTxService {
             profile.setPatientId(patientId);
         }
         profile.setExternalId(row.id());
-        profile.setRegisterSource(row.str(8));
+        String registerSource = row.str(8);
+        if (!notBlank(registerSource)) {
+            JsonNode extend = row.json(54);
+            if (extend != null && extend.isObject()) {
+                registerSource = DatamainParseUtil.text(extend.get("registerSource"));
+            }
+        }
+        profile.setRegisterSource(registerSource);
         profile.setIdType(row.str(9));
         profile.setExternalCreatedAt(row.dateTime(10));
         profile.setExternalDoctorId(row.str(12));

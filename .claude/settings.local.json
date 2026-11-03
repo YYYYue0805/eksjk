@@ -293,7 +293,16 @@
       "Bash(tasklist //FI \"IMAGENAME eq curl.exe\")",
       "Bash(tasklist //FI \"PID eq 13612\")",
       "Bash(ssh-keyscan -p 443 ssh.github.com)",
-      "Bash(ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_eksjk -N \"\" -C \"eksjk-claude\")"
+      "Bash(ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_eksjk -N \"\" -C \"eksjk-claude\")",
+      "Bash(javac SchemaDump.java)",
+      "Bash(grep -oP '^CREATE TABLE `\\\\K[^`]+' /tmp/eksjk_remote_schema.sql)",
+      "Bash(grep -oP '^CREATE TABLE `\\\\K[^`]+' /tmp/eksjk_local_schema.sql)",
+      "Bash(cygpath -w /tmp/eltm_mapping.sql)",
+      "Bash(iconv -f GBK -t UTF-8 /tmp/eltm_mapping.sql)",
+      "Bash(cygpath -w /tmp/eltm_mapping_utf8.sql)",
+      "Bash(mysql -ueksjk -peksjk123 -h127.0.0.1 -N -e \"SELECT COUNT\\(*\\), COUNT\\(DISTINCT CONCAT\\(form_key,'|',field_key\\)\\) FROM eksjk_db.eltm_form_field_mapping;\")",
+      "Bash(mysql -ueksjk -peksjk123 -h127.0.0.1 --default-character-set=utf8mb4 --batch --skip-column-names -e \"SELECT CONCAT\\('INSERT INTO eltm_form_field_mapping \\(id,form_key,form_name,field_key,target_scope,target_field,value_type,transform_rule,priority,enabled,remark,create_time,update_time\\) VALUES \\(',id,',',QUOTE\\(form_key\\),',',QUOTE\\(form_name\\),',',QUOTE\\(field_key\\),',',QUOTE\\(target_scope\\),',',QUOTE\\(target_field\\),',',QUOTE\\(value_type\\),',',IFNULL\\(QUOTE\\(transform_rule\\),'NULL'\\),',',priority,',',enabled,',',IFNULL\\(QUOTE\\(remark\\),'NULL'\\),',',IFNULL\\(QUOTE\\(DATE_FORMAT\\(create_time,'%Y-%m-%d %H:%i:%s'\\)\\),'NULL'\\),',',IFNULL\\(QUOTE\\(DATE_FORMAT\\(update_time,'%Y-%m-%d %H:%i:%s'\\)\\),'NULL'\\),'\\) ON DUPLICATE KEY UPDATE form_name=VALUES\\(form_name\\), target_scope=VALUES\\(target_scope\\), target_field=VALUES\\(target_field\\), value_type=VALUES\\(value_type\\), transform_rule=VALUES\\(transform_rule\\), priority=VALUES\\(priority\\), enabled=VALUES\\(enabled\\), remark=VALUES\\(remark\\);'\\) FROM eksjk_db.eltm_form_field_mapping ORDER BY id;\")",
+      "Bash(cygpath -w /tmp/mapping_utf8.sql)"
     ],
     "defaultMode": "auto"
   },

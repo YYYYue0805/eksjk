@@ -3,6 +3,7 @@ package com.eksjk.service.eltm;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.mapper.*;
 import com.eksjk.model.entity.*;
+import com.eksjk.service.sync.EltmFormRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -36,17 +37,12 @@ public class EltmModuleMigrationService {
     private static final Pattern YEAR_PATTERN = Pattern.compile("(\\d{4})");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-    private static final Set<String> DEMOGRAPHIC_FORMS = Set.of(
-            "人口学信息", "人口学资料_医生填写", "儿童基本信息", "儿童基础信息 ",
-            "病例基本信息采集（研究对象）", "人口学及基线资料", "患者基线信息");
+    private static final Set<String> DEMOGRAPHIC_FORMS = EltmFormRegistry.DEMOGRAPHIC_FORMS;
 
-    private static final Set<String> FOLLOWUP_FORMS = Set.of(
-            "GH用药记录", "合并用药记录", "合并用药&非药物治疗记录（随访期）",
-            "生长激素治疗相关病史：临床症状和体征", "随访检查记录", "治疗随访-实验室检查",
-            "基础测量（身高、体重、头围、BMI）", "体重记录", "长高记录");
+    private static final Set<String> FOLLOWUP_FORMS = EltmFormRegistry.FOLLOWUP_FORMS;
 
-    private static final Set<String> AE_FORMS = Set.of("不良事件", "不良反应收集");
-    private static final Set<String> CONSENT_FORMS = Set.of("知情同意书上传");
+    private static final Set<String> AE_FORMS = EltmFormRegistry.AE_FORMS;
+    private static final Set<String> CONSENT_FORMS = EltmFormRegistry.CONSENT_FORMS;
     private static final Set<String> STAGE_LABELS = Set.of("Ⅰ期", "Ⅱ期", "Ⅲ期", "Ⅳ期", "Ⅴ期");
     private static final Set<String> SEVERITY_LABELS = Set.of("轻度", "中度", "重度", "危及生命", "致残", "住院");
     private static final Set<String> CAUSALITY_LABELS = Set.of("肯定相关", "很可能相关", "可能相关", "可能无关", "无关", "待评价");
@@ -74,6 +70,7 @@ public class EltmModuleMigrationService {
      */
     public int projectPatient(Patient patient) {
         int changed = 0;
+        changed += ensureEltmCase(patient);
         changed += projectDemographics(patient);
         changed += projectPhysicalExtras(patient);
         changed += projectPhysicalExam(patient);
@@ -85,8 +82,29 @@ public class EltmModuleMigrationService {
         return changed;
     }
 
-    // ==================== 人口学信息 -> 基本信息 ====================
+    // ==================== ELTM 病例行 ====================
 
+    /**
+     * 外部患者至少保留一行 ELTM 病例数据，保证详情页病种子模块可正常加载。
+     */
+    private int ensureEltmCase(Patient patient) {
+        if (patient.getExternalId() == null) {
+            return 0;
+        }
+        Long count = eltmCaseMapper.selectCount(new LambdaQueryWrapper<EltmCase>()
+                .eq(EltmCase::getPatientId, patient.getId()));
+        if (count != null && count > 0) {
+            return 0;
+        }
+        EltmCase entity = new EltmCase();
+        entity.setPatientId(patient.getId());
+        entity.setCreateTime(LocalDateTime.now());
+        entity.setUpdateTime(LocalDateTime.now());
+        eltmCaseMapper.insert(entity);
+        return 1;
+    }
+
+    // ==================== 人口学信息 -> 基本信息 ====================
     private int projectDemographics(Patient patient) {
         List<EltmFormSubmission> submissions = loadSubmissions(patient.getId(), DEMOGRAPHIC_FORMS);
         if (submissions.isEmpty()) {
@@ -157,7 +175,7 @@ public class EltmModuleMigrationService {
     }
 
     private String detectAddress(JsonNode data) {
-        String best = null;
+        List<String> candidates = new ArrayList<>();
         for (Map.Entry<String, JsonNode> entry : dataFields(data)) {
             JsonNode node = entry.getValue();
             if (node.isObject() && node.has("cascadeValue")) {
@@ -169,20 +187,45 @@ public class EltmModuleMigrationService {
                     parts.add(node.get("detailAddr").asText());
                 }
                 String joined = String.join("", parts);
-                if (joined.length() > 5 && (best == null || joined.length() > best.length())) {
-                    best = joined;
+                if (joined.length() > 5) {
+                    candidates.add(joined);
                 }
                 continue;
             }
             String text = textOf(node);
-            if (text == null || text.length() < 5 || text.length() > 200) {
+            if (text == null || text.length() < 2 || text.length() > 200) {
                 continue;
             }
-            if (looksLikeAddress(text) && (best == null || text.length() > best.length())) {
-                best = text;
+            if (text.endsWith("族") || isNumber(text)) {
+                continue;
+            }
+            if (looksLikeAddress(text) || (text.length() >= 4 && text.length() <= 12 && !isGenericText(text))) {
+                candidates.add(text);
             }
         }
-        return best;
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        String longest = candidates.stream()
+                .max(Comparator.comparingInt(String::length))
+                .orElse(null);
+        if (longest == null) {
+            return null;
+        }
+        StringBuilder prefix = new StringBuilder();
+        candidates.stream()
+                .filter(item -> !item.equals(longest) && item.length() <= 20)
+                .sorted(Comparator.comparingInt(String::length))
+                .forEach(item -> {
+                    if (!longest.contains(item) && !prefix.toString().contains(item)) {
+                        prefix.append(item);
+                    }
+                });
+        return prefix + longest;
+    }
+
+    private boolean isGenericText(String text) {
+        return Set.of("无", "有", "是", "否", "不详", "未查", "其他").contains(text);
     }
 
     private boolean looksLikeAddress(String text) {
@@ -243,7 +286,7 @@ public class EltmModuleMigrationService {
     // ==================== 体格检查 -> 基线-临床信息 ====================
 
     private int projectPhysicalExam(Patient patient) {
-        List<EltmFormSubmission> submissions = loadSubmissions(patient.getId(), Set.of("体格检查", "儿童体格检查"));
+        List<EltmFormSubmission> submissions = loadSubmissions(patient.getId(), EltmFormRegistry.PHYSICAL_EXAM_FORMS);
         if (submissions.isEmpty()) {
             return 0;
         }
@@ -321,19 +364,29 @@ public class EltmModuleMigrationService {
     private boolean applyStageFields(Patient patient, JsonNode data) {
         List<String> stages = new ArrayList<>();
         for (Map.Entry<String, JsonNode> entry : dataFields(data)) {
-            Set<String> options = optionLabels(entry.getValue());
+            JsonNode node = entry.getValue();
+            // 外部表单的 Select 字段以 "selectXXXlabel" 扁平键存储展示文本
+            if (entry.getKey().endsWith("label") && node.isValueNode() && !node.isNull()) {
+                String text = node.asText().trim();
+                if (!text.isBlank() && STAGE_LABELS.contains(text)) {
+                    stages.add(text);
+                }
+                continue;
+            }
+            Set<String> options = optionLabels(node);
             if (!options.isEmpty() && STAGE_LABELS.containsAll(options)) {
-                List<String> selected = selectedLabels(entry.getValue());
+                List<String> selected = selectedLabels(node);
                 if (!selected.isEmpty()) {
-                    stages.add(selected.get(0));
+                    stages.addAll(selected);
                 }
             }
         }
-        if (stages.isEmpty()) {
+        List<String> distinct = stages.stream().distinct().toList();
+        if (distinct.isEmpty()) {
             return false;
         }
         boolean dirty = false;
-        int first = stageNumber(stages.get(0));
+        int first = stageNumber(distinct.get(0));
         if ("2".equals(patient.getSex())) {
             if (blank(patient.getBreastDevLeft()) && first > 0) {
                 patient.setBreastDevLeft("B" + first);
@@ -347,8 +400,8 @@ public class EltmModuleMigrationService {
             patient.setGenStag("G" + first);
             dirty = true;
         }
-        if (stages.size() > 1 && blank(patient.getPubStag())) {
-            int second = stageNumber(stages.get(1));
+        if (distinct.size() > 1 && blank(patient.getPubStag())) {
+            int second = stageNumber(distinct.get(1));
             if (second > 0) {
                 patient.setPubStag(String.valueOf(second));
                 dirty = true;

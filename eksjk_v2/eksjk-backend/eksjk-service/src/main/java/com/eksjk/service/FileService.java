@@ -23,6 +23,24 @@ public interface FileService {
     String upload(MultipartFile file, Long patientId, String category);
 
     /**
+     * 按指定对象键保存字节内容（用于外部附件迁移等内部场景）
+     *
+     * @param objectKey        存储对象键/相对路径
+     * @param content          文件字节
+     * @param originalFilename 原始文件名（用于扩展名/元数据）
+     * @return 实际保存的对象键
+     */
+    String store(String objectKey, byte[] content, String originalFilename);
+
+    /**
+     * 判断对象是否已存在
+     *
+     * @param filePath 文件路径/对象键
+     * @return 是否存在
+     */
+    boolean exists(String filePath);
+
+    /**
      * 获取文件字节内容
      *
      * @param filePath 文件路径

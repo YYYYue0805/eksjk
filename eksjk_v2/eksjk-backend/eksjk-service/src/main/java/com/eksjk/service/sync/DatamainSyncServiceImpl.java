@@ -1,15 +1,19 @@
 package com.eksjk.service.sync;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.eksjk.mapper.EltmFormFieldMappingMapper;
 import com.eksjk.mapper.EltmPatientRawMapper;
 import com.eksjk.mapper.EltmSyncErrorMapper;
 import com.eksjk.mapper.EltmSyncLogMapper;
 import com.eksjk.mapper.PatientMapper;
+import com.eksjk.model.entity.EltmFormFieldMapping;
 import com.eksjk.model.entity.EltmPatientRaw;
 import com.eksjk.model.entity.EltmSyncError;
 import com.eksjk.model.entity.EltmSyncLog;
 import com.eksjk.model.entity.Patient;
 import com.eksjk.service.eltm.EltmProjectionService;
+import com.eksjk.service.eltm.EltmUnprocessedService;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +24,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * datamain 数据同步实现
@@ -41,14 +50,27 @@ public class DatamainSyncServiceImpl implements DatamainSyncService {
     private final EltmSyncLogMapper syncLogMapper;
     private final EltmSyncErrorMapper syncErrorMapper;
     private final EltmProjectionService projectionService;
+    private final EltmFormFieldMappingMapper mappingMapper;
+    private final EltmUnprocessedService unprocessedService;
 
     @Value("${eksjk.datamain.sync-enabled:false}")
     private boolean syncEnabled;
 
     private final AtomicBoolean running = new AtomicBoolean(false);
 
+    private final ExecutorService asyncExecutor = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r, "datamain-sync");
+        thread.setDaemon(true);
+        return thread;
+    });
+
     @Override
     public Map<String, Object> syncFromExternal(String triggerType) {
+        return syncFromExternal(triggerType, false, 0);
+    }
+
+    @Override
+    public Map<String, Object> syncFromExternal(String triggerType, boolean force, int limit) {
         if (!running.compareAndSet(false, true)) {
             throw new IllegalStateException("同步进行中，请稍后再试");
         }
@@ -77,30 +99,53 @@ public class DatamainSyncServiceImpl implements DatamainSyncService {
         long startedAt = System.currentTimeMillis();
 
         try {
+            Map<Long, EltmPatientRaw> rawByExternalId = rawMapper.selectList(
+                            new LambdaQueryWrapper<EltmPatientRaw>()
+                                    .select(EltmPatientRaw::getExternalId, EltmPatientRaw::getRowHash)
+                                    .isNotNull(EltmPatientRaw::getExternalId))
+                    .stream()
+                    .collect(Collectors.toMap(EltmPatientRaw::getExternalId, Function.identity(), (a, b) -> a));
+            Map<Long, Patient> patientByExternalId = patientMapper.selectList(
+                            new LambdaQueryWrapper<Patient>()
+                                    .select(Patient::getId, Patient::getExternalId)
+                                    .isNotNull(Patient::getExternalId))
+                    .stream()
+                    .collect(Collectors.toMap(Patient::getExternalId, Function.identity(), (a, b) -> a));
+            Map<String, Set<String>> mappingIndex = loadMappingIndex();
+
             DatamainApiClient.FetchResult result = apiClient.streamCxList(row -> {
+                if (limit > 0 && total.get() >= limit) {
+                    return;
+                }
                 total.incrementAndGet();
                 try {
                     String rowHash = DatamainParseUtil.sha256(row.rawJson());
-                    EltmPatientRaw raw = rawMapper.selectOne(new LambdaQueryWrapper<EltmPatientRaw>()
-                            .eq(EltmPatientRaw::getExternalId, row.id()).last("LIMIT 1"));
-                    Patient patient = patientMapper.selectOne(new LambdaQueryWrapper<Patient>()
-                            .eq(Patient::getExternalId, row.id()).last("LIMIT 1"));
-                    if (raw != null && patient != null && rowHash.equals(raw.getRowHash())) {
+                    EltmPatientRaw raw = rawByExternalId.get(row.id());
+                    Patient patient = patientByExternalId.get(row.id());
+                    if (!force && raw != null && patient != null && rowHash.equals(raw.getRowHash())) {
                         skippedCount.incrementAndGet();
                         return;
                     }
-                    boolean isNew = txService.syncPatient(row, rowHash);
+                    DatamainSyncTxService.SyncOutcome outcome =
+                            txService.syncPatient(row, rowHash, mappingIndex);
+                    try {
+                        unprocessedService.replacePending(outcome.patientId(),
+                                EltmUnprocessedCollector.API_CX_LIST, outcome.unprocessed());
+                    } catch (Exception e) {
+                        log.error("保存未处理数据失败 externalId={}", row.id(), e);
+                    }
                     try {
                         projectionService.projectByExternalId(row.id());
                     } catch (Exception e) {
                         log.warn("ELTM 数据投影失败 externalId={}", row.id(), e);
                     }
-                    if (isNew) {
+                    if (outcome.isNew()) {
                         newCount.incrementAndGet();
                     } else {
                         updatedCount.incrementAndGet();
                     }
                     if (total.get() % 100 == 0) {
+                        updateProgress(syncLog, total, newCount, updatedCount, skippedCount, failedCount);
                         log.info("datamain 同步进度：{} 行，新增 {}，更新 {}，跳过 {}，失败 {}",
                                 total.get(), newCount.get(), updatedCount.get(),
                                 skippedCount.get(), failedCount.get());
@@ -142,6 +187,51 @@ public class DatamainSyncServiceImpl implements DatamainSyncService {
         result.put("elapsedSeconds", (System.currentTimeMillis() - startedAt) / 1000);
         result.put("status", syncLog.getStatus());
         return result;
+    }
+
+    @Override
+    public Map<String, Object> startAsync(String triggerType, boolean force, int limit) {
+        if (running.get()) {
+            throw new IllegalStateException("同步进行中，请稍后再试");
+        }
+        asyncExecutor.submit(() -> {
+            try {
+                syncFromExternal(triggerType, force, limit);
+            } catch (Exception e) {
+                log.error("datamain 异步同步失败", e);
+            }
+        });
+        Map<String, Object> result = new HashMap<>();
+        result.put("started", true);
+        result.put("triggerType", triggerType);
+        result.put("force", force);
+        result.put("limit", limit);
+        return result;
+    }
+
+    private Map<String, Set<String>> loadMappingIndex() {
+        return mappingMapper.selectList(new LambdaQueryWrapper<EltmFormFieldMapping>()
+                        .eq(EltmFormFieldMapping::getEnabled, 1))
+                .stream()
+                .filter(mapping -> mapping.getFormKey() != null && mapping.getFieldKey() != null)
+                .collect(Collectors.groupingBy(EltmFormFieldMapping::getFormKey,
+                        Collectors.mapping(EltmFormFieldMapping::getFieldKey, Collectors.toSet())));
+    }
+
+    private void updateProgress(EltmSyncLog syncLog, AtomicInteger total, AtomicInteger newCount,
+                                AtomicInteger updatedCount, AtomicInteger skippedCount,
+                                AtomicInteger failedCount) {
+        syncLog.setTotalCount(total.get());
+        syncLog.setNewCount(newCount.get());
+        syncLog.setUpdatedCount(updatedCount.get());
+        syncLog.setSkippedCount(skippedCount.get());
+        syncLog.setFailedCount(failedCount.get());
+        syncLogMapper.updateById(syncLog);
+    }
+
+    @PreDestroy
+    public void shutdownExecutor() {
+        asyncExecutor.shutdownNow();
     }
 
     @Override

@@ -46,6 +46,7 @@ public class EltmProjectionTxService {
     private final EltmProjectionLogMapper projectionLogMapper;
     private final ObjectMapper objectMapper;
     private final EltmModuleMigrationService moduleMigrationService;
+    private final EltmUnprocessedService unprocessedService;
 
     /**
      * 对单个患者执行投影
@@ -94,7 +95,7 @@ public class EltmProjectionTxService {
                         LinkedHashMap::new, Collectors.toList()));
 
         // 同一目标字段只取最近一次非空提交
-        Map<String, String> targets = new LinkedHashMap<>();
+        Map<String, TargetValue> targets = new LinkedHashMap<>();
         for (EltmFormSubmission submission : submissions) {
             List<EltmFormFieldMapping> formMappings = byFormKey.get(submission.getFormKey());
             if (formMappings == null || formMappings.isEmpty()) {
@@ -115,7 +116,7 @@ public class EltmProjectionTxService {
                 String value = extractValue(data, mapping);
                 value = applyTransform(value, mapping.getTransformRule());
                 if (value != null && !value.isBlank()) {
-                    targets.put(key, value);
+                    targets.put(key, new TargetValue(value, submission.getFormDataId(), mapping.getFieldKey()));
                 }
             }
         }
@@ -126,11 +127,11 @@ public class EltmProjectionTxService {
         PatientGenetics genetics = null;
         Map<String, String> familyTargets = new LinkedHashMap<>();
 
-        for (Map.Entry<String, String> entry : targets.entrySet()) {
+        for (Map.Entry<String, TargetValue> entry : targets.entrySet()) {
             String[] parts = entry.getKey().split("\\.", 2);
             String scope = parts[0];
             String field = parts[1];
-            String value = entry.getValue();
+            String value = entry.getValue().value();
             switch (scope) {
                 case "PATIENT" -> {
                     if (setIfBlank(patient, field, value)) {
@@ -170,7 +171,25 @@ public class EltmProjectionTxService {
         if (genetics != null && genetics.getId() != null) {
             patientGeneticsMapper.updateById(genetics);
         }
+        markMappedTargets(patient.getId(), targets);
         return changed;
+    }
+
+    private void markMappedTargets(Long patientId, Map<String, TargetValue> targets) {
+        for (TargetValue target : targets.values()) {
+            if (target.formDataId() == null || target.fieldKey() == null) {
+                continue;
+            }
+            try {
+                unprocessedService.markMapped(patientId, target.formDataId(), target.fieldKey());
+            } catch (Exception e) {
+                log.warn("标记 ELTM 未处理字段失败 patientId={} formDataId={} fieldKey={}",
+                        patientId, target.formDataId(), target.fieldKey(), e);
+            }
+        }
+    }
+
+    private record TargetValue(String value, Long formDataId, String fieldKey) {
     }
 
     private EltmCase findOrCreateEltmCase(Long patientId) {

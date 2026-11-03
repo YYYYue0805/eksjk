@@ -26,7 +26,7 @@ EKSJK（儿科数据管理系统）是一个面向医疗健康领域的全栈 We
 | 数据库 | RDS MySQL 8.0.36 Serverless（VPC 内网） |
 | 对象存储 | OSS（S3 兼容，eksjk-staging bucket） |
 | 镜像仓库 | ACR Personal（上海）: `crpi-s9dswjc6u3l5d0to.cn-shanghai.personal.cr.aliyuncs.com/eksjk/` |
-| 当前镜像 | backend: `develop-806e7a2` / frontend: `develop-806e7a2` |
+| 当前镜像 | backend: `develop-f83109a-mapping2` / frontend: `develop-f83109a-mapping` |
 | 登录账号 | `super_admin` / `Test@1234`（还有 doctor_1～3, hospital_admin_1～2, parent_1，密码均为 `Test@1234`） |
 
 ### 常用命令速查

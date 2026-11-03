@@ -16,6 +16,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -30,6 +32,7 @@ import java.util.function.Consumer;
 public class DatamainApiClient {
 
     private static final int EXPECTED_COLUMNS = 66;
+    private static final int EXPECTED_PIC_COLUMNS = 16;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JsonFactory jsonFactory = new JsonFactory();
@@ -39,6 +42,12 @@ public class DatamainApiClient {
 
     @Value("${eksjk.datamain.cx-list-path:/datamain/cxList}")
     private String cxListPath;
+
+    @Value("${eksjk.datamain.pic-path:/datamain/gettpbyid}")
+    private String picPath;
+
+    @Value("${eksjk.datamain.consent-path:/datamain/getzqbyid}")
+    private String consentPath;
 
     @Value("${eksjk.datamain.connect-timeout-seconds:10}")
     private int connectTimeoutSeconds;
@@ -163,7 +172,7 @@ public class DatamainApiClient {
      * <p>响应较小（约 0.2MB），直接读为字符串解析。</p>
      */
     public com.fasterxml.jackson.databind.JsonNode fetchConsentRecords(long externalId) {
-        String url = baseUrl + "/datamain/getzqbyid?queryId=" + externalId;
+        String url = baseUrl + consentPath + "?queryId=" + externalId;
         try {
             HttpClient client = HttpClient.newBuilder()
                     .connectTimeout(Duration.ofSeconds(connectTimeoutSeconds))
@@ -186,6 +195,47 @@ public class DatamainApiClient {
             return data.isArray() ? data : objectMapper.createArrayNode();
         } catch (Exception e) {
             throw new IllegalStateException("获取知情同意书失败 externalId=" + externalId + ": " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 拉取单个患者的病历图片记录（gettpbyid，16 列）
+     */
+    public List<com.fasterxml.jackson.databind.JsonNode> fetchPicRecords(long externalId) {
+        String url = baseUrl + picPath + "?queryId=" + externalId;
+        List<com.fasterxml.jackson.databind.JsonNode> rows = new ArrayList<>();
+        try {
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(connectTimeoutSeconds))
+                    .build();
+            HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                    .timeout(Duration.ofSeconds(readTimeoutSeconds))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new IOException("HTTP " + response.statusCode());
+            }
+            com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response.body());
+            int code = root.path("code").asInt(-1);
+            if (code != 0) {
+                throw new IOException("外部接口返回 code=" + code);
+            }
+            com.fasterxml.jackson.databind.JsonNode data = root.path("data").path("data");
+            if (data.isArray()) {
+                for (com.fasterxml.jackson.databind.JsonNode row : data) {
+                    if (!row.isArray() || row.size() != EXPECTED_PIC_COLUMNS) {
+                        log.error("gettpbyid 列数异常 externalId={} 期望={} 实际={}",
+                                externalId, EXPECTED_PIC_COLUMNS, row.isArray() ? row.size() : -1);
+                        continue;
+                    }
+                    rows.add(row);
+                }
+            }
+            return rows;
+        } catch (Exception e) {
+            throw new IllegalStateException("获取病历图片失败 externalId=" + externalId + ": " + e.getMessage(), e);
         }
     }
 

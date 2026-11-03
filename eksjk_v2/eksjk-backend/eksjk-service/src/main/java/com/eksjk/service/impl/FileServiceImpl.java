@@ -109,12 +109,39 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public String store(String objectKey, byte[] content, String originalFilename) {
+        if (content == null || content.length == 0) {
+            throw new BusinessException("文件内容不能为空");
+        }
+        if (content.length > maxFileSize) {
+            throw new BusinessException("文件大小超过限制（最大50MB）");
+        }
+        Path base = Paths.get(uploadBasePath).toAbsolutePath().normalize();
+        Path target = base.resolve(objectKey).normalize();
+        if (!target.startsWith(base)) {
+            throw new BusinessException("非法文件路径");
+        }
+        try {
+            Files.createDirectories(target.getParent());
+            Files.write(target, content);
+            return objectKey.replace('\\', '/');
+        } catch (IOException e) {
+            log.error("文件保存失败: {}", objectKey, e);
+            throw new BusinessException("文件保存失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean exists(String filePath) {
+        return Files.exists(Paths.get(uploadBasePath, filePath));
+    }
+
+    @Override
     public byte[] download(String filePath) {
         Path path = Paths.get(uploadBasePath, filePath);
         if (!Files.exists(path)) {
             throw new BusinessException("文件不存在");
         }
-
         try {
             return Files.readAllBytes(path);
         } catch (IOException e) {

@@ -28,6 +28,8 @@ eksjk:
   datamain:
     base-url: http://36.26.56.94:8026
     cx-list-path: /datamain/cxList
+    pic-path: /datamain/gettpbyid
+    consent-path: /datamain/getzqbyid
     connect-timeout-seconds: 10
     read-timeout-seconds: 180
     max-retry: 3

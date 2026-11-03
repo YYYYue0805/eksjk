@@ -14,6 +14,16 @@ export function syncEltmData() {
 }
 
 /**
+ * 后台异步触发 ELTM 数据同步
+ */
+export function syncEltmDataAsync() {
+  return request({
+    url: '/api/eltm/sync/async',
+    method: 'post'
+  })
+}
+
+/**
  * 查询 ELTM 同步状态
  */
 export function getEltmSyncStatus() {
@@ -122,6 +132,67 @@ export function getEltmExerciseSleep(patientId) {
 export function diagnoseBatch() {
   return request({
     url: '/api/eltm/diagnose-batch',
+    method: 'post'
+  })
+}
+
+/**
+ * ELTM 未识别数据分页
+ */
+export function getEltmUnprocessed(patientId, params) {
+  return request({
+    url: `/api/eltm/patients/${patientId}/unprocessed`,
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * ELTM 未识别数据按目标模块统计
+ */
+export function getEltmUnprocessedModules(patientId) {
+  return request({
+    url: `/api/eltm/patients/${patientId}/unprocessed-modules`,
+    method: 'get'
+  })
+}
+
+/**
+ * ELTM 未识别数据详情（含 rawJson）
+ */
+export function getEltmUnprocessedDetail(patientId, recordId) {
+  return request({
+    url: `/api/eltm/patients/${patientId}/unprocessed/${recordId}`,
+    method: 'get'
+  })
+}
+
+/**
+ * ELTM 患者 cxList 原始行
+ */
+export function getEltmPatientRaw(patientId) {
+  return request({
+    url: `/api/eltm/patients/${patientId}/raw`,
+    method: 'get'
+  })
+}
+
+/**
+ * 单患者补拉病历图片（gettpbyid）
+ */
+export function syncEltmPatientPics(patientId) {
+  return request({
+    url: `/api/eltm/patients/${patientId}/pics/sync`,
+    method: 'post'
+  })
+}
+
+/**
+ * 批量补拉 pic_count>0 患者的病历图片
+ */
+export function syncEltmPicsBatch() {
+  return request({
+    url: '/api/eltm/sync/pics',
     method: 'post'
   })
 }

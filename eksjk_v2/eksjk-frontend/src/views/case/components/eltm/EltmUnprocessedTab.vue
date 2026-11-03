@@ -27,6 +27,12 @@
       <el-tab-pane label="项目与医院" name="assign" lazy>
         <EltmAssignTab :patient-id="patientId" />
       </el-tab-pane>
+      <el-tab-pane label="未识别数据" name="unmapped" lazy>
+        <EltmUnmappedTab :patient-id="patientId" />
+      </el-tab-pane>
+      <el-tab-pane label="原始行" name="raw" lazy>
+        <EltmRawTab :patient-id="patientId" />
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -39,6 +45,8 @@ import EltmReportsTab from '@/views/case/components/eltm/EltmReportsTab.vue'
 import EltmGrowthTab from '@/views/case/components/eltm/EltmGrowthTab.vue'
 import EltmExerciseSleepTab from '@/views/case/components/eltm/EltmExerciseSleepTab.vue'
 import EltmAssignTab from '@/views/case/components/eltm/EltmAssignTab.vue'
+import EltmUnmappedTab from '@/views/case/components/eltm/EltmUnmappedTab.vue'
+import EltmRawTab from '@/views/case/components/eltm/EltmRawTab.vue'
 
 defineProps({
   patientId: { type: String, required: true }

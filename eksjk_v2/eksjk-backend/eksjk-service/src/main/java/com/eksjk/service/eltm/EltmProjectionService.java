@@ -26,6 +26,7 @@ public class EltmProjectionService {
     private final EltmProjectionTxService txService;
     private final EltmAttachmentService attachmentService;
     private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean attachmentRunning = new AtomicBoolean(false);
 
     /**
      * 全量重投影（可重复执行，只填空不覆盖）
@@ -95,10 +96,40 @@ public class EltmProjectionService {
     }
 
     /**
-     * 全量迁移外部附件到本地文件存储
+     * 全量迁移外部附件到文件存储
      */
     public Map<String, Object> projectAllAttachments() {
         return attachmentService.projectAll();
+    }
+
+    public Map<String, Object> projectAllAttachments(int limit) {
+        return attachmentService.projectAll(limit);
+    }
+
+    /**
+     * 异步执行附件迁移，避免同步请求超时
+     */
+    public Map<String, Object> startAttachmentsAsync(int limit) {
+        Map<String, Object> result = new HashMap<>();
+        if (!attachmentRunning.compareAndSet(false, true)) {
+            result.put("started", false);
+            result.put("message", "附件迁移任务正在执行中");
+            return result;
+        }
+        result.put("started", true);
+        result.put("limit", limit);
+        Thread worker = new Thread(() -> {
+            try {
+                attachmentService.projectAll(limit);
+            } catch (Exception e) {
+                log.error("ELTM 附件迁移失败", e);
+            } finally {
+                attachmentRunning.set(false);
+            }
+        }, "eltm-attachment-sync");
+        worker.setDaemon(true);
+        worker.start();
+        return result;
     }
 
     /**

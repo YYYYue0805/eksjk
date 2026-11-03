@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.eksjk.mapper.*;
 import com.eksjk.model.entity.*;
+import com.eksjk.service.FileService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -52,13 +53,8 @@ public class EltmAttachmentService {
     private final InformedConsentMapper informedConsentMapper;
     private final PatientFollowUpMapper followUpMapper;
     private final FileNoteMapper fileNoteMapper;
+    private final FileService fileService;
     private final ObjectMapper objectMapper;
-
-    @Value("${eksjk.upload.storage-type:local}")
-    private String storageType;
-
-    @Value("${eksjk.upload.path:./uploads}")
-    private String uploadBasePath;
 
     @Value("${eksjk.eltm.attachment-sync-enabled:true}")
     private boolean enabled;
@@ -67,23 +63,35 @@ public class EltmAttachmentService {
     private int maxPerPatient;
 
     private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
+            .connectTimeout(Duration.ofSeconds(5))
             .build();
 
     /**
      * 全量附件迁移
      */
     public Map<String, Object> projectAll() {
+        return projectAll(0);
+    }
+
+    /**
+     * 全量附件迁移
+     *
+     * @param limit 最多处理的患者数，0 表示不限制
+     */
+    public Map<String, Object> projectAll(int limit) {
         Map<String, Object> result = new LinkedHashMap<>();
-        if (!enabled || !"local".equalsIgnoreCase(storageType)) {
+        if (!enabled) {
             result.put("enabled", false);
-            result.put("message", "附件迁移未启用或非本地存储");
+            result.put("message", "附件迁移未启用");
             return result;
         }
         List<Patient> patients = patientMapper.selectList(new LambdaQueryWrapper<Patient>()
                 .select(Patient::getId)
                 .isNotNull(Patient::getExternalId)
                 .eq(Patient::getDelFlg, "1"));
+        if (limit > 0 && patients.size() > limit) {
+            patients = patients.subList(0, limit);
+        }
         java.util.concurrent.atomic.AtomicInteger downloadedCounter = new java.util.concurrent.atomic.AtomicInteger();
         java.util.concurrent.atomic.AtomicInteger skippedCounter = new java.util.concurrent.atomic.AtomicInteger();
         java.util.concurrent.atomic.AtomicInteger failedCounter = new java.util.concurrent.atomic.AtomicInteger();
@@ -93,6 +101,7 @@ public class EltmAttachmentService {
         int threads = Math.max(2, Math.min(8, Runtime.getRuntime().availableProcessors()));
         java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(threads);
         List<java.util.concurrent.Future<?>> futures = new ArrayList<>();
+        int totalPatients = patients.size();
         for (Patient patient : patients) {
             futures.add(pool.submit(() -> {
                 Map<String, Object> one = projectByPatientId(patient.getId());
@@ -103,7 +112,7 @@ public class EltmAttachmentService {
                 failedCounter.addAndGet((int) one.getOrDefault("failed", 0));
                 int done = doneCounter.incrementAndGet();
                 if (done % 500 == 0) {
-                    log.info("ELTM 附件迁移进度 {}/{}", done, patients.size());
+                    log.info("ELTM 附件迁移进度 {}/{}", done, totalPatients);
                 }
             }));
         }
@@ -137,7 +146,7 @@ public class EltmAttachmentService {
         result.put("downloaded", 0);
         result.put("skipped", 0);
         result.put("failed", 0);
-        if (!enabled || !"local".equalsIgnoreCase(storageType) || patientId == null) {
+        if (!enabled || patientId == null) {
             return result;
         }
 
@@ -150,6 +159,7 @@ public class EltmAttachmentService {
         int skipped = 0;
         int failed = 0;
         int processed = 0;
+        int consecutiveFailures = 0;
         Map<Long, List<String>> followUpImages = new LinkedHashMap<>();
         Map<String, String> consentPaths = new LinkedHashMap<>();
         Set<String> seen = new HashSet<>();
@@ -166,12 +176,16 @@ public class EltmAttachmentService {
             Path relative = relativePath(patientId, attachment.url, attachment.kind);
             if (relative == null) {
                 failed++;
+                if (++consecutiveFailures >= 5) {
+                    log.warn("ELTM 附件连续失败，跳过剩余附件 patientId={}", patientId);
+                    break;
+                }
                 continue;
             }
             String relativePath = relative.toString().replace('\\', '/');
-            Path target = Paths.get(uploadBasePath, relative.toString());
-            if (Files.exists(target)) {
+            if (fileService.exists(relativePath)) {
                 skipped++;
+                consecutiveFailures = 0;
                 applyLink(attachment, relativePath, followUpImages, consentPaths);
                 continue;
             }
@@ -179,15 +193,24 @@ public class EltmAttachmentService {
                 byte[] data = download(attachment.url);
                 if (data == null || data.length == 0) {
                     failed++;
+                    if (++consecutiveFailures >= 5) {
+                        log.warn("ELTM 附件连续失败，跳过剩余附件 patientId={}", patientId);
+                        break;
+                    }
                     continue;
                 }
-                Files.createDirectories(target.getParent());
-                Files.write(target, data);
+                String filename = relative.getFileName().toString();
+                fileService.store(relativePath, data, filename);
                 insertNote(relativePath, attachment);
                 applyLink(attachment, relativePath, followUpImages, consentPaths);
                 downloaded++;
+                consecutiveFailures = 0;
             } catch (Exception e) {
                 failed++;
+                if (++consecutiveFailures >= 5) {
+                    log.warn("ELTM 附件连续失败，跳过剩余附件 patientId={}", patientId);
+                    break;
+                }
                 log.warn("ELTM 附件下载失败 patientId={} url={}", patientId, attachment.url, e);
             }
         }
@@ -299,7 +322,7 @@ public class EltmAttachmentService {
     private byte[] download(String url) {
         try {
             HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(12))
                     .header("Referer", REFERER)
                     .header("User-Agent", "Mozilla/5.0")
                     .GET()

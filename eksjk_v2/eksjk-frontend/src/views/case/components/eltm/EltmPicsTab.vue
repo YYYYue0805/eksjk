@@ -3,6 +3,10 @@
     <el-alert title="数据来源：E路童萌，图片地址为外部系统链接，点击可查看原图" type="info"
               :closable="false" show-icon class="source-tip" />
 
+    <div class="toolbar">
+      <el-button type="primary" size="small" :disabled="false" :loading="syncing" @click="handleSyncPics">补拉图片</el-button>
+    </div>
+
     <div v-if="records.length > 0" class="pic-grid">
       <el-card v-for="pic in records" :key="pic.id" shadow="hover" class="pic-card">
         <el-image
@@ -37,13 +41,15 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { getEltmPics } from '@/api/eltm'
+import { ElMessage } from 'element-plus'
+import { getEltmPics, syncEltmPatientPics } from '@/api/eltm'
 
 const props = defineProps({
   patientId: { type: String, required: true }
 })
 
 const loading = ref(false)
+const syncing = ref(false)
 const records = ref([])
 
 const IMAGE_TYPES = {
@@ -81,6 +87,20 @@ async function loadData() {
   }
 }
 
+async function handleSyncPics() {
+  syncing.value = true
+  try {
+    const res = await syncEltmPatientPics(props.patientId)
+    const data = res.data || {}
+    ElMessage.success(`图片补拉完成：新增 ${data.created || 0} 条，更新 ${data.updated || 0} 条`)
+    await loadData()
+  } catch (error) {
+    ElMessage.error('图片补拉失败，请检查外部系统连接')
+  } finally {
+    syncing.value = false
+  }
+}
+
 watch(() => props.patientId, (value) => {
   if (value) loadData()
 })
@@ -92,6 +112,7 @@ onMounted(() => {
 
 <style scoped>
 .source-tip { margin-bottom: 16px; }
+.toolbar { margin-bottom: 12px; text-align: right; }
 .pic-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
