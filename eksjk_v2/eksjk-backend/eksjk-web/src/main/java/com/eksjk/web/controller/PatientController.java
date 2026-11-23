@@ -79,6 +79,16 @@ public class PatientController {
     }
 
     /**
+     * 上传单个病例到审核发放模块
+     */
+    @PostMapping("/{id}/submit-audit")
+    public R<Void> submitAudit(@PathVariable String id) {
+        long patientId = HashidsUtil.decode(id);
+        patientService.submitAudit(patientId);
+        return R.ok();
+    }
+
+    /**
      * 导出Excel
      */
     @GetMapping("/export")

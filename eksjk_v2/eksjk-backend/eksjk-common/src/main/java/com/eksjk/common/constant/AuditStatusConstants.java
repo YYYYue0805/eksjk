@@ -10,6 +10,12 @@ public final class AuditStatusConstants {
     private AuditStatusConstants() {
     }
 
+    /** 草稿（必填信息未完善，不参与审核发放） */
+    public static final String DRAFT = "draft";
+
+    /** 未上传（外部同步数据，需在病例管理手动上传后进入审核发放流程） */
+    public static final String PENDING_UPLOAD = "pending_upload";
+
     /** 待审核 */
     public static final String PENDING_REVIEW = "pending_review";
 

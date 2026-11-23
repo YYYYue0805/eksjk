@@ -267,6 +267,10 @@ function booleanFieldsToComma(data) {
 }
 
 async function handleSave() {
+  if (!isEdit.value && !props.patientId) {
+    ElMessage.warning('请先保存病例后再录入不良事件')
+    return
+  }
   try { await formRef.value?.validate() }
   catch { ElMessage.warning('请完善必填信息'); return }
 

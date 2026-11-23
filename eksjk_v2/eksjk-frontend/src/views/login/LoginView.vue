@@ -25,6 +25,8 @@
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
+              name="username"
+              autocomplete="username"
               placeholder="请输入用户名"
               prefix-icon="User"
               clearable
@@ -35,6 +37,8 @@
             <el-input
               v-model="loginForm.password"
               type="password"
+              name="password"
+              autocomplete="current-password"
               placeholder="请输入密码"
               prefix-icon="Lock"
               show-password
@@ -43,7 +47,10 @@
           </el-form-item>
 
           <div class="login-page__options">
-            <el-checkbox v-model="rememberUsername">记住用户名</el-checkbox>
+            <div class="login-page__options-left">
+              <el-checkbox v-model="rememberUsername">记住用户名</el-checkbox>
+              <el-checkbox v-model="loginForm.rememberMe">记住登录状态</el-checkbox>
+            </div>
             <el-link type="primary" :underline="false" @click="handleForgotPassword">
               忘记密码?
             </el-link>
@@ -121,7 +128,8 @@ const rememberUsername = ref(false)
 
 const loginForm = ref({
   username: '',
-  password: ''
+  password: '',
+  rememberMe: false
 })
 
 const loginRules = {
@@ -168,6 +176,8 @@ onMounted(() => {
     loginForm.value.username = savedUsername
     rememberUsername.value = true
   }
+  // 恢复“记住登录状态”勾选
+  loginForm.value.rememberMe = localStorage.getItem('eksjk-remember-me') === '1'
 })
 
 // ==================== 方法 ====================
@@ -185,6 +195,13 @@ async function handleLogin() {
       localStorage.setItem('eksjk-remember-username', loginForm.value.username)
     } else {
       localStorage.removeItem('eksjk-remember-username')
+    }
+
+    // 记住“记住登录状态”勾选（Token 有效期已由后端按 rememberMe 决定）
+    if (loginForm.value.rememberMe) {
+      localStorage.setItem('eksjk-remember-me', '1')
+    } else {
+      localStorage.removeItem('eksjk-remember-me')
     }
 
     // 存储 Token 和用户信息
@@ -353,6 +370,12 @@ function handleForgotPassword() {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+}
+
+.login-page__options-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .login-page__submit-btn {

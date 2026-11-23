@@ -63,6 +63,17 @@ export function deletePatient(id) {
 }
 
 /**
+ * 上传单个病例到审核发放模块
+ * @param {string} id - 患者ID（Hashids编码）
+ */
+export function submitPatientAudit(id) {
+  return request({
+    url: `/api/patients/${id}/submit-audit`,
+    method: 'post'
+  })
+}
+
+/**
  * 导出Excel
  * @param {Object} params - 查询参数
  */

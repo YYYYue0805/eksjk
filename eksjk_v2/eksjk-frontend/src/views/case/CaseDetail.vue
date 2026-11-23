@@ -49,8 +49,14 @@
     <el-alert v-if="isViewMode && formData.auditStatus === 'rejected'"
               :title="'已驳回 — ' + (formData.auditRemark || '未填写原因')"
               type="error" show-icon :closable="false" style="margin-bottom: 16px" />
+    <el-alert v-if="!isCreateMode && formData.auditStatus === 'draft'"
+              title="草稿病例 — 必填信息未完善，不参与审核发放；请完善必填信息后保存以提交审核"
+              type="info" show-icon :closable="false" style="margin-bottom: 16px" />
+    <el-alert v-if="!isCreateMode && formData.auditStatus === 'pending_upload'"
+              title="未上传 — 该病例为同步数据，尚未进入审核发放流程；请在病例列表中点击「上传」提交审核"
+              type="info" show-icon :closable="false" style="margin-bottom: 16px" />
 
-    <el-form ref="formRef" :model="formData" :disabled="isViewMode" label-width="130px">
+    <el-form ref="formRef" :model="formData" :disabled="isViewMode" label-width="130px" hide-required-asterisk>
       <el-tabs v-model="activeTab" class="detail-tabs" type="border-card">
 
         <!-- Tab 1：基本信息（完全不变） -->
@@ -101,7 +107,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="身份证号码" prop="card"
-                            :rules="[{ required: isCreateMode, message: '请输入身份证号码', trigger: 'blur' },
+                            :rules="[{ required: requireCoreFields, message: '请输入身份证号码', trigger: 'blur' },
                                      { validator: validateIdCard, trigger: 'blur' }]">
                 <el-input v-model="formData.card" placeholder="请输入身份证号码" maxlength="18" />
               </el-form-item>
@@ -130,7 +136,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="出生体重" prop="bwt"
-                            :rules="[{ required: isCreateMode, message: '请输入出生体重', trigger: 'blur' }]">
+                            :rules="[{ required: requireCoreFields, message: '请输入出生体重', trigger: 'blur' }]">
                 <el-input v-model="formData.bwt" placeholder="kg"><template #suffix>kg</template></el-input>
               </el-form-item>
             </el-col>
@@ -141,13 +147,13 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="孕周" prop="gesWeek"
-                            :rules="[{ required: isCreateMode, message: '请输入孕周', trigger: 'blur' }]">
+                            :rules="[{ required: requireCoreFields, message: '请输入孕周', trigger: 'blur' }]">
                 <el-input v-model="formData.gesWeek" placeholder="周"><template #suffix>周</template></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="分娩方式" prop="cesaSec"
-                            :rules="[{ required: isCreateMode, message: '请选择分娩方式', trigger: 'change' }]">
+                            :rules="[{ required: requireCoreFields, message: '请选择分娩方式', trigger: 'change' }]">
                 <el-select v-model="formData.cesaSec" placeholder="请选择">
                   <el-option label="顺产" value="0" /><el-option label="剖宫产" value="1" />
                   <el-option label="臀围产" value="2" /><el-option label="足先露" value="3" />
@@ -180,14 +186,14 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item prop="firVisTime" :rules="[{ required: true, message: '请选择初诊时间', trigger: 'change' }]">
-                <template #label><span class="req-flag">√ </span>初诊时间</template>
+                <template #label>初诊时间</template>
                 <el-date-picker v-model="formData.firVisTime" type="date" placeholder="选择日期"
                   value-format="YYYY-MM-DDTHH:mm:ss" style="width:100%" :disabled="isViewMode" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item prop="firVisAge" :rules="[{ required: true, message: '请选择初诊时间以计算年龄', trigger: 'change' }]">
-                <template #label><span class="req-flag">√ </span>初诊年龄</template>
+                <template #label>初诊年龄</template>
                 <el-input v-model="formData.firVisAge" placeholder="岁" disabled />
               </el-form-item>
             </el-col>
@@ -196,7 +202,7 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <el-form-item prop="growRate" :rules="[{ required: true, message: '请选择生长速率', trigger: 'change' }]">
-                <template #label><span class="req-flag">√ </span>生长速率</template>
+                <template #label>生长速率</template>
                 <el-radio-group v-model="formData.growRate" :disabled="isViewMode">
                   <el-radio value="1">不详</el-radio>
                   <el-radio value="2">请选择</el-radio>
@@ -222,7 +228,7 @@
           <el-row :gutter="20">
             <el-col :span="24">
               <el-form-item prop="chiCom" :rules="[{ required: true, message: '请输入主诉', trigger: 'blur' }]">
-                <template #label><span class="req-flag">√ </span>主诉</template>
+                <template #label>主诉</template>
                 <el-input v-model="formData.chiCom" type="textarea" :rows="3" placeholder="请输入主诉" :disabled="isViewMode" />
               </el-form-item>
             </el-col>
@@ -267,19 +273,19 @@
           <el-row :gutter="20">
             <el-col :span="6">
               <el-form-item prop="height" :rules="[{ required: true, message: '请输入身高', trigger: 'blur' }]">
-                <template #label><span class="req-flag">√ </span>身高</template>
+                <template #label>身高</template>
                 <el-input v-model="formData.height" placeholder="cm" @blur="calcBmi"><template #suffix>cm</template></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item prop="weight" :rules="[{ required: true, message: '请输入体重', trigger: 'blur' }]">
-                <template #label><span class="req-flag">√ </span>体重</template>
+                <template #label>体重</template>
                 <el-input v-model="formData.weight" placeholder="kg" @blur="calcBmi"><template #suffix>kg</template></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item prop="bmi" :rules="[{ required: true, message: '请输入身高体重以计算BMI', trigger: 'blur' }]">
-                <template #label><span class="req-flag">√ </span>BMI</template>
+                <template #label>BMI</template>
                 <el-input v-model="formData.bmi" disabled />
               </el-form-item>
             </el-col>
@@ -746,7 +752,9 @@
         <!-- Tab 5：随访记录 -->
         <el-tab-pane label="随访记录" name="followup" lazy>
           <div class="tab-pane-header">
-            <el-button type="primary" size="small" @click="showFollowUpForm = true">
+            <el-button type="primary" size="small" :disabled="isDraft || isCreateMode"
+                       :title="isCreateMode ? '请先保存病例后再录入随访数据' : (isDraft ? '草稿病例完善必填信息后才能上传随访数据' : '')"
+                       @click="openFollowUpForm">
               <el-icon><Plus /></el-icon>新增随访
             </el-button>
           </div>
@@ -761,7 +769,9 @@
         <!-- Tab 7：GH不良事件 -->
         <el-tab-pane label="GH不良事件" name="ghAdverseEvent" lazy>
           <div class="tab-pane-header">
-            <el-button type="primary" size="small" @click="openGhAdverseEventAdd">
+            <el-button type="primary" size="small" :disabled="isDraft || isCreateMode"
+                       :title="isCreateMode ? '请先保存病例后再录入不良事件' : (isDraft ? '草稿病例完善必填信息后才能录入不良事件' : '')"
+                       @click="openGhAdverseEventAdd">
               <el-icon><Plus /></el-icon>新增不良事件
             </el-button>
           </div>
@@ -1123,6 +1133,10 @@ const formData = reactive({
   auditRemark: ''
 })
 
+const isDraft = computed(() => formData.auditStatus === 'draft')
+// 新建及草稿编辑时，核心信息按必填校验；完善后才能提交审核
+const requireCoreFields = computed(() => isCreateMode.value || isDraft.value)
+
 const saving = ref(false)
 const showFollowUpForm = ref(false)
 const followUpListRef = ref(null)
@@ -1136,6 +1150,14 @@ onMounted(() => {
   if (patientId.value && !isCreateMode.value) loadDetail()
   else ensureFamilyBaseRows()
 })
+
+// 新建/编辑/查看共用同一组件实例，路由切换时需重新加载详情数据
+watch(
+  () => route.fullPath,
+  () => {
+    if (!isCreateMode.value && patientId.value) loadDetail()
+  }
+)
 
 // 自动计算初诊年龄：根据出生日期和初诊时间精确计算
 watch(
@@ -1161,7 +1183,7 @@ watch(
 )
 
 // 哪些字段属于哪个子对象（后端平铺 → 前端嵌套的映射）
-const EXAM_FIELDS = ['lh','lhCheckDate','fsh','fshCheckDate','e2','e2CheckDate','t','tCheckDate','prl','prlCheckDate','dht','dhtCheckDate','ft','ftCheckDate','shbg','shbgCheckDate','amh','amhCheckDate','inhb','inhbCheckDate','igf1','igf1CheckDate','igfbp3','igfbp3CheckDate','fasBloodGlu','fasBloodGluCheckDate','fasInsulin','fasInsulinCheckDate','glyHem','glyHemCheckDate','acth','acthCheckDate','cortisol','cortisolCheckDate','ohp','ohpCheckDate','dheas','dheasCheckDate','androstenedione','androstenedioneCheckDate','hcg','hcgCheckDate','hcgt','hcgtCheckDate','hcgdht','hcgdhtCheckDate','hcgad','hcgadCheckDate','lhMax','lhMaxCheckDate','fshMax','fshMaxCheckDate','tsh','tshCheckDate','ft3','ft3CheckDate','ft4','ft4CheckDate','tpoab','tpoabCheckDate','tgab','tgabCheckDate','thyroidFunction','gonBUlt','pituitaryMri','thyroidUlt','bonMinDen','bloodRoutine','urineRoutine','hepatitisB','liverKidneyElectrolyte']
+const EXAM_FIELDS = ['lh','lhCheckDate','fsh','fshCheckDate','e2','e2CheckDate','t','tCheckDate','prl','prlCheckDate','dht','dhtCheckDate','ft','ftCheckDate','shbg','shbgCheckDate','amh','amhCheckDate','inhb','inhbCheckDate','igf1','igf1CheckDate','igfbp3','igfbp3CheckDate','fasBloodGlu','fasBloodGluCheckDate','fasInsulin','fasInsulinCheckDate','glyHem','glyHemCheckDate','acth','acthCheckDate','cortisol','cortisolCheckDate','ohp','ohpCheckDate','dheas','dheasCheckDate','androstenedione','androstenedioneCheckDate','hcg','hcgCheckDate','hcgt','hcgtCheckDate','hcgdht','hcgdhtCheckDate','hcgad','hcgadCheckDate','lhMax','lhMaxCheckDate','fshMax','fshMaxCheckDate','tsh','tshCheckDate','ft3','ft3CheckDate','ft4','ft4CheckDate','tpoab','tpoabCheckDate','tgab','tgabCheckDate','thyroidFunction','gonBUlt','gonBUltDetail','pituitaryMri','thyroidUlt','thyroidUltDetail','bonMinDen','bloodRoutine','urineRoutine','hepatitisB','liverKidneyElectrolyte','ecgNote','ecgCheckDate']
 const GENETICS_FIELDS = ['karyotype','biologBank','biologBankFa','biologBankMo','geneTestMethod','geneTestResult','surgeryNote','pathologyResult','chrom','chromOther']
 const DIAGNOSIS_FIELDS = ['diagnosis','secondaryDiagnosis','treatmentPlan']
 
@@ -1348,16 +1370,28 @@ function resolveTabByField(field) {
 }
 
 async function handleSave() {
-  let validationFields = null
+  let saveAsDraft = false
   try { await formRef.value?.validate() }
   catch (fields) {
-    validationFields = fields
-    ElMessage.warning('请完善必填信息')
-    if (fields && typeof fields === 'object') {
-      const firstErrorField = Object.keys(fields)[0]
+    const firstErrorField = fields && typeof fields === 'object' ? Object.keys(fields)[0] : null
+    // 仅新建和草稿编辑允许跳过必填校验保存为草稿
+    if (!isCreateMode.value && !isDraft.value) {
+      ElMessage.warning('请完善必填信息')
       activeTab.value = firstErrorField ? resolveTabByField(firstErrorField) : 'basic'
-    } else { activeTab.value = 'basic' }
-    return
+      return
+    }
+    try {
+      await ElMessageBox.confirm(
+        '必填信息尚未填写完整，是否保存为草稿？草稿病例在完善必填信息前不能上传数据、审核和发放。',
+        '保存为草稿',
+        { confirmButtonText: '保存为草稿', cancelButtonText: '继续完善', type: 'warning' }
+      )
+    } catch {
+      ElMessage.warning('请完善必填信息')
+      activeTab.value = firstErrorField ? resolveTabByField(firstErrorField) : 'basic'
+      return
+    }
+    saveAsDraft = true
   }
 
   saving.value = true
@@ -1413,17 +1447,42 @@ async function handleSave() {
     payload.familyMembers = familyMembers.length > 0 ? JSON.stringify(familyMembers) : ''
 
     if (isCreateMode.value) {
+      payload.draft = saveAsDraft
       const res = await createPatient(payload)
-      ElMessage.success('新建成功，病例编号：' + (res.data?.caseNum || ''))
+      if (saveAsDraft) {
+        ElMessage.success('已保存为草稿，完善必填信息后可提交审核')
+      } else {
+        ElMessage.success('新建成功，病例编号：' + (res.data?.caseNum || ''))
+      }
       router.replace(`/case/${diseaseType.value}/${res.data?.patientId || res.data?.caseNum}`)
     } else {
+      payload.draft = saveAsDraft
+      const wasDraft = isDraft.value
       await updatePatient(patientId.value, payload)
-      ElMessage.success('保存成功')
+      if (saveAsDraft) {
+        ElMessage.success('已保存为草稿')
+      } else if (wasDraft) {
+        ElMessage.success('必填信息已完善，病例已提交审核')
+      } else {
+        ElMessage.success('保存成功')
+      }
       router.replace('/case/' + diseaseType.value + '/' + patientId.value)
     }
   } catch (error) {
     console.error('保存失败', error)
   } finally { saving.value = false }
+}
+
+function openFollowUpForm() {
+  if (isCreateMode.value) {
+    ElMessage.warning('请先保存病例后再录入随访数据')
+    return
+  }
+  if (isDraft.value) {
+    ElMessage.warning('草稿病例完善必填信息后才能上传随访数据')
+    return
+  }
+  showFollowUpForm.value = true
 }
 
 function handleFollowUpEdit(item) {
@@ -1437,6 +1496,14 @@ function onFollowUpSaved() {
 }
 
 function openGhAdverseEventAdd() {
+  if (isCreateMode.value) {
+    ElMessage.warning('请先保存病例后再录入不良事件')
+    return
+  }
+  if (isDraft.value) {
+    ElMessage.warning('草稿病例完善必填信息后才能录入不良事件')
+    return
+  }
   ghAdverseEventEditData.value = null
   showGhAdverseEventForm.value = true
 }
@@ -1466,7 +1533,6 @@ function onGhAdverseEventClosed() {
   font-size: 15px; font-weight: 600; color: #303133;
   margin-bottom: 20px; padding-left: 10px; border-left: 3px solid #409eff;
 }
-.req-flag { color: #f56c6c; font-weight: 600; }
 .tab-section-header {
   display: flex; justify-content: space-between; align-items: center;
 }

@@ -22,4 +22,7 @@ public class LoginDTO implements Serializable {
     /** 密码 */
     @NotBlank(message = "密码不能为空")
     private String password;
+
+    /** 记住登录状态（勾选后签发长效 Token，免去频繁重新输入密码） */
+    private Boolean rememberMe;
 }

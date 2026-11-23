@@ -52,6 +52,7 @@ public class PatientServiceImpl implements PatientService {
     private final PatientFollowUpMapper followUpMapper;
     private final PatientGeneticsMapper patientGeneticsMapper;
     private final InformedConsentMapper informedConsentMapper;
+    private final PatientEcgInfoMapper patientEcgInfoMapper;
 
     /** 疾病分类编码与名称映射 */
     private static final Map<String, String> DIS_CLASS_MAP = new LinkedHashMap<>();
@@ -99,11 +100,15 @@ public class PatientServiceImpl implements PatientService {
             }
             // ELTM不限制disClass，展示全部疾病类型
         } else {
-            // 非ELTM病种：默认只展示已发放病例
+            // 非ELTM病种：默认展示已发放病例；草稿与未上传病例可见以便继续完善/上传
             if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
                 wrapper.eq(Patient::getAuditStatus, queryDTO.getAuditStatus());
             } else {
-                wrapper.eq(Patient::getAuditStatus, AuditStatusConstants.RELEASED);
+                wrapper.and(w -> w.eq(Patient::getAuditStatus, AuditStatusConstants.RELEASED)
+                        .or()
+                        .eq(Patient::getAuditStatus, AuditStatusConstants.DRAFT)
+                        .or()
+                        .eq(Patient::getAuditStatus, AuditStatusConstants.PENDING_UPLOAD));
             }
             if (StringUtils.isNotBlank(queryDTO.getDisClass())) {
                 wrapper.eq(Patient::getDisClass, queryDTO.getDisClass());
@@ -225,6 +230,13 @@ public class PatientServiceImpl implements PatientService {
         );
         vo.setFollowUpCount(followUpCount.intValue());
 
+        // 心电图备注与检查时间（独立表）
+        PatientEcgInfo ecg = patientEcgInfoMapper.selectById(patient.getId());
+        if (ecg != null) {
+            vo.setEcgNote(ecg.getEcgNote());
+            vo.setEcgCheckDate(ecg.getEcgCheckDate());
+        }
+
         return vo;
     }
 
@@ -234,6 +246,9 @@ public class PatientServiceImpl implements PatientService {
         // 创建患者主表记录
         Patient patient = new Patient();
         BeanUtils.copyProperties(patientDTO, patient);
+
+        // 草稿：必填信息未完善时允许保存，但不进入审核发放流程
+        boolean draft = Boolean.TRUE.equals(patientDTO.getDraft());
 
         // 自动生成病例编号
         String caseNum = generateCaseNum(patientDTO.getDisClass());
@@ -247,7 +262,12 @@ public class PatientServiceImpl implements PatientService {
         patient.setModifyTime(LocalDateTime.now());
         patient.setOneTime(LocalDateTime.now());
         patient.setDelFlg("1");
-        patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
+        if (draft) {
+            patient.setAuditStatus(AuditStatusConstants.DRAFT);
+        } else {
+            checkRequiredFields(patient);
+            patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
+        }
 
         // 自动生成家庭分组ID
         if (StringUtils.isBlank(patient.getFamilyId())) {
@@ -279,9 +299,12 @@ public class PatientServiceImpl implements PatientService {
         // 保存遗传学染色体核型（独立表）
         savePatientGenetics(patient.getId(), patientDTO);
 
+        // 保存心电图备注与检查时间（独立表）
+        saveEcgInfo(patient.getId(), patientDTO);
+
         String encodedPatientId = HashidsUtil.encode(patient.getId());
 
-        log.info("新建病例成功: caseNum={}, disClass={}, operator={}", caseNum, patientDTO.getDisClass(), SecurityUtil.getCurrentUsername());
+        log.info("新建病例成功: caseNum={}, disClass={}, draft={}, operator={}", caseNum, patientDTO.getDisClass(), draft, SecurityUtil.getCurrentUsername());
         return encodedPatientId + ":" + caseNum;
     }
 
@@ -301,6 +324,7 @@ public class PatientServiceImpl implements PatientService {
         String originalHospitalName = patient.getHospitalName();
         LocalDateTime originalCTime = patient.getCTime();
         LocalDateTime originalOneTime = patient.getOneTime();
+        String originalAuditStatus = patient.getAuditStatus();
 
         // 更新主表字段（忽略 DTO 中的 null 字段，避免覆盖原有有效值）
         BeanUtils.copyProperties(patientDTO, patient, getNullPropertyNames(patientDTO));
@@ -315,8 +339,16 @@ public class PatientServiceImpl implements PatientService {
         patient.setModifyTime(LocalDateTime.now());
         patient.setModifyPer(SecurityUtil.getCurrentUsername());
 
-        // 驳回后编辑自动重置为待审核
-        if (AuditStatusConstants.REJECTED.equals(patient.getAuditStatus())) {
+        // 草稿编辑：继续存草稿，或必填信息完善后自动提交待审核
+        if (AuditStatusConstants.DRAFT.equals(originalAuditStatus)) {
+            if (Boolean.TRUE.equals(patientDTO.getDraft())) {
+                patient.setAuditStatus(AuditStatusConstants.DRAFT);
+            } else {
+                checkRequiredFields(patient);
+                patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
+            }
+        } else if (AuditStatusConstants.REJECTED.equals(patient.getAuditStatus())) {
+            // 驳回后编辑自动重置为待审核
             patient.setAuditStatus(AuditStatusConstants.PENDING_REVIEW);
             patient.setAuditTime(null);
             patient.setAuditBy(null);
@@ -347,7 +379,32 @@ public class PatientServiceImpl implements PatientService {
         // 保存遗传学染色体核型（独立表）
         savePatientGenetics(id, patientDTO);
 
+        // 保存心电图备注与检查时间（独立表）
+        saveEcgInfo(id, patientDTO);
+
         log.info("编辑病例成功: id={}, operator={}", id, SecurityUtil.getCurrentUsername());
+    }
+
+    /** 保存病例心电图信息（备注+检查时间），均为空则删除 */
+    private void saveEcgInfo(Long patientId, PatientDTO dto) {
+        boolean blank = StringUtils.isBlank(dto.getEcgNote()) && StringUtils.isBlank(dto.getEcgCheckDate());
+        PatientEcgInfo existing = patientEcgInfoMapper.selectById(patientId);
+        if (blank) {
+            if (existing != null) {
+                patientEcgInfoMapper.deleteById(patientId);
+            }
+            return;
+        }
+        PatientEcgInfo info = existing != null ? existing : new PatientEcgInfo();
+        info.setPatientId(patientId);
+        info.setEcgNote(dto.getEcgNote());
+        info.setEcgCheckDate(dto.getEcgCheckDate());
+        info.setUpdateTime(LocalDateTime.now());
+        if (existing != null) {
+            patientEcgInfoMapper.updateById(info);
+        } else {
+            patientEcgInfoMapper.insert(info);
+        }
     }
 
     @Override
@@ -364,6 +421,34 @@ public class PatientServiceImpl implements PatientService {
         patientMapper.update(null, wrapper);
 
         log.info("删除病例成功: id={}, operator={}", id, SecurityUtil.getCurrentUsername());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void submitAudit(Long id) {
+        Patient patient = patientMapper.selectById(id);
+        if (patient == null || "0".equals(patient.getDelFlg())) {
+            throw new BusinessException("病例不存在");
+        }
+        if (!AuditStatusConstants.PENDING_UPLOAD.equals(patient.getAuditStatus())) {
+            throw new BusinessException("仅未上传的病例可提交审核");
+        }
+
+        LambdaUpdateWrapper<Patient> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Patient::getId, id)
+                .eq(Patient::getAuditStatus, AuditStatusConstants.PENDING_UPLOAD)
+                .set(Patient::getAuditStatus, AuditStatusConstants.PENDING_REVIEW)
+                .set(Patient::getAuditBy, null)
+                .set(Patient::getAuditTime, null)
+                .set(Patient::getAuditRemark, null)
+                .set(Patient::getModifyTime, LocalDateTime.now())
+                .set(Patient::getModifyPer, SecurityUtil.getCurrentUsername());
+
+        int rows = patientMapper.update(null, wrapper);
+        if (rows == 0) {
+            throw new BusinessException("状态已变更，请刷新后重试");
+        }
+        log.info("上传病例至审核发放: id={}, operator={}", id, SecurityUtil.getCurrentUsername());
     }
 
     @Override
@@ -853,6 +938,43 @@ public class PatientServiceImpl implements PatientService {
                 patientId, oldDisClass, targetDisClass, newCaseNum,
                 SecurityUtil.getCurrentUsername() != null ? SecurityUtil.getCurrentUsername() : "unknown");
         return newCaseNum;
+    }
+
+    /**
+     * 校验新建/草稿提交时的必填信息，未完善则不允许进入审核流程
+     */
+    private void checkRequiredFields(Patient patient) {
+        List<String> missing = new ArrayList<>();
+        if (StringUtils.isBlank(patient.getName())) {
+            missing.add("患者姓名");
+        }
+        if (StringUtils.isBlank(patient.getMedrecNum())) {
+            missing.add("病历号");
+        }
+        if (StringUtils.isBlank(patient.getSex())) {
+            missing.add("性别");
+        }
+        if (patient.getBirthTime() == null) {
+            missing.add("出生日期");
+        }
+        if (StringUtils.isBlank(patient.getSelfTel())) {
+            missing.add("联系电话");
+        }
+        if (StringUtils.isBlank(patient.getCard())) {
+            missing.add("身份证号码");
+        }
+        if (StringUtils.isBlank(patient.getBwt())) {
+            missing.add("出生体重");
+        }
+        if (StringUtils.isBlank(patient.getGesWeek())) {
+            missing.add("孕周");
+        }
+        if (StringUtils.isBlank(patient.getCesaSec())) {
+            missing.add("分娩方式");
+        }
+        if (!missing.isEmpty()) {
+            throw new BusinessException("必填信息未完善，无法提交审核：" + String.join("、", missing));
+        }
     }
 
     /**

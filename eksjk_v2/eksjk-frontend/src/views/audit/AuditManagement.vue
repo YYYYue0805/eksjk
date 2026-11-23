@@ -390,6 +390,8 @@ function canOperateFollowUp(row) {
 
 function auditStatusLabel(status) {
   const map = {
+    draft: '草稿',
+    pending_upload: '未上传',
     pending_review: '待审核',
     pending_release: '待发放',
     released: '已发放',
@@ -400,6 +402,8 @@ function auditStatusLabel(status) {
 
 function auditStatusTag(status) {
   const map = {
+    draft: 'info',
+    pending_upload: 'info',
     pending_review: 'warning',
     pending_release: '',
     released: 'success',

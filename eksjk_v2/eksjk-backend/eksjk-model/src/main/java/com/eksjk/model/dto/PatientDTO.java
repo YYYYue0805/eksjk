@@ -15,6 +15,9 @@ public class PatientDTO {
 
     // ==================== 基本信息 ====================
 
+    /** 是否保存为草稿（必填信息未完善时使用，仅新建或草稿编辑生效） */
+    private Boolean draft;
+
     /** 疾病分类编码 */
     private String disClass;
 
@@ -155,6 +158,12 @@ public class PatientDTO {
 
     /** 一般检查描述 */
     private String generalExamDesc;
+
+    /** 心电图备注 */
+    private String ecgNote;
+
+    /** 心电图检查时间 */
+    private String ecgCheckDate;
 
     /** 初次遗精 */
     private String firstEjaculation;

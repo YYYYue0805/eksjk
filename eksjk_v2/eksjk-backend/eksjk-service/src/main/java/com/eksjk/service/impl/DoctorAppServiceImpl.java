@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.eksjk.common.constant.AuditStatusConstants;
 import com.eksjk.common.constant.RoleConstants;
 import com.eksjk.common.exception.BusinessException;
 import com.eksjk.common.util.HashidsUtil;
@@ -406,6 +407,9 @@ public class DoctorAppServiceImpl implements DoctorAppService {
         Patient patient = patientMapper.selectById(patientId);
         if (patient == null || !"1".equals(patient.getDelFlg())) {
             throw new BusinessException("患者记录不存在");
+        }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，请先完善必填信息并提交审核后再录入随访数据");
         }
 
         PatientFollowUp followUp = new PatientFollowUp();

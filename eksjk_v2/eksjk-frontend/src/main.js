@@ -41,6 +41,31 @@ import router from './router'
 import 'element-plus/dist/index.css'
 import './styles/index.scss'
 
+/**
+ * 部署新版本后，旧页面引用的懒加载 chunk 文件名已失效（404）。
+ * 捕获此类错误后自动刷新一次，让浏览器拿到最新 index 与资源。
+ */
+const CHUNK_RELOAD_KEY = 'eksjk-chunk-reload-at'
+function reloadOnceForStaleChunk() {
+  const lastReloadAt = Number(sessionStorage.getItem(CHUNK_RELOAD_KEY) || 0)
+  // 30 秒内不重复刷新，避免资源确实缺失时陷入刷新循环
+  if (Date.now() - lastReloadAt < 30000) return
+  sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()))
+  window.location.reload()
+}
+
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  reloadOnceForStaleChunk()
+})
+
+router.onError((error) => {
+  const message = String(error?.message || error)
+  if (/Failed to fetch dynamically imported module|Importing a module script failed/i.test(message)) {
+    reloadOnceForStaleChunk()
+  }
+})
+
 const app = createApp(App)
 
 // Pinia 状态管理（含持久化插件）

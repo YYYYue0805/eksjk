@@ -38,6 +38,11 @@ public interface PatientService {
     void delete(Long id);
 
     /**
+     * 上传单个病例到审核发放模块（仅未上传的同步数据可操作）
+     */
+    void submitAudit(Long id);
+
+    /**
      * 导出病例 Excel
      */
     byte[] exportExcel(PatientQueryDTO queryDTO);

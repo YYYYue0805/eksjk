@@ -54,6 +54,9 @@ public class AuditServiceImpl implements AuditService {
                 Patient::getHospitalName, Patient::getAuditStatus, Patient::getAuditBy,
                 Patient::getAuditTime, Patient::getAuditRemark, Patient::getDelFlg);
         wrapper.eq(Patient::getDelFlg, "1");
+        // 未上传的同步数据不属于审核发放范围
+        wrapper.and(w -> w.isNull(Patient::getAuditStatus)
+                .or().ne(Patient::getAuditStatus, AuditStatusConstants.PENDING_UPLOAD));
 
         // 审核状态过滤
         if (StringUtils.isNotBlank(queryDTO.getAuditStatus())) {
@@ -92,6 +95,9 @@ public class AuditServiceImpl implements AuditService {
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("病例不存在");
         }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，必填信息未完善，请完善后再提交审核");
+        }
         if (!AuditStatusConstants.PENDING_REVIEW.equals(patient.getAuditStatus())) {
             throw new BusinessException("当前状态不可审核，仅待审核状态可操作");
         }
@@ -122,6 +128,9 @@ public class AuditServiceImpl implements AuditService {
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("病例不存在");
         }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，必填信息未完善，无需审核");
+        }
         if (!AuditStatusConstants.PENDING_REVIEW.equals(patient.getAuditStatus())) {
             throw new BusinessException("当前状态不可审核，仅待审核状态可操作");
         }
@@ -147,6 +156,9 @@ public class AuditServiceImpl implements AuditService {
         Patient patient = patientMapper.selectById(patientId);
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("病例不存在");
+        }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，必填信息未完善，不可发放");
         }
         if (!AuditStatusConstants.PENDING_RELEASE.equals(patient.getAuditStatus())) {
             throw new BusinessException("当前状态不可发放，请先审核通过");
@@ -204,6 +216,12 @@ public class AuditServiceImpl implements AuditService {
         Map<Long, Patient> finalPatientMap = patientMap;
         List<FollowUpVO> voList = result.getRecords().stream()
                 .map(fu -> convertToFollowUpVO(fu, finalPatientMap))
+                .collect(Collectors.toList());
+
+        // 未上传或草稿病例的随访不进入审核发放范围
+        voList = voList.stream()
+                .filter(vo -> !AuditStatusConstants.PENDING_UPLOAD.equals(vo.getPatientAuditStatus())
+                        && !AuditStatusConstants.DRAFT.equals(vo.getPatientAuditStatus()))
                 .collect(Collectors.toList());
 
         // 应用姓名搜索过滤（后置过滤）
@@ -333,6 +351,12 @@ public class AuditServiceImpl implements AuditService {
         if (patient == null) {
             throw new BusinessException("关联的病例不存在");
         }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，请先完善必填信息并提交审核");
+        }
+        if (AuditStatusConstants.PENDING_UPLOAD.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例尚未上传审核发放，请先在病例管理中上传");
+        }
         if (AuditStatusConstants.PENDING_REVIEW.equals(patient.getAuditStatus())
                 || AuditStatusConstants.REJECTED.equals(patient.getAuditStatus())) {
             throw new BusinessException("请先审核通过该患者的基线信息");
@@ -383,7 +407,13 @@ public class AuditServiceImpl implements AuditService {
     private long countFollowUpsByStatus(String status) {
         LambdaQueryWrapper<PatientFollowUp> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(PatientFollowUp::getDelFlg, "1")
-                .eq(PatientFollowUp::getAuditStatus, status);
+                .eq(PatientFollowUp::getAuditStatus, status)
+                // 外部同步的随访不进本地审核流程
+                .and(w -> w.ne(PatientFollowUp::getDataSource, "ELTM_SYNC")
+                        .or().isNull(PatientFollowUp::getDataSource))
+                // 未上传病例的随访不计入待审核/待发放统计
+                .notInSql(PatientFollowUp::getPatientId,
+                        "SELECT id FROM datamain_patient WHERE del_flg = '1' AND audit_status = 'pending_upload'");
         return followUpMapper.selectCount(wrapper);
     }
 

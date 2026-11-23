@@ -120,6 +120,12 @@ public class PatientVO {
     /** 一般检查描述 */
     private String generalExamDesc;
 
+    /** 心电图备注 */
+    private String ecgNote;
+
+    /** 心电图检查时间 */
+    private String ecgCheckDate;
+
     /** 初次遗精 */
     private String firstEjaculation;
 

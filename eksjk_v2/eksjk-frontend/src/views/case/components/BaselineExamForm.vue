@@ -328,7 +328,8 @@
         <el-col :span="24">
           <el-form-item label="左侧甲状腺">
             <el-radio-group v-model="thyroidUltDetail.leftResult" :disabled="disabled" @change="syncThyroidUltDetail">
-              <el-radio value="1">正常没有变化</el-radio>
+              <el-radio value="0">未查</el-radio>
+              <el-radio value="1">正常</el-radio>
               <el-radio value="2">异常</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -375,7 +376,8 @@
         <el-col :span="24">
           <el-form-item label="右侧甲状腺">
             <el-radio-group v-model="thyroidUltDetail.rightResult" :disabled="disabled" @change="syncThyroidUltDetail">
-              <el-radio value="1">正常没有变化</el-radio>
+              <el-radio value="0">未查</el-radio>
+              <el-radio value="1">正常</el-radio>
               <el-radio value="2">异常</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -614,12 +616,28 @@
     <el-row :gutter="16">
       <el-col :span="12">
         <el-form-item label="乙肝三系">
-          <el-select v-model="localData.hepatitisB" :disabled="disabled" placeholder="请选择">
-            <el-option label="阴性" value="阴性" />
-            <el-option label="HBSAb阳性" value="HBSAb阳性" />
+          <el-radio-group v-model="hepatitisBState.result" :disabled="disabled" @change="syncHepatitisB">
+            <el-radio value="0">未查</el-radio>
+            <el-radio value="1">正常</el-radio>
+            <el-radio value="2">异常</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row v-if="hepatitisBState.result === '2'" :gutter="16">
+      <el-col :span="12">
+        <el-form-item label="乙肝三系异常">
+          <el-select v-model="hepatitisBState.subtype" :disabled="disabled" placeholder="请选择" @change="syncHepatitisB">
             <el-option label="小三阳" value="小三阳" />
             <el-option label="大三阳" value="大三阳" />
+            <el-option label="其他" value="其他" />
           </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col v-if="hepatitisBState.subtype === '其他'" :span="12">
+        <el-form-item label="异常说明">
+          <el-input v-model="hepatitisBState.description" :disabled="disabled" maxlength="20"
+                    placeholder="请输入异常说明" @input="syncHepatitisB" />
         </el-form-item>
       </el-col>
     </el-row>
@@ -637,6 +655,7 @@
       <el-col :span="24">
         <el-form-item label="甲状腺功能">
           <el-radio-group v-model="thyroidFunctionState.result" :disabled="disabled" @change="syncThyroidFunction">
+            <el-radio value="0">未查</el-radio>
             <el-radio value="1">正常</el-radio>
             <el-radio value="2">异常</el-radio>
           </el-radio-group>
@@ -769,9 +788,44 @@
       </el-row>
     </template>
 
-    <!-- 影像资料上传 -->
-    <div class="section-title">影像资料上传</div>
-    <FileUpload :patient-id="patientId" />
+    <!-- 影像放射检查（分模块上传） -->
+    <div class="section-title">影像放射检查</div>
+
+    <!-- 心电图：图片 + 备注 + 检查时间 -->
+    <div class="imaging-block">
+      <div class="imaging-block__title">心电图</div>
+      <FileUpload :patient-id="patientId" category="ecg" :disabled="disabled" />
+      <el-form-item label="心电图备注" class="imaging-block__item" label-width="100px">
+        <el-input v-model="localData.ecgNote" type="textarea" :rows="2" :disabled="disabled" placeholder="请输入心电图备注" />
+      </el-form-item>
+      <el-form-item label="检查时间" class="imaging-block__item" label-width="100px">
+        <el-date-picker
+          v-model="localData.ecgCheckDate"
+          type="date"
+          value-format="YYYY-MM-DD"
+          placeholder="选择心电图检查时间"
+          :disabled="disabled"
+        />
+      </el-form-item>
+    </div>
+
+    <!-- 骨龄图片 -->
+    <div class="imaging-block">
+      <div class="imaging-block__title">骨龄图片</div>
+      <FileUpload :patient-id="patientId" category="bone_age" :disabled="disabled" />
+    </div>
+
+    <!-- 脊柱全长片 -->
+    <div class="imaging-block">
+      <div class="imaging-block__title">脊柱全长片</div>
+      <FileUpload :patient-id="patientId" category="spine" :disabled="disabled" />
+    </div>
+
+    <!-- 其他 -->
+    <div class="imaging-block">
+      <div class="imaging-block__title">其他</div>
+      <FileUpload :patient-id="patientId" category="image" :disabled="disabled" />
+    </div>
   </div>
 </template>
 
@@ -869,7 +923,41 @@ const bloodState = reactive({ result: '0', description: '' })
 const urineState = reactive({ result: '0', description: '' })
 
 // 甲状腺功能评估状态
-const thyroidFunctionState = reactive({ result: '1', description: '' })
+const thyroidFunctionState = reactive({ result: '0', description: '' })
+
+// 乙肝三系状态（兼容旧值：阴性/HBSAb阳性/小三阳/大三阳）
+const hepatitisBState = reactive({ result: '0', subtype: '', description: '' })
+
+function syncHepatitisB() {
+  if (hepatitisBState.result === '0') {
+    localData.hepatitisB = '未查'
+  } else if (hepatitisBState.result === '1') {
+    localData.hepatitisB = '阴性'
+  } else if (hepatitisBState.subtype === '其他') {
+    localData.hepatitisB = hepatitisBState.description
+      ? '其他：' + hepatitisBState.description
+      : '其他'
+  } else {
+    localData.hepatitisB = hepatitisBState.subtype || '异常'
+  }
+}
+
+function parseHepatitisB(raw) {
+  if (!raw || raw === '未查') return { result: '0', subtype: '', description: '' }
+  if (raw === '阴性' || raw === 'HBSAb阳性' || raw === '正常') return { result: '1', subtype: '', description: '' }
+  if (raw === '小三阳' || raw === '大三阳') return { result: '2', subtype: raw, description: '' }
+  if (raw === '异常') return { result: '2', subtype: '', description: '' }
+  if (raw === '其他') return { result: '2', subtype: '其他', description: '' }
+  if (raw.startsWith('其他：')) return { result: '2', subtype: '其他', description: raw.substring(3) }
+  return { result: '2', subtype: '其他', description: raw }
+}
+
+function loadHepatitisBState() {
+  const h = parseHepatitisB(localData.hepatitisB)
+  hepatitisBState.result = h.result
+  hepatitisBState.subtype = h.subtype
+  hepatitisBState.description = h.description
+}
 
 function syncRoutineState() {
   localData.bloodRoutine = encodeField(bloodState.result, bloodState.description)
@@ -891,18 +979,18 @@ function syncThyroidFunction() {
 
 function loadThyroidFunctionState() {
   const t = parseField(localData.thyroidFunction)
-  thyroidFunctionState.result = t.result || '1'
+  thyroidFunctionState.result = t.result || '0'
   thyroidFunctionState.description = t.description
 }
 
 // 甲状腺B超左右侧细节（CPP）
 const thyroidUltDetail = reactive({
-  leftResult: '1',
+  leftResult: '0',
   leftNoduleGrade: '',
   leftSize: '',
   leftDiffuseLesion: '',
   leftOther: '',
-  rightResult: '1',
+  rightResult: '0',
   rightNoduleGrade: '',
   rightSize: '',
   rightDiffuseLesion: '',
@@ -924,6 +1012,19 @@ function parseGonBUltDetail(json) {
 }
 
 function syncThyroidUltDetail() {
+  // 非异常状态时清空隐藏的异常明细，避免残留旧数据
+  if (thyroidUltDetail.leftResult !== '2') {
+    thyroidUltDetail.leftNoduleGrade = ''
+    thyroidUltDetail.leftSize = ''
+    thyroidUltDetail.leftDiffuseLesion = ''
+    thyroidUltDetail.leftOther = ''
+  }
+  if (thyroidUltDetail.rightResult !== '2') {
+    thyroidUltDetail.rightNoduleGrade = ''
+    thyroidUltDetail.rightSize = ''
+    thyroidUltDetail.rightDiffuseLesion = ''
+    thyroidUltDetail.rightOther = ''
+  }
   localData.thyroidUltDetail = JSON.stringify({ ...thyroidUltDetail })
 }
 
@@ -1016,7 +1117,8 @@ const localData = reactive({
   gonBUltDetail: '',
   thyroidUltDetail: '',
   thyroidFunction: '',
-  bloodRoutine: '0|', urineRoutine: '0|', hepatitisB: '', liverKidneyElectrolyte: ''
+  bloodRoutine: '0|', urineRoutine: '0|', hepatitisB: '', liverKidneyElectrolyte: '',
+  ecgNote: '', ecgCheckDate: ''
 })
 
 watch(() => props.modelValue, (val) => {
@@ -1029,6 +1131,7 @@ watch(() => props.modelValue, (val) => {
     loadImagingFromLocalData()
     loadRoutineState()
     loadThyroidFunctionState()
+    loadHepatitisBState()
     parseGonBUltDetail(val.gonBUltDetail)
     parseThyroidUltDetail(val.thyroidUltDetail)
   }
@@ -1124,5 +1227,21 @@ watch(localData, () => {
 .exam-dt {
   flex-shrink: 0;
   width: 140px;
+}
+.imaging-block {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid #ebeef5;
+  border-radius: 6px;
+}
+.imaging-block__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 10px;
+}
+.imaging-block__item {
+  margin-top: 10px;
+  margin-bottom: 0;
 }
 </style>

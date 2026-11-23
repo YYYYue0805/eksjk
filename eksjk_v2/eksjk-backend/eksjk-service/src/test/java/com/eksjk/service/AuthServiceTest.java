@@ -1,5 +1,6 @@
 package com.eksjk.service;
 
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.common.exception.BusinessException;
@@ -11,6 +12,7 @@ import com.eksjk.service.impl.AuthServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -53,7 +55,7 @@ class AuthServiceTest extends BaseServiceTest {
                 var mockSession = mock(cn.dev33.satoken.session.SaSession.class);
                 when(mockSession.set(anyString(), any())).thenReturn(mockSession);
 
-                stpMock.when(() -> StpUtil.login(any())).thenAnswer(inv -> null);
+                stpMock.when(() -> StpUtil.login(any(), any(SaLoginModel.class))).thenAnswer(inv -> null);
                 stpMock.when(StpUtil::getTokenValue).thenReturn("test-token-123");
                 stpMock.when(StpUtil::getSession).thenReturn(mockSession);
 
@@ -65,6 +67,61 @@ class AuthServiceTest extends BaseServiceTest {
                 assertThat(result.getToken()).isEqualTo("test-token-123");
                 assertThat(result.getUsername()).isEqualTo("super_admin");
                 assertThat(result.getRoleCode()).isEqualTo("super_admin");
+            }
+        }
+
+        @Test
+        @DisplayName("默认登录应签发 24 小时有效期的 Token")
+        void shouldUseDefaultTimeoutWhenNotRememberMe() {
+            // Given
+            User user = createSuperAdmin();
+            LoginDTO loginDTO = createLoginDTO("super_admin", TEST_PASSWORD);
+
+            when(userMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(user);
+            when(userMapper.updateById(any(User.class))).thenReturn(1);
+
+            try (MockedStatic<StpUtil> stpMock = mockStatic(StpUtil.class)) {
+                var mockSession = mock(cn.dev33.satoken.session.SaSession.class);
+                when(mockSession.set(anyString(), any())).thenReturn(mockSession);
+                stpMock.when(() -> StpUtil.login(any(), any(SaLoginModel.class))).thenAnswer(inv -> null);
+                stpMock.when(StpUtil::getTokenValue).thenReturn("test-token");
+                stpMock.when(StpUtil::getSession).thenReturn(mockSession);
+
+                // When
+                authService.login(loginDTO, "127.0.0.1");
+
+                // Then
+                ArgumentCaptor<SaLoginModel> captor = ArgumentCaptor.forClass(SaLoginModel.class);
+                stpMock.verify(() -> StpUtil.login(any(), captor.capture()));
+                assertThat(captor.getValue().getTimeout()).isEqualTo(86400L);
+            }
+        }
+
+        @Test
+        @DisplayName("勾选记住登录状态应签发 7 天有效期的 Token")
+        void shouldUseLongerTimeoutWhenRememberMe() {
+            // Given
+            User user = createSuperAdmin();
+            LoginDTO loginDTO = createLoginDTO("super_admin", TEST_PASSWORD);
+            loginDTO.setRememberMe(true);
+
+            when(userMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(user);
+            when(userMapper.updateById(any(User.class))).thenReturn(1);
+
+            try (MockedStatic<StpUtil> stpMock = mockStatic(StpUtil.class)) {
+                var mockSession = mock(cn.dev33.satoken.session.SaSession.class);
+                when(mockSession.set(anyString(), any())).thenReturn(mockSession);
+                stpMock.when(() -> StpUtil.login(any(), any(SaLoginModel.class))).thenAnswer(inv -> null);
+                stpMock.when(StpUtil::getTokenValue).thenReturn("test-token");
+                stpMock.when(StpUtil::getSession).thenReturn(mockSession);
+
+                // When
+                authService.login(loginDTO, "127.0.0.1");
+
+                // Then
+                ArgumentCaptor<SaLoginModel> captor = ArgumentCaptor.forClass(SaLoginModel.class);
+                stpMock.verify(() -> StpUtil.login(any(), captor.capture()));
+                assertThat(captor.getValue().getTimeout()).isEqualTo(604800L);
             }
         }
 
@@ -123,7 +180,7 @@ class AuthServiceTest extends BaseServiceTest {
                 var mockSession = mock(cn.dev33.satoken.session.SaSession.class);
                 when(mockSession.set(anyString(), any())).thenReturn(mockSession);
 
-                stpMock.when(() -> StpUtil.login(any())).thenAnswer(inv -> null);
+                stpMock.when(() -> StpUtil.login(any(), any(SaLoginModel.class))).thenAnswer(inv -> null);
                 stpMock.when(StpUtil::getTokenValue).thenReturn("test-token-456");
                 stpMock.when(StpUtil::getSession).thenReturn(mockSession);
 

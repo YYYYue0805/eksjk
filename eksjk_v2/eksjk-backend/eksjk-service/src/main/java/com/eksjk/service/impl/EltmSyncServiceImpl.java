@@ -1,6 +1,7 @@
 package com.eksjk.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.eksjk.common.constant.AuditStatusConstants;
 import com.eksjk.mapper.EltmCaseMapper;
 import com.eksjk.mapper.PatientMapper;
 import com.eksjk.model.entity.EltmCase;
@@ -172,7 +173,7 @@ public class EltmSyncServiceImpl implements EltmSyncService {
         patient.setModifyTime(LocalDateTime.now());
 
         if (isNew) {
-            patient.setAuditStatus("pending_review");
+            patient.setAuditStatus(AuditStatusConstants.PENDING_UPLOAD);
             patientMapper.insert(patient);
             // 创建 EltmCase 子表记录
             EltmCase eltmCase = new EltmCase();

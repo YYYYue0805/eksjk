@@ -2,6 +2,7 @@ package com.eksjk.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.eksjk.common.constant.AuditStatusConstants;
 import com.eksjk.common.exception.BusinessException;
 import com.eksjk.common.util.HashidsUtil;
 import com.eksjk.common.util.SecurityUtil;
@@ -78,6 +79,9 @@ public class FollowUpServiceImpl implements FollowUpService {
         Patient patient = patientMapper.selectById(patientId);
         if (patient == null || "0".equals(patient.getDelFlg())) {
             throw new BusinessException("关联的病例不存在");
+        }
+        if (AuditStatusConstants.DRAFT.equals(patient.getAuditStatus())) {
+            throw new BusinessException("该病例为草稿，请先完善必填信息并提交审核后再录入随访数据");
         }
 
         PatientFollowUp followUp = new PatientFollowUp();

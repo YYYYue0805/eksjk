@@ -2,6 +2,7 @@ package com.eksjk.service.sync;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.eksjk.common.constant.AuditStatusConstants;
 import com.eksjk.mapper.*;
 import com.eksjk.model.entity.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -139,7 +140,7 @@ public class DatamainSyncTxService {
         patient.setDelFlg("1");
         patient.setCaseNum(generateEltmCaseNum());
         patient.setOneTime(LocalDateTime.now());
-        patient.setAuditStatus("pending_review");
+        patient.setAuditStatus(AuditStatusConstants.PENDING_UPLOAD);
         patient.setImpPer("ELTM-SYNC");
         patient.setModifyPer("ELTM-SYNC");
     }

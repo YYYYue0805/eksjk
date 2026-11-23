@@ -3,7 +3,7 @@
     <el-upload
       :action="uploadUrl"
       :headers="uploadHeaders"
-      :data="{ patientId: patientId, category: 'image' }"
+      :data="{ patientId: patientId, category: category }"
       :on-success="handleUploadSuccess"
       :on-error="handleUploadError"
       :before-upload="beforeUpload"
@@ -80,7 +80,9 @@ import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
   patientId: { type: String, required: true },
-  disabled: { type: Boolean, default: false }
+  disabled: { type: Boolean, default: false },
+  // 附件分类（即后端存储子目录），不同模块用不同值区分
+  category: { type: String, default: 'image' }
 })
 
 const userStore = useUserStore()
@@ -119,7 +121,7 @@ watch(() => props.patientId, (val) => {
 async function loadFiles() {
   loading.value = true
   try {
-    const res = await getFileList(props.patientId, 'image')
+    const res = await getFileList(props.patientId, props.category)
     files.value = res.data || []
     // 清除旧的 blob URL 缓存
     Object.values(blobUrls.value).forEach(url => URL.revokeObjectURL(url))

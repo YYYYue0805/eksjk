@@ -951,6 +951,10 @@ function parseEyeExam(json) {
 }
 
 async function handleSave() {
+  if (!formData.patientId) {
+    ElMessage.warning('请先保存病例后再录入随访数据')
+    return
+  }
   try {
     calcBmi()
     await formRef.value?.validate()

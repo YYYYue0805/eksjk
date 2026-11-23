@@ -26,3 +26,40 @@ export function getDashboardNotices() {
     method: 'get'
   })
 }
+
+/**
+ * 获取参与医院列表（医院名 + 入组病例数 + 医生人数）
+ * @returns {Promise} 医院列表
+ */
+export function getHospitalStats() {
+  return request({
+    url: '/api/dashboard/hospitals',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取单个医院明细（入组人数、医生人数、随访完成度）
+ * @param {string} unitName 医院名称
+ * @returns {Promise} 医院明细
+ */
+export function getHospitalDetail(unitName) {
+  return request({
+    url: '/api/dashboard/hospitals/detail',
+    method: 'get',
+    params: { unitName }
+  })
+}
+
+/**
+ * 某病种在各医院的录入例数
+ * @param {string} diseaseName 病种显示名
+ * @returns {Promise} 医院录入明细
+ */
+export function getDiseaseHospitals(diseaseName) {
+  return request({
+    url: '/api/dashboard/disease/hospitals',
+    method: 'get',
+    params: { diseaseName }
+  })
+}

@@ -23,12 +23,6 @@
         <el-button v-if="diseaseType === 'eltm'" type="success" @click="handleSync" :loading="syncing">
           <el-icon><Refresh /></el-icon>同步数据
         </el-button>
-        <el-button v-if="diseaseType === 'eltm'" type="success" plain @click="handlePicSync" :loading="picSyncing">
-          <el-icon><Picture /></el-icon>补拉图片
-        </el-button>
-        <el-button v-if="diseaseType === 'eltm'" type="warning" @click="handleDiagnose" :loading="diagnosing">
-          <el-icon><Cpu /></el-icon>智能诊断
-        </el-button>
         <el-button v-if="diseaseType === 'eltm'" type="success" plain @click="handleConsentSync" :loading="consentSyncing">
           <el-icon><Document /></el-icon>同步知情同意书
         </el-button>
@@ -69,7 +63,12 @@
                @page-change="handlePageChange" @row-dblclick="handleView">
       <el-table-column type="selection" width="50" />
       <el-table-column v-if="diseaseType === 'eltm'" prop="disClassName" label="疾病类型" width="160" />
-      <el-table-column prop="caseNum" label="病例编号" width="160" show-overflow-tooltip />
+      <el-table-column prop="caseNum" label="病例编号" width="160" show-overflow-tooltip>
+        <template #default="{ row }">
+          <span>{{ row.caseNum }}</span>
+          <el-tag v-if="row.auditStatus === 'draft'" type="info" size="small" style="margin-left: 6px">草稿</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="姓名" width="100" />
       <el-table-column prop="sexName" label="性别" width="70" align="center" />
       <el-table-column prop="age" label="年龄" width="80" />
@@ -89,6 +88,8 @@
           <el-tag v-else-if="row.auditStatus === 'pending_review'" type="warning" size="small">待审核</el-tag>
           <el-tag v-else-if="row.auditStatus === 'pending_release'" type="primary" size="small">待发放</el-tag>
           <el-tag v-else-if="row.auditStatus === 'rejected'" type="danger" size="small">已驳回</el-tag>
+          <el-tag v-else-if="row.auditStatus === 'draft'" type="info" size="small">草稿</el-tag>
+          <el-tag v-else-if="row.auditStatus === 'pending_upload'" type="info" size="small">未上传</el-tag>
           <span v-else style="color: #909399">未知</span>
         </template>
       </el-table-column>
@@ -114,10 +115,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="doctorName" label="医生" width="100" show-overflow-tooltip />
-      <el-table-column label="操作" width="160" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleView(row)">
             查看
+          </el-button>
+          <el-button v-if="row.auditStatus === 'pending_upload'" link type="success" size="small"
+                     :loading="uploadingId === row.id" @click="handleSubmitAudit(row)">
+            上传
           </el-button>
           <el-button link type="primary" size="small" @click="handleEdit(row)">
             编辑
@@ -137,12 +142,12 @@
 import { shallowRef, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Download, Refresh, Cpu, ArrowDown, Document, Picture } from '@element-plus/icons-vue'
+import { Plus, Download, Refresh, ArrowDown, Document } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import DataTable from '@/components/DataTable.vue'
-import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType, getDiseaseTypeByCode } from '@/api/patient'
-import { syncEltmDataAsync, getEltmSyncStatus, diagnoseBatch, syncEltmPicsBatch } from '@/api/eltm'
+import { getPatientList, deletePatient, exportPatientExcel, diseaseTypes, getDisClassByType, getDiseaseTypeByCode, submitPatientAudit } from '@/api/patient'
+import { syncEltmDataAsync, getEltmSyncStatus } from '@/api/eltm'
 import { syncInformedConsent } from '@/api/informedConsent'
 
 const route = useRoute()
@@ -172,9 +177,8 @@ const tableData = shallowRef([])
 const total = ref(0)
 const loading = ref(false)
 const syncing = ref(false)
-const picSyncing = ref(false)
-const diagnosing = ref(false)
 const consentSyncing = ref(false)
+const uploadingId = ref('')
 
 // 监听日期范围变化
 watch(dateRange, (val) => {
@@ -266,6 +270,26 @@ async function handleDelete(row) {
   }
 }
 
+async function handleSubmitAudit(row) {
+  try {
+    await ElMessageBox.confirm(
+      '上传后该病例将进入审核发放模块，由审核人员进一步审核，是否继续？',
+      '上传审核',
+      { type: 'info', confirmButtonText: '上传' }
+    )
+  } catch { return }
+  uploadingId.value = row.id
+  try {
+    await submitPatientAudit(row.id)
+    ElMessage.success('已上传，等待审核')
+    loadData()
+  } catch (error) {
+    console.error('上传失败', error)
+  } finally {
+    uploadingId.value = ''
+  }
+}
+
 async function handleSync() {
   try {
     await ElMessageBox.confirm('将从外部系统同步ELTM数据，是否继续？', '确认同步', { type: 'info' })
@@ -308,44 +332,6 @@ async function pollSyncStatus() {
     }
   }
   ElMessage.warning('同步仍在后台执行，请稍后刷新列表查看')
-}
-
-async function handlePicSync() {
-  try {
-    await ElMessageBox.confirm('将对有图片记录的ELTM患者补拉 gettpbyid 数据，是否继续？', '确认补拉', { type: 'info' })
-  } catch { return }
-  picSyncing.value = true
-  try {
-    const res = await syncEltmPicsBatch()
-    const data = res.data || {}
-    ElMessage.success(`补拉完成：处理 ${data.processed || 0}/${data.total || 0}，成功 ${data.success || 0}，失败 ${data.failed || 0}`)
-  } catch (error) {
-    ElMessage.error('补拉图片失败，请检查外部系统连接')
-  } finally {
-    picSyncing.value = false
-  }
-}
-
-async function handleDiagnose() {
-  try {
-    await ElMessageBox.confirm(
-      '系统将根据检查指标自动分析所有未分类的ELTM病例，高置信度自动归类，不确定的标记为待审查。是否继续？',
-      '确认智能诊断',
-      { type: 'info', confirmButtonText: '开始诊断' }
-    )
-  } catch { return }
-  diagnosing.value = true
-  try {
-    const res = await diagnoseBatch()
-    const data = res.data || {}
-    const msg = `诊断完成：自动归类 ${data.autoClassified || 0} 例，建议归类 ${data.suggested || 0} 例，待审查 ${data.uncertain || 0} 例`
-    ElMessage.success(msg)
-    loadData()
-  } catch (error) {
-    ElMessage.error('智能诊断失败')
-  } finally {
-    diagnosing.value = false
-  }
 }
 
 async function handleConsentSync() {

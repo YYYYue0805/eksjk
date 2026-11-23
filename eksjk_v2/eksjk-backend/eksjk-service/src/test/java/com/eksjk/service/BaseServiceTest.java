@@ -10,6 +10,7 @@ import com.eksjk.model.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -61,9 +62,9 @@ public abstract class BaseServiceTest {
     /** 测试用密码（明文） */
     protected static final String TEST_PASSWORD = "Test@1234";
 
-    /** 测试用 BCrypt 密码（Test@1234 的 BCrypt 加密值） */
+    /** 测试用 BCrypt 密码（Test@1234 的 BCrypt 加密值，运行时生成以保证与明文一致） */
     protected static final String TEST_PASSWORD_BCRYPT =
-            "$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi";
+            new BCryptPasswordEncoder().encode(TEST_PASSWORD);
 
     // ==================== 生命周期 ====================
 
@@ -171,6 +172,14 @@ public abstract class BaseServiceTest {
         dto.setSex("男");
         dto.setHeight("120.5");
         dto.setWeight("25.0");
+        // 补齐必填信息，满足新建病例的完整性校验
+        dto.setMedrecNum("TEST0001");
+        dto.setBirthTime(LocalDateTime.of(2015, 1, 1, 0, 0));
+        dto.setSelfTel("13800000000");
+        dto.setCard("110101201501011234");
+        dto.setBwt("3.2");
+        dto.setGesWeek("39");
+        dto.setCesaSec("0");
         return dto;
     }
 

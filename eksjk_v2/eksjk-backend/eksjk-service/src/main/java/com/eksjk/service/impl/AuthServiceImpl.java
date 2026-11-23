@@ -1,5 +1,6 @@
 package com.eksjk.service.impl;
 
+import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.eksjk.common.constant.CommonConstants;
@@ -34,6 +35,12 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
 
     private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+
+    /** 普通登录 Token 有效期（秒），与 application.yml 的 sa-token.timeout 保持一致：24 小时 */
+    private static final long DEFAULT_LOGIN_TIMEOUT = 86400L;
+
+    /** 勾选“记住登录状态”的 Token 有效期（秒）：7 天 */
+    private static final long REMEMBER_ME_LOGIN_TIMEOUT = 604800L;
 
     @Override
     public LoginVO login(LoginDTO loginDTO, String ip) {
@@ -80,8 +87,11 @@ public class AuthServiceImpl implements AuthService {
         // 4. 确定角色标识
         String roleCode = resolveRoleCode(user);
 
-        // 5. Sa-Token 登录，携带角色和医院信息
-        StpUtil.login(user.getId());
+        // 5. Sa-Token 登录，按“记住登录状态”签发不同有效期的 Token，并携带角色和医院信息
+        long timeout = Boolean.TRUE.equals(loginDTO.getRememberMe())
+                ? REMEMBER_ME_LOGIN_TIMEOUT
+                : DEFAULT_LOGIN_TIMEOUT;
+        StpUtil.login(user.getId(), new SaLoginModel().setTimeout(timeout));
         StpUtil.getSession()
                 .set("roleCode", roleCode)
                 .set("hospitalId", user.getUnit() != null ? user.getUnit() : "")
